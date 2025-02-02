@@ -1,0 +1,97 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="GOST_Control.GOST_Сheck"
+        Title="Проверка на ГОСТ">
+	<Border BorderThickness="2"
+			BorderBrush="Aqua">
+		<Grid Name="GostControl_Сheck_Okko"
+			  ColumnDefinitions="*,*,*"
+			  RowDefinitions="*,*,*"
+			  ShowGridLines="True">
+
+
+			<StackPanel Grid.ColumnSpan="3"
+						Grid.Row="0"
+						HorizontalAlignment="Center"
+						VerticalAlignment="Center">
+				
+			<TextBlock Name="GostControl"
+					   Text="Проверка соответствия ГОСТ"
+					   FontWeight="Bold"
+					   FontSize="30"/>
+
+			<TextBlock Name="ErrorControlGost"
+					   Margin="0 5 0 0"
+					   Text="Проверка ErrorControlGost"
+					   FontWeight="Bold"
+					   FontSize="30"/>
+
+				<TextBlock Name="ErrorControl"
+						   Margin="0 5 0 0"
+						   Text="Проверка ErrorControl"
+						   FontWeight="Bold"
+						   FontSize="30"/>
+
+
+
+
+				<TextBlock Name="ErrorControlFontBD"
+						   Margin="0 5 0 0"
+						   Text="Проверка ErrorControlFontBD"
+						   FontWeight="Bold"
+						   FontSize="30"/>
+				
+			</StackPanel>
+
+			<TextBlock Grid.ColumnSpan="3"
+					   Grid.Row="1"
+					   Name="FilePathTextBlock"
+					   Text="Путь к выбранному файлу"
+					   FontWeight="Bold"
+					   FontSize="14"
+					   HorizontalAlignment="Center"
+					   VerticalAlignment="Center"
+					   Foreground="Black"/>
+			
+			
+			<Button Name="SelectFile"
+					Click="Button_Click_SelectFile"
+					CornerRadius="10"
+					BorderThickness="2"
+					BorderBrush="Aqua"
+					Height="33"
+					VerticalAlignment="Bottom"
+					HorizontalAlignment="Center"
+					Background="Wheat"
+					Grid.Column="1"
+					Grid.Row="1">
+				<TextBlock Text="Проверить на ГОСТ"
+						   FontWeight="Bold"
+						   HorizontalAlignment="Center"
+						   VerticalAlignment="Center"/>
+			</Button>
+			
+			<Button Name="LogOut"
+					Click="Button_Click_LogOut"
+					CornerRadius="10"
+					BorderThickness="2"
+					BorderBrush="Aqua"
+					Height="33"
+					Margin="10"
+					VerticalAlignment="Top"
+					HorizontalAlignment="Right"
+					Background="Wheat"
+					Grid.Column="2"
+					Grid.Row="0">
+				<TextBlock Text="Закрыть"
+						   FontWeight="Bold"
+						   HorizontalAlignment="Center"
+						   VerticalAlignment="Center"/>
+			</Button>
+
+		</Grid>
+	</Border>
+</Window>

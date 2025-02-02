@@ -1,0 +1,24 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="GOST_Control.App"
+             RequestedThemeVariant="Default">
+             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+
+    <Application.Styles>
+
+		<Style Selector="Grid.ThemeBlack">
+			<Setter Property="Background" Value="#181368"/>
+		</Style>
+
+		<Style Selector="Window">
+			<Setter Property="MaxHeight" Value="980"/>
+			<Setter Property="MinHeight" Value="650"/>
+			<Setter Property="MaxWidth" Value="1900"/>
+			<Setter Property="MinWidth" Value="1000"/>
+			<Setter Property="FontFamily" Value="Comic Sans MS"/>
+			<Setter Property="WindowStartupLocation" Value="CenterScreen"/>
+		</Style>
+		
+		<FluentTheme />
+    </Application.Styles>
+</Application>
