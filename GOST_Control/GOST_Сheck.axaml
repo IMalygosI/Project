@@ -12,40 +12,99 @@
 			  RowDefinitions="*,*,*"
 			  ShowGridLines="True">
 
+			
+			
+			
+			
 
-			<StackPanel Grid.ColumnSpan="3"
-						Grid.Row="0"
+			<StackPanel Grid.Column="0"
+						Grid.Row="1"
 						HorizontalAlignment="Center"
 						VerticalAlignment="Center">
 				
 			<TextBlock Name="GostControl"
 					   Text="Проверка соответствия ГОСТ"
 					   FontWeight="Bold"
-					   FontSize="30"/>
-
+					   FontSize="30"/>				
+				
+			<!-- Проверка есть ли ГОСТ в базе данных -->				
 			<TextBlock Name="ErrorControlGost"
 					   Margin="0 5 0 0"
-					   Text="Проверка ErrorControlGost"
+					   Text=""
 					   FontWeight="Bold"
 					   FontSize="30"/>
 
+				<!-- Проверка Удалось ли открыть документ -->
 				<TextBlock Name="ErrorControl"
 						   Margin="0 5 0 0"
-						   Text="Проверка ErrorControl"
+						   Text=""
+						   FontWeight="Bold"
+						   FontSize="30"/>
+
+				<!-- Проверка на соответствие шрифта -->
+				<TextBlock Name="ErrorControlFont"
+						   Margin="0 5 0 0"
+						   Text=""
+						   FontWeight="Bold"
+						   FontSize="30"/>
+
+				<!-- Проверка на соответствие размера шрифта -->
+				<TextBlock Name="ErrorControlFontSize"
+						   Margin="0 5 0 0"
+						   Text=""
 						   FontWeight="Bold"
 						   FontSize="30"/>
 
 
 
 
-				<TextBlock Name="ErrorControlFontBD"
+
+
+
+
+
+
+
+
+
+				<!-- Проверка на Поля документа -->
+				<TextBlock Name="ErrorControlMargins"
 						   Margin="0 5 0 0"
-						   Text="Проверка ErrorControlFontBD"
+						   Text=""
+						   FontWeight="Bold"
+						   FontSize="30"/>
+
+
+
+
+				<!--  Поля документа -->
+				<TextBlock Name="ErrorControlMarginsTOP"
+						   Margin="0 5 0 0"
+						   Text=""
+						   FontWeight="Bold"
+						   FontSize="30"/>
+				<TextBlock Name="ErrorControlMarginsBOTTON"
+						   Margin="0 5 0 0"
+						   Text=""
+						   FontWeight="Bold"
+						   FontSize="30"/>
+				<TextBlock Name="ErrorControlMarginsLEFT"
+						   Margin="0 5 0 0"
+						   Text=""
+						   FontWeight="Bold"
+						   FontSize="30"/>
+				<TextBlock Name="ErrorControlMarginsRIGHT"
+						   Margin="0 5 0 0"
+						   Text=""
 						   FontWeight="Bold"
 						   FontSize="30"/>
 				
 			</StackPanel>
 
+			
+			
+			
+			
 			<TextBlock Grid.ColumnSpan="3"
 					   Grid.Row="1"
 					   Name="FilePathTextBlock"

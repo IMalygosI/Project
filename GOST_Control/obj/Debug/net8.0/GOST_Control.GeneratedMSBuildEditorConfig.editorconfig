@@ -23,17 +23,17 @@ build_property.EnforceExtendedAnalyzerRules =
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = GOST_Control
-build_property.ProjectDir = C:\Users\dimau\source\repos\GOST_Control\GOST_Control\
+build_property.ProjectDir = C:\Users\dimau\Desktop\Диплом\Project\GOST_Control\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.EffectiveAnalysisLevelStyle = 8.0
 build_property.EnableCodeStyleSeverity = 
 
-[C:/Users/dimau/source/repos/GOST_Control/GOST_Control/App.axaml]
+[C:/Users/dimau/Desktop/Диплом/Project/GOST_Control/App.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
-[C:/Users/dimau/source/repos/GOST_Control/GOST_Control/GOST_Сheck.axaml]
+[C:/Users/dimau/Desktop/Диплом/Project/GOST_Control/GOST_Сheck.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
-[C:/Users/dimau/source/repos/GOST_Control/GOST_Control/MainWindow.axaml]
+[C:/Users/dimau/Desktop/Диплом/Project/GOST_Control/MainWindow.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
