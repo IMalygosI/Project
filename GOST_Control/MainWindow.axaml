@@ -2,8 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-		WindowStartupLocation="CenterScreen"
+        mc:Ignorable="d" d:DesignWidth="1900" d:DesignHeight="980"
         x:Class="GOST_Control.MainWindow"
         Title="Главное окно">
 	<Border BorderThickness="2"
@@ -40,11 +39,12 @@
 			</Button>
 
 			<Button Name="Setting"
+					Click="Button_Click_Setting"
 					CornerRadius="10"
 					BorderThickness="2"
 					BorderBrush="Aqua"
 					Background="Wheat"
-					Height="40"
+					Height="33"
 					Width="150"
 					Margin="10"
 					VerticalAlignment="Top"

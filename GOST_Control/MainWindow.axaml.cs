@@ -12,8 +12,6 @@ namespace GOST_Control
             InitializeComponent();
         }
 
-
-
         private readonly FileDialogFilter fileFilter = new()
         {
             Extensions = new List<string>() { "doc", "docx" }, // Допустимые форматы
@@ -50,28 +48,12 @@ namespace GOST_Control
             }
             catch { }
         }
-        /*
-        private async Task ProcessSelectedFileAsync(string filePath)
+
+        private void Button_Click_Setting(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
         {
-            try
-            {
-                // Проверка существования файла
-                if (!File.Exists(filePath))
-                    throw new FileNotFoundException("Файл не найден", filePath);
-                // Имитация обработки файла (вместо этого добавьте реальную логику)
-                string fileName = Path.GetFileName(filePath);
-                long fileSize = new FileInfo(filePath).Length;
-                // Копируем файл в папку проекта (по аналогии с изображениями)
-                string destinationPath = Path.Combine("ProcessedDocs", fileName);
-                // Убедимся, что папка существует
-                Directory.CreateDirectory("ProcessedDocs");
-                // Копируем файл
-                await Task.Run(() => File.Copy(filePath, destinationPath, overwrite: true));
-            }
-            catch { }
-        }
-        */
-
-
+            Settings settings = new Settings();
+            settings.Show();
+            Close();
+        }   
     }
 }

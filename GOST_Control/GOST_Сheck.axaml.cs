@@ -69,7 +69,6 @@ public partial class GOST_Сheck : Window
                         ErrorControl.Text = "Не удалось открыть документ.";
                     }
 
-
                     // Забираем текст из документа
                     var body = wordDoc.MainDocumentPart.Document.Body;
 
@@ -81,7 +80,7 @@ public partial class GOST_Сheck : Window
                     // Проверка типа шрифта
                     if (!string.IsNullOrEmpty(gost.FontName))
                     {
-                        FontNameValid = CheckFont(gost.FontName, body);
+                        FontNameValid = CheckFontName(gost.FontName, body);
                     }
                     ErrorControlFont.Text += "Тип шрифта соответствует ГОСТу.";
 
@@ -226,12 +225,12 @@ public partial class GOST_Сheck : Window
     }
 
     /// <summary>
-    /// Смотрим тип шрифта
+    /// Смотрим наименование шрифта
     /// </summary>
     /// <param name="requiredFontName"></param>
     /// <param name="body"></param>
     /// <returns></returns>
-    private bool CheckFont(string requiredFontName, Body body)
+    private bool CheckFontName(string requiredFontName, Body body)
     {
         foreach (var paragraph in body.Elements<Paragraph>())
         {
