@@ -11,12 +11,18 @@
 		</Style>
 
 		<Style Selector="Window">
-			<Setter Property="MaxHeight" Value="980"/>
-			<Setter Property="MinHeight" Value="650"/>
-			<Setter Property="MaxWidth" Value="1900"/>
-			<Setter Property="MinWidth" Value="1000"/>
+			
 			<Setter Property="FontFamily" Value="Comic Sans MS"/>
+			
 			<Setter Property="WindowStartupLocation" Value="CenterScreen"/>
+			
+			<Setter Property="WindowState" Value="Maximized"/>
+
+			<Setter Property="MaxHeight" Value="1080"/>
+			<Setter Property="MinHeight" Value="650"/>
+			<Setter Property="MaxWidth" Value="1920"/>
+			<Setter Property="MinWidth" Value="700"/>
+
 		</Style>
 		
 		<FluentTheme />

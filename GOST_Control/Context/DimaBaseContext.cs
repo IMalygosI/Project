@@ -36,6 +36,7 @@ public partial class DimaBaseContext : DbContext
             entity.Property(e => e.FontName).HasMaxLength(255);
             entity.Property(e => e.Name).HasMaxLength(255);
             entity.Property(e => e.RequiredSections).HasColumnType("character varying");
+            entity.Property(e => e.TextAlignment).HasColumnType("character varying");
         });
 
         OnModelCreatingPartial(modelBuilder);

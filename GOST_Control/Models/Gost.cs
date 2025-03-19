@@ -26,4 +26,10 @@ public partial class Gost
     public bool? PageNumbering { get; set; }
 
     public string? RequiredSections { get; set; }
+
+    public double? LineSpacing { get; set; }
+
+    public double? FirstLineIndent { get; set; }
+
+    public string? TextAlignment { get; set; }
 }

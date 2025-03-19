@@ -1,10 +1,12 @@
 using System;
 using System.IO;
 using System.Linq;  // Для методов расширений LINQ
+using System.Text;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using GOST_Control.Context;
@@ -46,11 +48,13 @@ public partial class GOST_Сheck : Window
         if (gost == null)
         {
             ErrorControlGost.Text = "ГОСТ не найден в базе данных.";
+            ErrorControlGost.Foreground = Brushes.Red; // Красный цвет
             return;
         }
         else
         {
             ErrorControlGost.Text = "ГОСТ найден в базе данных.";
+            ErrorControlGost.Foreground = Brushes.Green; // Зеленый цвет
         }
 
         if (!string.IsNullOrEmpty(gost.FontName) || gost.FontSize.HasValue)
@@ -63,10 +67,12 @@ public partial class GOST_Сheck : Window
                     if (wordDoc != null)
                     {
                         ErrorControl.Text = "Удалось открыть документ.";
+                        ErrorControl.Foreground = Brushes.Green; // Зеленый цвет
                     }
                     else
                     {
                         ErrorControl.Text = "Не удалось открыть документ.";
+                        ErrorControl.Foreground = Brushes.Red; // Красный цвет
                     }
 
                     // Забираем текст из документа
@@ -76,13 +82,19 @@ public partial class GOST_Сheck : Window
                     bool FontNameValid = true;
                     bool FontSizeValid = true;
                     bool MarginsValid = true;
+                    bool LineSpacingValid = true;
+                    bool FirstLineIndentValid = true;
+                    bool TextAlignmentValid = true;
+
+
 
                     // Проверка типа шрифта
                     if (!string.IsNullOrEmpty(gost.FontName))
                     {
                         FontNameValid = CheckFontName(gost.FontName, body);
                     }
-                    ErrorControlFont.Text += "Тип шрифта соответствует ГОСТу.";
+                    ErrorControlFont.Text = "Тип шрифта соответствует ГОСТу.";
+                    ErrorControlFont.Foreground = Brushes.Green; // Зеленый цвет
 
                     // Проверка размера шрифта
                     if (gost.FontSize.HasValue)
@@ -90,40 +102,87 @@ public partial class GOST_Сheck : Window
                         FontSizeValid = CheckFontSize(gost.FontSize, body);
                     }
                     ErrorControlFontSize.Text = "Размер шрифта соответствует госту!";
+                    ErrorControlFontSize.Foreground = Brushes.Green; // Зеленый цвет
 
                     // Проверка полей документа
                     MarginsValid = CheckMargins(gost.MarginTop, gost.MarginBottom, gost.MarginLeft, gost.MarginRight, body);
                     ErrorControlMargins.Text = "Поля документа соответствуют ГОСТу.";
+                    ErrorControlMargins.Foreground = Brushes.Green; // Зеленый цвет
+
+                    // Проверка межстрочного интервала
+                    if (gost.LineSpacing.HasValue)
+                    {
+                        LineSpacingValid = CheckLineSpacing(gost.LineSpacing, body);
+                    }
+                    ErrorControlMnochitel.Text = "Межстрочный интервал соответствует ГОСТу.";
+                    ErrorControlMnochitel.Foreground = Brushes.Green; // Зеленый цвет
+
+                    // Проверка отступа  
+                    if (gost.FirstLineIndent.HasValue)
+                    {
+                        FirstLineIndentValid = CheckFirstLineIndent(gost.FirstLineIndent, body);
+                    }
+                    ErrorControlFirstLineIndent.Text = "Отступ соответствует ГОСТу.";
+                    ErrorControlFirstLineIndent.Foreground = Brushes.Green; // Зеленый цвет
+
+                    // Проверка выравнивания текста
+                    if (!string.IsNullOrEmpty(gost.TextAlignment))
+                    {
+                        TextAlignmentValid = CheckTextAlignment(gost.TextAlignment, body);
+                    }
+                    ErrorControlViravnivanie.Text = "Выравнивание текста соответствует ГОСТу.";
+                    ErrorControlViravnivanie.Foreground = Brushes.Green; // Зеленый цвет
 
 
 
                     // Обновляем UI в зависимости от результатов проверки
-                    if (FontNameValid && FontSizeValid && MarginsValid)
+                    if (FontNameValid && FontSizeValid && MarginsValid && LineSpacingValid && FirstLineIndentValid && TextAlignmentValid)
                     {
                         GostControl.Text = "Документ соответствует ГОСТу.";
+                        GostControl.Foreground = Brushes.Green; // Зеленый цвет
                     }
                     else
                     {
                         GostControl.Text = "Документ не соответствует ГОСТу:";
+                        GostControl.Foreground = Brushes.Red; // Красный цвет
 
                         if (!FontNameValid)
                         {
                             ErrorControlFont.Text = "Тип шрифта не соответствует.";
+                            ErrorControlFont.Foreground = Brushes.Red; // Красный цвет
                         }
                         if (!FontSizeValid)
                         {
                             ErrorControlFontSize.Text = "Размер шрифта не соответствует.";
+                            ErrorControlFontSize.Foreground = Brushes.Red; // Красный цвет
                         }
                         if (!MarginsValid)
                         {
                             ErrorControlMargins.Text = "Поля документа не соответствуют ГОСТу.";
+                            ErrorControlMargins.Foreground = Brushes.Red; // Красный цвет
+                        }                        
+                        if (!LineSpacingValid)
+                        {
+                            ErrorControlMnochitel.Text = "Межстрочный интервал не соответствует ГОСТу.";
+                            ErrorControlMnochitel.Foreground = Brushes.Red; // Красный цвет
+                        }
+                        if (!FirstLineIndentValid)
+                        {
+                            ErrorControlFirstLineIndent.Text = "Отступ не соответствует ГОСТу.";
+                            ErrorControlFirstLineIndent.Foreground = Brushes.Red; // Красный цвет
+                        }
+                        if (!TextAlignmentValid)
+                        {
+                            ErrorControlViravnivanie.Text = "Выравнивание текста не соответствует ГОСТу.";
+                            ErrorControlViravnivanie.Foreground = Brushes.Red; // Красный цвет
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                GostControl.Text = $"Ошибка при открытии документа: {ex.Message}";
+                GostControl.Text = $"Ошибка при открытии документа! Закройте докуммент!";
+                GostControl.Foreground = Brushes.Red; // Красный цвет
             }
         }
     }
@@ -136,15 +195,114 @@ public partial class GOST_Сheck : Window
 
 
 
+    /// <summary>
+    /// Проверка на выравнивание 
+    /// </summary>
+    /// <param name="requiredAlignment"></param>
+    /// <param name="body"></param>
+    /// <returns></returns>
+    private bool CheckTextAlignment(string requiredAlignment, Body body)
+    {
+        foreach (var paragraph in body.Elements<Paragraph>())
+        {
+            var paragraphProperties = paragraph.ParagraphProperties;
+            if (paragraphProperties == null) continue;
 
+            var justification = paragraphProperties.Justification; // Выравнивание текста
+            if (justification == null) continue;
 
+            // Получаем текущее выравнивание
+            string currentAlignment;
 
+            if (justification.Val?.Value == JustificationValues.Left)
+            {
+                currentAlignment = "Left";
+            }
+            else if (justification.Val?.Value == JustificationValues.Center)
+            {
+                currentAlignment = "Center";
+            }
+            else if (justification.Val?.Value == JustificationValues.Right)
+            {
+                currentAlignment = "Right";
+            }
+            else if (justification.Val?.Value == JustificationValues.Both)
+            {
+                currentAlignment = "Justify";
+            }
+            else
+            {
+                currentAlignment = "Left";
+            }
 
+            // Сравниваем с требуемым выравниванием
+            if (currentAlignment != requiredAlignment)
+            {
+                return false; // Выравнивание не соответствует ГОСТу
+            }
+        }
+        return true; // Всё соответствует ГОСТу
+    }
 
+    /// <summary>
+    /// Проверка на отступы
+    /// </summary>
+    /// <param name="requiredFirstLineIndent"></param>
+    /// <param name="body"></param>
+    /// <returns></returns>
+    private bool CheckFirstLineIndent(double? requiredFirstLineIndent, Body body)
+    {
+        foreach (var paragraph in body.Elements<Paragraph>())
+        {
+            var paragraphProperties = paragraph.ParagraphProperties;
+            if (paragraphProperties == null) continue;
 
+            var indent = paragraphProperties.Indentation;
+            if (indent == null) continue;
 
+            if (indent.FirstLine != null)
+            {
+                double firstLineIndentInCm = double.Parse(indent.FirstLine.Value) / 567.0; // 1 см = 567 twips
 
+                double tolerance = 0.01;
 
+                if (Math.Abs(firstLineIndentInCm - requiredFirstLineIndent.Value) > tolerance)
+                {
+                    return false; 
+                }
+            }
+        }
+        return true; 
+    }
+
+    /// <summary>
+    /// Проверка межстрочного интервала на соответствие ГОСТу
+    /// </summary>
+    /// <param name="requiredLineSpacing"></param>
+    /// <param name="body"></param>
+    /// <returns></returns>
+    private bool CheckLineSpacing(double? requiredLineSpacing, Body body)
+    {
+        foreach (var paragraph in body.Elements<Paragraph>())
+        {
+            var paragraphProperties = paragraph.ParagraphProperties;
+            if (paragraphProperties == null) continue;
+
+            var spacing = paragraphProperties.SpacingBetweenLines;
+            if (spacing == null) continue;
+
+            if (spacing.Line != null && spacing.LineRule == LineSpacingRuleValues.Auto)
+            {
+                double lineSpacing = double.Parse(spacing.Line.Value) / 240.0; // 240 = 1 строка
+
+                if (Math.Abs(lineSpacing - requiredLineSpacing.Value) > 0.01) // Допустимая погрешность
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 
     /// <summary>
     /// Метод проверки полей документа
@@ -203,10 +361,7 @@ public partial class GOST_Сheck : Window
                     // Преобразуем значение размера шрифта из строки в double
                     if (double.TryParse(fontSizeElement.Val.Value, out double fontSize))
                     {
-                        // Размер шрифта в документах Word измеряется в "полуточках" (1/20 точки)
-                        // Переводим размер шрифта из полуточек в пункты (1 пункт = 2 полуточки)
                         double fontSizeInPoints = fontSize / 2;
-
                         // Сравниваем с требуемым размером шрифта
                         if (fontSizeInPoints != requiredFontSize.Value)
                         {
@@ -215,13 +370,12 @@ public partial class GOST_Сheck : Window
                     }
                     else
                     {
-                        // Если не удалось преобразовать размер шрифта в число, считаем это ошибкой
                         return false;
                     }
                 }
             }
         }
-        return true; // Всё соответствует ГОСТу
+        return true;
     }
 
     /// <summary>
