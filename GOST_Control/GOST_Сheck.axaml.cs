@@ -78,15 +78,16 @@ public partial class GOST_Сheck : Window
                     // Забираем текст из документа
                     var body = wordDoc.MainDocumentPart.Document.Body;
 
-                    // Проверки ГОСТа
+                    // Поля проверки ГОСТа
                     bool FontNameValid = true;
                     bool FontSizeValid = true;
                     bool MarginsValid = true;
                     bool LineSpacingValid = true;
                     bool FirstLineIndentValid = true;
                     bool TextAlignmentValid = true;
+                    bool PageNumberingValid = true;
 
-
+                    // Запуск проверок документа на ГОСТ
 
                     // Проверка типа шрифта
                     if (!string.IsNullOrEmpty(gost.FontName))
@@ -133,10 +134,33 @@ public partial class GOST_Сheck : Window
                     ErrorControlViravnivanie.Text = "Выравнивание текста соответствует ГОСТу.";
                     ErrorControlViravnivanie.Foreground = Brushes.Green; // Зеленый цвет
 
+                    // Проверка нумерации страниц
+                    if (!string.IsNullOrEmpty(gost.CheckPageNumbering))
+                    {
+                        PageNumberingValid = CheckPageNumbering(wordDoc, gost.CheckPageNumbering);
+                        if (PageNumberingValid)
+                        {
+                            ErrorControlNumberPage.Text = "Нумерация страниц соответствует ГОСТу.";
+                            ErrorControlNumberPage.Foreground = Brushes.Green; // Зеленый цвет
+                        }
+                        else
+                        {
+                            ErrorControlNumberPage.Text = "Нумерация страниц не соответствует ГОСТу.";
+                            ErrorControlNumberPage.Foreground = Brushes.Red; // Красный цвет
+                        }
+                    }
+                    else
+                    {
+                        ErrorControlNumberPage.Text = "Нумерация страниц не требуется.";
+                        ErrorControlNumberPage.Foreground = Brushes.Gray; // Серый цвет
+                    }
+                    
 
 
-                    // Обновляем UI в зависимости от результатов проверки
-                    if (FontNameValid && FontSizeValid && MarginsValid && LineSpacingValid && FirstLineIndentValid && TextAlignmentValid)
+
+                    // ВЫВОДИМ РЕЗУЛЬТАТ ПРОВЕРКИ ДОКУМЕНТА
+                    if (FontNameValid && FontSizeValid && MarginsValid && LineSpacingValid 
+                       && FirstLineIndentValid && TextAlignmentValid && PageNumberingValid)
                     {
                         GostControl.Text = "Документ соответствует ГОСТу.";
                         GostControl.Foreground = Brushes.Green; // Зеленый цвет
@@ -176,6 +200,11 @@ public partial class GOST_Сheck : Window
                             ErrorControlViravnivanie.Text = "Выравнивание текста не соответствует ГОСТу.";
                             ErrorControlViravnivanie.Foreground = Brushes.Red; // Красный цвет
                         }
+                        if (!PageNumberingValid)
+                        {
+                            ErrorControlNumberPage.Text = "Нумерация страниц не соответствует ГОСТу.";
+                            ErrorControlNumberPage.Foreground = Brushes.Red; // Красный цвет
+                        }
                     }
                 }
             }
@@ -194,6 +223,103 @@ public partial class GOST_Сheck : Window
 
 
 
+
+
+    /// <summary>
+    /// Проверка на нумерацию
+    /// </summary>
+    /// <param name="wordDoc"></param>
+    /// <param name="requiredAlignment"></param>
+    /// <returns></returns>
+    private bool CheckPageNumbering(WordprocessingDocument wordDoc, string requiredAlignment)
+    {
+        // Если выравнивание не указано, нумерация не требуется
+        if (string.IsNullOrEmpty(requiredAlignment))
+        {
+            return true;
+        }
+
+        // Нижний колонтитул
+        if (wordDoc.MainDocumentPart.FooterParts != null)
+        {
+            foreach (var footerPart in wordDoc.MainDocumentPart.FooterParts)
+            {
+                var footer = footerPart.Footer;
+                if (footer != null)
+                {
+                    bool hasPageNumber = footer.Descendants<SimpleField>().Any(f => f.Instruction?.Value?.Contains("PAGE") == true);
+
+                    if (hasPageNumber)
+                    {
+                        // Проверяем выравнивание в нижнем колонтитуле
+                        foreach (var paragraph in footer.Descendants<Paragraph>())
+                        {
+                            var paragraphProperties = paragraph.ParagraphProperties;
+                            if (paragraphProperties == null) continue;
+
+                            var justification = paragraphProperties.Justification;
+                            if (justification == null) continue;
+
+                            // Проверяем
+                            if (requiredAlignment == "Center" && justification.Val?.Value == JustificationValues.Center)
+                            {
+                                return true;
+                            }
+                            if (requiredAlignment == "Right" && justification.Val?.Value == JustificationValues.Right)
+                            {
+                                return true;
+                            }
+                            if (requiredAlignment == "Left" && justification.Val?.Value == JustificationValues.Left)
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Верхний колонтитул
+        if (wordDoc.MainDocumentPart.HeaderParts != null)
+        {
+            foreach (var headerPart in wordDoc.MainDocumentPart.HeaderParts)
+            {
+                var header = headerPart.Header;
+                if (header != null)
+                {
+                    bool hasPageNumber = header.Descendants<SimpleField>().Any(f => f.Instruction?.Value?.Contains("PAGE") == true);
+
+                    if (hasPageNumber)
+                    {
+                        // Проверяем выравнивание в верхнем колонтитуле
+                        foreach (var paragraph in header.Descendants<Paragraph>())
+                        {
+                            var paragraphProperties = paragraph.ParagraphProperties;
+                            if (paragraphProperties == null) continue;
+
+                            var justification = paragraphProperties.Justification;
+                            if (justification == null) continue;
+
+                            // Проверяем
+                            if (requiredAlignment == "Center" && justification.Val?.Value == JustificationValues.Center)
+                            {
+                                return true;
+                            }
+                            if (requiredAlignment == "Right" && justification.Val?.Value == JustificationValues.Right)
+                            {
+                                return true;
+                            }
+                            if (requiredAlignment == "Left" && justification.Val?.Value == JustificationValues.Left)
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
 
     /// <summary>
     /// Проверка на выравнивание 

@@ -33,6 +33,7 @@ public partial class DimaBaseContext : DbContext
             entity.Property(e => e.GostId)
                 .UseIdentityAlwaysColumn()
                 .HasColumnName("GostID");
+            entity.Property(e => e.CheckPageNumbering).HasColumnType("character varying");
             entity.Property(e => e.FontName).HasMaxLength(255);
             entity.Property(e => e.Name).HasMaxLength(255);
             entity.Property(e => e.RequiredSections).HasColumnType("character varying");

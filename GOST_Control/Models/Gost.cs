@@ -32,4 +32,6 @@ public partial class Gost
     public double? FirstLineIndent { get; set; }
 
     public string? TextAlignment { get; set; }
+
+    public string? CheckPageNumbering { get; set; }
 }
