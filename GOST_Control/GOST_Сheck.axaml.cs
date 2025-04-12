@@ -9,20 +9,32 @@ using Avalonia.Threading;
 using DocumentFormat.OpenXml.Drawing.Charts;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
+using Style = DocumentFormat.OpenXml.Wordprocessing.Style;
 
 namespace GOST_Control
 {
+    /// <summary>
+    /// Класс для проверок ГОСТа на соответствие заданным требованиям
+    /// </summary>
     public partial class GOST_Сheck : Window
     {
-        private readonly string _filePath;
-        private JsonGostService _gostService;
-        private readonly Task _initializationTask;
+        private readonly string _filePath; // Путь к файлу документа, который будет проверяться на соответствие ГОСТу
+        private JsonGostService _gostService; // Сервис для работы с данными ГОСТов из JSON-файла
+        private readonly Task _initializationTask; // Задача инициализации сервиса ГОСТов, запускаемая при создании экземпляра класса
 
+        /// <summary>
+        // Конструктор по умолчанию класса GOST_Сheck. Инициализирует компоненты окна.
+        /// </summary>
         public GOST_Сheck()
         {
             InitializeComponent();
         }
 
+        /// <summary>
+        /// Конструктор класса GOST_Сheck с параметром пути к файлу.
+        /// Инициализирует компоненты окна и запускает асинхронную инициализацию сервиса ГОСТов.
+        /// </summary>
+        /// <param name="filePath"></param>
         public GOST_Сheck(string filePath)
         {
             InitializeComponent();
@@ -32,6 +44,11 @@ namespace GOST_Control
             _initializationTask = InitializeAsync();
         }
 
+        /// <summary>
+        /// Асинхронно инициализирует сервис для работы с ГОСТами из JSON-файла.
+        /// Обновляет UI с информацией о пути к файлу или ошибкой загрузки.
+        /// </summary>
+        /// <returns></returns>
         private async Task InitializeAsync()
         {
             try
@@ -61,7 +78,7 @@ namespace GOST_Control
         }
 
         /// <summary>
-        /// Основной метод проверки документа на соответствие ГОСТу
+        /// Основной метод проверки-"вызова проверок" документа на соответствие ГОСТу
         /// </summary>
         /// <param name="filePath">Путь к проверяемому файлу</param>
         /// <param name="gostId">ID ГОСТа для проверки</param>
@@ -78,7 +95,7 @@ namespace GOST_Control
                 return;
             }
 
-            // Получаем ГОСТ из JSON файла
+            // Получение ГОСТ из JSON файла
             var gost = await GetGostByIdAsync(gostId);
 
             if (gost == null)
@@ -108,6 +125,13 @@ namespace GOST_Control
                         {
                             ErrorControl.Text = "Не удалось открыть документ.";
                             ErrorControl.Foreground = Brushes.Red;
+                        }
+
+                        bool stylesValid = CheckStyleFonts(wordDoc, gost);
+                        if (!stylesValid)
+                        {
+                            ErrorControlFont.Text = "Ошибка в стилях документа!";
+                            ErrorControlFont.Foreground = Brushes.Red;
                         }
 
                         var body = wordDoc.MainDocumentPart.Document.Body;
@@ -212,14 +236,13 @@ namespace GOST_Control
             }
         }
 
-
         /// <summary>
         /// Проверка обязательных разделов (Введение, Заключение и т.д.)
         /// </summary>
         private bool CheckRequiredSections(Gost gost, Body body)
         {
             if (string.IsNullOrEmpty(gost.RequiredSections))
-                return true; // Если разделы не требуются, проверка пройдена
+                return true;
 
             var requiredSections = gost.RequiredSections.Split(',')
                 .Select(s => s.Trim())
@@ -239,11 +262,11 @@ namespace GOST_Control
                 bool sectionFound = false;
                 bool sectionValid = true;
 
-                // Ищем параграфы, содержащие название раздела
+                // Ищем параграфы, содержащие название раздела (более гибкое сравнение)
                 foreach (var paragraph in body.Elements<Paragraph>())
                 {
                     var text = paragraph.InnerText.Trim();
-                    if (text.Equals(section, StringComparison.OrdinalIgnoreCase))
+                    if (text.IndexOf(section, StringComparison.OrdinalIgnoreCase) >= 0)
                     {
                         sectionFound = true;
 
@@ -259,7 +282,7 @@ namespace GOST_Control
                                     double fontSizeValue = double.Parse(fontSize.Val.Value) / 2;
                                     if (Math.Abs(fontSizeValue - gost.HeaderFontSize.Value) > 0.1)
                                     {
-                                        invalidSections.Add($"{section} (неверный размер шрифта)");
+                                        invalidSections.Add($"{section} (неверный размер шрифта: {fontSizeValue})");
                                         sectionValid = false;
                                         break;
                                     }
@@ -271,12 +294,6 @@ namespace GOST_Control
                                     break;
                                 }
                             }
-                            else
-                            {
-                                invalidSections.Add($"{section} (отсутствует Run)");
-                                sectionValid = false;
-                                break;
-                            }
                         }
 
                         // Проверяем выравнивание заголовка
@@ -287,11 +304,14 @@ namespace GOST_Control
 
                             if (currentAlignment != gost.HeaderAlignment)
                             {
-                                invalidSections.Add($"{section} (неверное выравнивание)");
+                                invalidSections.Add($"{section} (неверное выравнивание: {currentAlignment})");
                                 sectionValid = false;
                                 break;
                             }
                         }
+
+                        // Если нашли раздел и он соответствует требованиям, переходим к следующему
+                        if (sectionValid) break;
                     }
                 }
 
@@ -329,10 +349,170 @@ namespace GOST_Control
             return allSectionsFound && allSectionsValid;
         }
 
-        // Вспомогательный метод для получения строкового представления выравнивания
+
+        /// <summary>
+        /// Проверка типа шрифта (исключая заголовки)
+        /// </summary>
+        private bool CheckFontName(string requiredFontName, Body body, Gost gost)
+        {
+            var headerTexts = GetHeaderTexts(body, gost);
+            bool isValid = true;
+
+            foreach (var paragraph in body.Elements<Paragraph>())
+            {
+                if (headerTexts.Contains(paragraph.InnerText.Trim()) || IsEmptyParagraph(paragraph))
+                    continue;
+
+                foreach (var run in paragraph.Elements<Run>())
+                {
+                    var fontName = run.RunProperties?.RunFonts?.Ascii?.Value;
+                    if (fontName != null && fontName != requiredFontName)
+                    {
+                        Dispatcher.UIThread.Post(() => {
+                            ErrorControlFont.Text = "Неверный шрифт в основном тексте";
+                            ErrorControlFont.Foreground = Brushes.Red;
+                        });
+                        isValid = false;
+                        break;
+                    }
+                }
+                if (!isValid) break;
+            }
+            return isValid;
+        }
+
+
+        /// <summary>
+        /// Проверка размера шрифта (исключая заголовки)
+        /// </summary>
+        private bool CheckFontSize(double requiredFontSize, Body body, Gost gost)
+        {
+            var headerTexts = GetHeaderTexts(body, gost);
+            bool isValid = true;
+
+            foreach (var paragraph in body.Elements<Paragraph>())
+            {
+                if (headerTexts.Contains(paragraph.InnerText.Trim()) || IsEmptyParagraph(paragraph))
+                    continue;
+
+                var text = paragraph.InnerText.Trim();
+                if (headerTexts.Contains(text)) continue;
+
+                foreach (var run in paragraph.Elements<Run>())
+                {
+                    var fontSize = run.RunProperties?.FontSize;
+                    if (fontSize != null)
+                    {
+                        double fontSizeValue = double.Parse(fontSize.Val.Value) / 2;
+                        if (Math.Abs(fontSizeValue - requiredFontSize) > 0.1)
+                        {
+                            Dispatcher.UIThread.Post(() => {
+                                ErrorControlFontSize.Text = "Ошибка: неверный размер шрифта";
+                                ErrorControlFontSize.Foreground = Brushes.Red;
+                            });
+                            isValid = false;
+                            break;
+                        }
+                    }
+                }
+                if (!isValid) break;
+            }
+            return isValid;
+        }
+
+
+        /// <summary>
+        /// Проверка выравнивания текста (исключая заголовки)
+        /// </summary>
+        private bool CheckTextAlignment(string requiredAlignment, Body body, Gost gost)
+        {
+            var headerTexts = GetHeaderTexts(body, gost);
+            bool isValid = true;
+
+            foreach (var paragraph in body.Elements<Paragraph>())
+            {
+                // Пропускаем: 1) заголовки, 2) пустые параграфы
+                if (headerTexts.Contains(paragraph.InnerText.Trim()) || IsEmptyParagraph(paragraph))
+                    continue;
+
+                var currentAlignment = GetAlignmentString(paragraph.ParagraphProperties?.Justification);
+
+                if (currentAlignment != requiredAlignment)
+                {
+                    Dispatcher.UIThread.Post(() => {
+                        ErrorControlViravnivanie.Text = $"Ошибка: выравнивание {currentAlignment} (требуется {requiredAlignment})";
+                        ErrorControlViravnivanie.Foreground = Brushes.Red;
+                    });
+                    isValid = false;
+                    break;
+                }
+            }
+            return isValid;
+        }
+
+        /// <summary>
+        /// Получает тексты заголовков из тела документа на основе обязательных разделов ГОСТа
+        /// </summary>
+        /// <param name="body"></param>
+        /// <param name="gost"></param>
+        /// <returns></returns>
+        private HashSet<string> GetHeaderTexts(Body body, Gost gost)
+        {
+            var requiredSections = GetRequiredSectionsList(gost);
+            var headerTexts = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var paragraph in body.Elements<Paragraph>())
+            {
+                var text = paragraph.InnerText.Trim();
+                foreach (var section in requiredSections)
+                {
+                    if (text.IndexOf(section, StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
+                        headerTexts.Add(text);
+                        break;
+                    }
+                }
+            }
+            return headerTexts;
+        }
+
+        /// <summary>
+        /// Проверяет соответствие шрифтов в стилях документа требованиям ГОСТа
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <param name="gost"></param>
+        /// <returns></returns>
+        private bool CheckStyleFonts(WordprocessingDocument doc, Gost gost)
+        {
+            var stylesPart = doc.MainDocumentPart.StyleDefinitionsPart;
+            if (stylesPart == null) return true;
+
+            foreach (var style in stylesPart.Styles.Elements<Style>())
+            {
+                var justification = style.StyleParagraphProperties?.Justification;
+                if (justification != null)
+                {
+                    string alignment = GetAlignmentString(justification);
+                    string requiredAlignment = style.Type == StyleValues.Paragraph ?
+                        gost.TextAlignment : gost.HeaderAlignment;
+
+                    if (alignment != requiredAlignment)
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Преобразует объект выравнивания в строковое представление
+        /// </summary>
+        /// <param name="justification"></param>
+        /// <returns></returns>
         private string GetAlignmentString(Justification justification)
         {
-            if (justification == null) return "По левому краю";
+            if (justification == null) return "Left";
 
             string alignment;
 
@@ -360,143 +540,6 @@ namespace GOST_Control
             return alignment;
         }
 
-
-        /// <summary>
-        /// Получает список всех заголовков разделов из документа
-        /// </summary>
-        private List<Paragraph> GetAllSectionHeaders(Body body, Gost gost)
-        {
-            var requiredSections = GetRequiredSectionsList(gost);
-            var headers = new List<Paragraph>();
-
-            foreach (var paragraph in body.Elements<Paragraph>())
-            {
-                var text = paragraph.InnerText.Trim();
-                if (requiredSections.Any(s => text.Equals(s, StringComparison.OrdinalIgnoreCase)))
-                {
-                    headers.Add(paragraph);
-                }
-            }
-            return headers;
-        }
-
-        /// <summary>
-        /// Проверка типа шрифта (полностью исключая заголовки)
-        /// </summary>
-        private bool CheckFontName(string requiredFontName, Body body, Gost gost)
-        {
-            var headers = GetAllSectionHeaders(body, gost);
-
-            foreach (var paragraph in body.Elements<Paragraph>())
-            {
-                // Пропускаем все заголовки
-                if (headers.Contains(paragraph))
-                    continue;
-
-                foreach (var run in paragraph.Elements<Run>())
-                {
-                    var fontName = run.RunProperties?.RunFonts?.Ascii?.Value;
-                    if (fontName != null && fontName != requiredFontName)
-                    {
-                        Console.WriteLine($"Ошибка шрифта в тексте: {paragraph.InnerText}");
-                        return false;
-                    }
-                }
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// Проверка размера шрифта (полностью исключая заголовки)
-        /// </summary>
-        private bool CheckFontSize(double requiredFontSize, Body body, Gost gost)
-        {
-            var headers = GetAllSectionHeaders(body, gost);
-
-            foreach (var paragraph in body.Elements<Paragraph>())
-            {
-                // Пропускаем все заголовки
-                if (headers.Contains(paragraph))
-                    continue;
-
-                foreach (var run in paragraph.Elements<Run>())
-                {
-                    var fontSize = run.RunProperties?.FontSize;
-                    if (fontSize == null) continue;
-
-                    if (double.TryParse(fontSize.Val.Value, out double fontSizeValue))
-                    {
-                        double fontSizeInPoints = fontSizeValue / 2;
-                        if (Math.Abs(fontSizeInPoints - requiredFontSize) > 0.1)
-                        {
-                            Console.WriteLine($"Ошибка размера шрифта ({fontSizeInPoints} вместо {requiredFontSize}) в тексте: {paragraph.InnerText}");
-                            return false;
-                        }
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// Проверка выравнивания текста (полностью исключая заголовки)
-        /// </summary>
-        private bool CheckTextAlignment(string requiredAlignment, Body body, Gost gost)
-        {
-            var headers = GetAllSectionHeaders(body, gost);
-
-            foreach (var paragraph in body.Elements<Paragraph>())
-            {
-                // Пропускаем все заголовки
-                if (headers.Contains(paragraph))
-                    continue;
-
-                var paragraphProperties = paragraph.ParagraphProperties;
-                if (paragraphProperties == null)
-                    continue;
-
-                var justification = paragraphProperties.Justification;
-                if (justification == null)
-                    continue;
-
-                string currentAlignment;
-
-                if (justification.Val?.Value == JustificationValues.Left)
-                {
-                    currentAlignment = "Left";
-                }
-                else if (justification.Val?.Value == JustificationValues.Center)
-                {
-                    currentAlignment = "Center";
-                }
-                else if (justification.Val?.Value == JustificationValues.Right)
-                {
-                    currentAlignment = "Right";
-                }
-                else if (justification.Val?.Value == JustificationValues.Both)
-                {
-                    currentAlignment = "Both";
-                }
-                else
-                {
-                    currentAlignment = "Left";
-                }
-
-                if (currentAlignment != requiredAlignment)
-                {
-                    Console.WriteLine($"Ошибка выравнивания ({currentAlignment} вместо {requiredAlignment}) в тексте: {paragraph.InnerText}");
-                    return false;
-                }
-            }
-            return true;
-        }
-
-
-
         /// <summary>
         /// Получает список обязательных разделов из строки
         /// </summary>
@@ -509,18 +552,6 @@ namespace GOST_Control
                 .Select(s => s.Trim())
                 .Where(s => !string.IsNullOrEmpty(s))
                 .ToList();
-        }
-
-        /// <summary>
-        /// Проверяет, является ли параграф заголовком раздела
-        /// </summary>
-        private bool IsSectionHeader(Paragraph paragraph, List<string> requiredSections)
-        {
-            if (!requiredSections.Any())
-                return false;
-
-            var text = paragraph.InnerText;
-            return requiredSections.Any(section => text.Contains(section));
         }
 
         /// <summary>
@@ -632,6 +663,29 @@ namespace GOST_Control
                 Math.Abs(marginRightInCm - requiredMarginRight.Value) > 0.01)
                 return false;
 
+            return true;
+        }
+
+        /// <summary>
+        /// Проверяет, является ли параграф пустым. 
+        /// Для того чтобы пустые места в документе не вызывали ошибок!
+        /// </summary>
+        /// <param name="paragraph"></param>
+        /// <returns></returns>
+        private bool IsEmptyParagraph(Paragraph paragraph)
+        {
+            foreach (var run in paragraph.Elements<Run>())
+            {
+                foreach (var text in run.Elements<Text>())
+                {
+                    if (!string.IsNullOrWhiteSpace(text.Text))
+                        return false;
+                }
+
+                // Проверяем специальные символы (например, разрывы строк)
+                if (run.Elements<Break>().Any() || run.Elements<TabChar>().Any())
+                    return false;
+            }
             return true;
         }
 

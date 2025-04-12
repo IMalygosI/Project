@@ -1,26 +1,22 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\dimau\\Desktop\\\u0414_\u041A\\GOST_Control\\",
+  "WorkspaceRootPath": "C:\\Users\\dimau\\Desktop\\\u0414\u0438\u043F\u043B\u043E\u043C\\Project\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{38027419-4475-4D13-8781-7F0DF1472C39}|GOST_Control\\GOST_Control.csproj|c:\\users\\dimau\\desktop\\\u0434_\u043A\\gost_control\\gost_control\\gost_\u0441heck.axaml||{6D5344A2-2FCD-49DE-A09D-6A14FD1B1224}",
-      "RelativeMoniker": "D:0:0:{38027419-4475-4D13-8781-7F0DF1472C39}|GOST_Control\\GOST_Control.csproj|solutionrelative:gost_control\\gost_\u0441heck.axaml||{6D5344A2-2FCD-49DE-A09D-6A14FD1B1224}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{38027419-4475-4D13-8781-7F0DF1472C39}|GOST_Control\\GOST_Control.csproj|c:\\users\\dimau\\desktop\\\u0434_\u043A\\gost_control\\gost_control\\gost_\u0441heck.axaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{38027419-4475-4D13-8781-7F0DF1472C39}|GOST_Control\\GOST_Control.csproj|c:\\users\\dimau\\desktop\\\u0434\u0438\u043F\u043B\u043E\u043C\\project\\gost_control\\gost_\u0441heck.axaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{38027419-4475-4D13-8781-7F0DF1472C39}|GOST_Control\\GOST_Control.csproj|solutionrelative:gost_control\\gost_\u0441heck.axaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\dimau\\Desktop\\\u0414_\u041A\\GOST_Control\\GOST_Control\\bin\\Debug\\net8.0\\gosts.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\dimau\\Desktop\\\u0414\u0438\u043F\u043B\u043E\u043C\\Project\\GOST_Control\\bin\\Debug\\net8.0\\gosts.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:GOST_Control\\bin\\Debug\\net8.0\\gosts.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{38027419-4475-4D13-8781-7F0DF1472C39}|GOST_Control\\GOST_Control.csproj|c:\\users\\dimau\\desktop\\\u0434_\u043A\\gost_control\\gost_control\\gost.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{38027419-4475-4D13-8781-7F0DF1472C39}|GOST_Control\\GOST_Control.csproj|c:\\users\\dimau\\desktop\\\u0434\u0438\u043F\u043B\u043E\u043C\\project\\gost_control\\gost.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{38027419-4475-4D13-8781-7F0DF1472C39}|GOST_Control\\GOST_Control.csproj|solutionrelative:gost_control\\gost.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{38027419-4475-4D13-8781-7F0DF1472C39}|GOST_Control\\GOST_Control.csproj|c:\\users\\dimau\\desktop\\\u0434_\u043A\\gost_control\\gost_control\\app.axaml||{6D5344A2-2FCD-49DE-A09D-6A14FD1B1224}",
-      "RelativeMoniker": "D:0:0:{38027419-4475-4D13-8781-7F0DF1472C39}|GOST_Control\\GOST_Control.csproj|solutionrelative:gost_control\\app.axaml||{6D5344A2-2FCD-49DE-A09D-6A14FD1B1224}"
+      "AbsoluteMoniker": "D:0:0:{38027419-4475-4D13-8781-7F0DF1472C39}|GOST_Control\\GOST_Control.csproj|c:\\users\\dimau\\desktop\\\u0434\u0438\u043F\u043B\u043E\u043C\\project\\gost_control\\gost_\u0441heck.axaml||{6D5344A2-2FCD-49DE-A09D-6A14FD1B1224}",
+      "RelativeMoniker": "D:0:0:{38027419-4475-4D13-8781-7F0DF1472C39}|GOST_Control\\GOST_Control.csproj|solutionrelative:gost_control\\gost_\u0441heck.axaml||{6D5344A2-2FCD-49DE-A09D-6A14FD1B1224}"
     }
   ],
   "DocumentGroupContainers": [
@@ -30,30 +26,17 @@
       "DocumentGroups": [
         {
           "DockedWidth": 334,
-          "SelectedChildIndex": 6,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "App.axaml",
-              "DocumentMoniker": "C:\\Users\\dimau\\Desktop\\\u0414_\u041A\\GOST_Control\\GOST_Control\\App.axaml",
-              "RelativeDocumentMoniker": "GOST_Control\\App.axaml",
-              "ToolTip": "C:\\Users\\dimau\\Desktop\\\u0414_\u041A\\GOST_Control\\GOST_Control\\App.axaml",
-              "RelativeToolTip": "GOST_Control\\App.axaml",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2025-04-12T16:55:39.849Z",
-              "IsPinned": true,
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 1,
               "Title": "gosts.json",
-              "DocumentMoniker": "C:\\Users\\dimau\\Desktop\\\u0414_\u041A\\GOST_Control\\GOST_Control\\bin\\Debug\\net8.0\\gosts.json",
+              "DocumentMoniker": "C:\\Users\\dimau\\Desktop\\\u0414\u0438\u043F\u043B\u043E\u043C\\Project\\GOST_Control\\bin\\Debug\\net8.0\\gosts.json",
               "RelativeDocumentMoniker": "GOST_Control\\bin\\Debug\\net8.0\\gosts.json",
-              "ToolTip": "C:\\Users\\dimau\\Desktop\\\u0414_\u041A\\GOST_Control\\GOST_Control\\bin\\Debug\\net8.0\\gosts.json",
+              "ToolTip": "C:\\Users\\dimau\\Desktop\\\u0414\u0438\u043F\u043B\u043E\u043C\\Project\\GOST_Control\\bin\\Debug\\net8.0\\gosts.json",
               "RelativeToolTip": "GOST_Control\\bin\\Debug\\net8.0\\gosts.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAABAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAgAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
               "WhenOpened": "2025-04-12T11:59:35.438Z",
               "IsPinned": true,
@@ -61,13 +44,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 2,
               "Title": "Gost.cs",
-              "DocumentMoniker": "C:\\Users\\dimau\\Desktop\\\u0414_\u041A\\GOST_Control\\GOST_Control\\Gost.cs",
+              "DocumentMoniker": "C:\\Users\\dimau\\Desktop\\\u0414\u0438\u043F\u043B\u043E\u043C\\Project\\GOST_Control\\Gost.cs",
               "RelativeDocumentMoniker": "GOST_Control\\Gost.cs",
-              "ToolTip": "C:\\Users\\dimau\\Desktop\\\u0414_\u041A\\GOST_Control\\GOST_Control\\Gost.cs",
+              "ToolTip": "C:\\Users\\dimau\\Desktop\\\u0414\u0438\u043F\u043B\u043E\u043C\\Project\\GOST_Control\\Gost.cs",
               "RelativeToolTip": "GOST_Control\\Gost.cs",
-              "ViewState": "AgIAAAwAAAAAAAAAAAAYwCMAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAsAAAAAAAAAAAAmwCEAAAAXAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-04-12T10:58:49.097Z",
               "IsPinned": true,
@@ -75,13 +58,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "GOST_\u0421heck.axaml.cs",
-              "DocumentMoniker": "C:\\Users\\dimau\\Desktop\\\u0414_\u041A\\GOST_Control\\GOST_Control\\GOST_\u0421heck.axaml.cs",
+              "DocumentMoniker": "C:\\Users\\dimau\\Desktop\\\u0414\u0438\u043F\u043B\u043E\u043C\\Project\\GOST_Control\\GOST_\u0421heck.axaml.cs",
               "RelativeDocumentMoniker": "GOST_Control\\GOST_\u0421heck.axaml.cs",
-              "ToolTip": "C:\\Users\\dimau\\Desktop\\\u0414_\u041A\\GOST_Control\\GOST_Control\\GOST_\u0421heck.axaml.cs",
+              "ToolTip": "C:\\Users\\dimau\\Desktop\\\u0414\u0438\u043F\u043B\u043E\u043C\\Project\\GOST_Control\\GOST_\u0421heck.axaml.cs",
               "RelativeToolTip": "GOST_Control\\GOST_\u0421heck.axaml.cs",
-              "ViewState": "AgIAAG0CAAAAAAAAAAAwwHsCAAAJAAAAAAAAAA==",
+              "ViewState": "AgIAAAQAAAAAAAAAAIAwwBkAAABIAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-02-01T14:23:39.632Z",
               "IsPinned": true,
@@ -97,11 +80,11 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 3,
               "Title": "GOST_\u0421heck.axaml",
-              "DocumentMoniker": "C:\\Users\\dimau\\Desktop\\\u0414_\u041A\\GOST_Control\\GOST_Control\\GOST_\u0421heck.axaml",
+              "DocumentMoniker": "C:\\Users\\dimau\\Desktop\\\u0414\u0438\u043F\u043B\u043E\u043C\\Project\\GOST_Control\\GOST_\u0421heck.axaml",
               "RelativeDocumentMoniker": "GOST_Control\\GOST_\u0421heck.axaml",
-              "ToolTip": "C:\\Users\\dimau\\Desktop\\\u0414_\u041A\\GOST_Control\\GOST_Control\\GOST_\u0421heck.axaml",
+              "ToolTip": "C:\\Users\\dimau\\Desktop\\\u0414\u0438\u043F\u043B\u043E\u043C\\Project\\GOST_Control\\GOST_\u0421heck.axaml",
               "RelativeToolTip": "GOST_Control\\GOST_\u0421heck.axaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
               "WhenOpened": "2025-04-12T12:52:20.887Z",

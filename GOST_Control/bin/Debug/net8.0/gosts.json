@@ -13,7 +13,7 @@
         "LineSpacing": 1.5,
         "FirstLineIndent": 1.25,
         "TextAlignment": "Both",
-        "RequiredSections": "Введение, Заключение",
+        "RequiredSections": "Введение, Заключение, Список литературы",
         "HeaderFontSize": 16.0,
         "HeaderAlignment": "Center"
     }
