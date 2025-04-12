@@ -1,0 +1,20 @@
+[
+    {
+        "GostId": 1,
+        "Name": "ГОСТ 2.105-95",
+        "Description": "Единая система конструкторской документации",
+        "FontName": "Times New Roman",
+        "FontSize": 14.0,
+        "MarginTop": 2.0,
+        "MarginBottom": 2.0,
+        "MarginLeft": 3.0,
+        "MarginRight": 1.5,
+        "PageNumbering": true,
+        "LineSpacing": 1.5,
+        "FirstLineIndent": 1.25,
+        "TextAlignment": "Both",
+        "RequiredSections": "Введение, Заключение",
+        "HeaderFontSize": 16.0,
+        "HeaderAlignment": "Center"
+    }
+]

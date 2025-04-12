@@ -1,7 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 
 namespace GOST_Control
 {
@@ -10,68 +13,47 @@ namespace GOST_Control
         public MainWindow()
         {
             InitializeComponent();
+
+            // Создаем файл gosts.json при первом запуске, если его нет
+            string jsonPath = Path.Combine(AppContext.BaseDirectory, "gosts.json");
+            if (!File.Exists(jsonPath))
+            {
+                File.WriteAllText(jsonPath, "[]");
+            }
         }
-
-
 
         private readonly FileDialogFilter fileFilter = new()
         {
-            Extensions = new List<string>() { "doc", "docx" }, // Допустимые форматы
+            Extensions = new List<string>() { "doc", "docx" },
             Name = "Документы Word"
         };
 
-        private async void Button_Click_SelectFile(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        private async void Button_Click_SelectFile(object? sender, RoutedEventArgs e)
         {
             try
             {
-                // Создаем диалог выбора файла
-                OpenFileDialog dialog = new OpenFileDialog
+                var dialog = new OpenFileDialog
                 {
                     Title = "Выберите документ для проверки",
-                    AllowMultiple = false
+                    AllowMultiple = false,
+                    Filters = { fileFilter }
                 };
-                // Добавляем фильтр
-                dialog.Filters.Add(fileFilter);
-                // Открываем диалог
+
                 var result = await dialog.ShowAsync(this);
-                // Проверяем, выбран ли файл
-                if (result is { Length: > 0 })
+
+                if (result != null && result.Length > 0)
                 {
                     string filePath = result[0];
 
-                    // Открываем новое окно
-                    var checkWindow = new GOST_Сheck(filePath);
+                    GOST_Сheck checkWindow = new GOST_Сheck(filePath);
                     checkWindow.Show();
-                    this.Close(); // Закрываем главное окно
-
-                    // обрабатываем файл
-                   // await ProcessSelectedFileAsync(filePath);
+                    this.Close();
                 }
             }
-            catch { }
-        }
-        /*
-        private async Task ProcessSelectedFileAsync(string filePath)
-        {
-            try
+            catch (Exception ex)
             {
-                // Проверка существования файла
-                if (!File.Exists(filePath))
-                    throw new FileNotFoundException("Файл не найден", filePath);
-                // Имитация обработки файла (вместо этого добавьте реальную логику)
-                string fileName = Path.GetFileName(filePath);
-                long fileSize = new FileInfo(filePath).Length;
-                // Копируем файл в папку проекта (по аналогии с изображениями)
-                string destinationPath = Path.Combine("ProcessedDocs", fileName);
-                // Убедимся, что папка существует
-                Directory.CreateDirectory("ProcessedDocs");
-                // Копируем файл
-                await Task.Run(() => File.Copy(filePath, destinationPath, overwrite: true));
+                Console.WriteLine($"Ошибка: {ex.Message}");
             }
-            catch { }
         }
-        */
-
-
     }
 }

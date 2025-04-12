@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "nQRCL/+UpX4=",
+  "dgSpecHash": "CDxEtqMLcnw=",
   "success": true,
-  "projectFilePath": "C:\\Users\\dimau\\source\\repos\\GOST_Control\\GOST_Control\\GOST_Control.csproj",
+  "projectFilePath": "C:\\Users\\dimau\\Desktop\\Д_К\\GOST_Control\\GOST_Control\\GOST_Control.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\dimau\\.nuget\\packages\\avalonia\\11.2.3\\avalonia.11.2.3.nupkg.sha512",
     "C:\\Users\\dimau\\.nuget\\packages\\avalonia.angle.windows.natives\\2.1.22045.20230930\\avalonia.angle.windows.natives.2.1.22045.20230930.nupkg.sha512",

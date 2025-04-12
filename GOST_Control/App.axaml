@@ -6,19 +6,21 @@
 
     <Application.Styles>
 
+		<Style Selector="Window">
+
+			<Setter Property="WindowState" Value="Maximized"/>
+			
+			<Setter Property="MinHeight" Value="650"/>
+			<Setter Property="MinWidth" Value="1000"/>
+			
+			<Setter Property="FontFamily" Value="Comic Sans MS"/>
+			<Setter Property="WindowStartupLocation" Value="CenterScreen"/>
+		</Style>
+
 		<Style Selector="Grid.ThemeBlack">
 			<Setter Property="Background" Value="#181368"/>
 		</Style>
 
-		<Style Selector="Window">
-			<Setter Property="MaxHeight" Value="980"/>
-			<Setter Property="MinHeight" Value="650"/>
-			<Setter Property="MaxWidth" Value="1900"/>
-			<Setter Property="MinWidth" Value="1000"/>
-			<Setter Property="FontFamily" Value="Comic Sans MS"/>
-			<Setter Property="WindowStartupLocation" Value="CenterScreen"/>
-		</Style>
-		
 		<FluentTheme />
     </Application.Styles>
 </Application>

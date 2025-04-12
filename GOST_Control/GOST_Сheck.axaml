@@ -2,7 +2,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d"  d:DesignWidth="1920" d:DesignHeight="1080"
+		x:CompileBindings="False"
         x:Class="GOST_Control.GOST_Сheck"
         Title="Проверка на ГОСТ">
 	<Border BorderThickness="2"
@@ -12,38 +13,120 @@
 			  RowDefinitions="*,*,*"
 			  ShowGridLines="True">
 
-
 			<StackPanel Grid.ColumnSpan="3"
 						Grid.Row="0"
-						HorizontalAlignment="Center"
+						HorizontalAlignment="Left"
 						VerticalAlignment="Center">
+
+				<TextBlock Name="GostControl"
+						   Text="Проверка соответствия ГОСТ"
+						   FontWeight="Bold"
+						   FontSize="30"/>
 				
-			<TextBlock Name="GostControl"
-					   Text="Проверка соответствия ГОСТ"
-					   FontWeight="Bold"
-					   FontSize="30"/>
-
-			<TextBlock Name="ErrorControlGost"
-					   Margin="0 5 0 0"
-					   Text="Проверка ErrorControlGost"
-					   FontWeight="Bold"
-					   FontSize="30"/>
-
+				<TextBlock Name="GostName"
+						   Text="ГОСТ"
+						   FontWeight="Bold"
+						   FontSize="30"/>
+				
+				<!-- Проверка есть ли ГОСТ в базе данных -->
+				<TextBlock Name="ErrorControlGost"
+						   Margin="0 5 0 0"
+						   Text="1---"
+						   FontWeight="Bold"
+						   FontSize="30"/>				
+				
+				<!-- Проверка Удалось ли открыть документ -->
 				<TextBlock Name="ErrorControl"
 						   Margin="0 5 0 0"
-						   Text="Проверка ErrorControl"
+						   Text="2---"
 						   FontWeight="Bold"
 						   FontSize="30"/>
 
+				<TextBlock Margin="0 5 0 0"
+						   Text="---"
+						   FontWeight="Bold"
+						   FontSize="30"/>
 
-
-
-				<TextBlock Name="ErrorControlFontBD"
+				<!-- Проверка на соответствие шрифта -->
+				<TextBlock Name="ErrorControlFont"
 						   Margin="0 5 0 0"
-						   Text="Проверка ErrorControlFontBD"
+						   Text="3---"
 						   FontWeight="Bold"
 						   FontSize="30"/>
-				
+
+				<!-- Проверка на соответствие размера шрифта -->
+				<TextBlock Name="ErrorControlFontSize"
+						   Margin="0 5 0 0"
+						   Text="4---"
+						   FontWeight="Bold"
+						   FontSize="30"/>
+
+				<!-- Проверка на Поля документа -->
+				<TextBlock Name="ErrorControlMargins"
+						   Margin="0 5 0 0"
+						   Text="5---"
+						   FontWeight="Bold"
+						   FontSize="30"/>
+
+				<TextBlock Margin="0 5 0 0"
+						   Text="6-!-"
+						   Name="ErrorControlViravnivanie"
+						   FontWeight="Bold"
+						   FontSize="30"/>
+				<TextBlock Margin="0 5 0 0"
+						   Name="ErrorControlMnochitel"
+						   Text="7---"
+						   FontWeight="Bold"
+						   FontSize="30"/>
+
+				<TextBlock Name="ErrorControlFirstLineIndent"
+						   Margin="0 5 0 0"
+						   Text="8---"
+						   FontWeight="Bold"
+						   FontSize="30"/>
+
+				<TextBlock Name="ErrorControlNumberPage"
+						   Margin="0 5 0 0"
+						   Text="9---"
+						   FontWeight="Bold"
+						   FontSize="30"/>
+
+				<TextBlock Margin="0 5 0 0"
+						   Text="10---Заголовки"
+						   FontWeight="Bold"
+						   FontSize="30"/>
+
+				<TextBlock Margin="0 5 0 0"
+						   Name="ErrorControlSections"
+						   Text="11---"
+						   FontWeight="Bold"
+						   FontSize="30"/>
+
+				<TextBlock Margin="0 5 0 0"
+						   Text="12---"
+						   FontWeight="Bold"
+						   FontSize="30"/>
+
+				<TextBlock Margin="0 5 0 0"
+						   Text="13---"
+						   FontWeight="Bold"
+						   FontSize="30"/>
+
+				<TextBlock Margin="0 5 0 0"
+						   Text="14---"
+						   FontWeight="Bold"
+						   FontSize="30"/>
+
+				<TextBlock Margin="0 5 0 0"
+						   Text="15---"
+						   FontWeight="Bold"
+						   FontSize="30"/>
+
+				<TextBlock Margin="0 5 0 0"
+						   Text="---"
+						   FontWeight="Bold"
+						   FontSize="30"/>
+
 			</StackPanel>
 
 			<TextBlock Grid.ColumnSpan="3"
@@ -55,8 +138,7 @@
 					   HorizontalAlignment="Center"
 					   VerticalAlignment="Center"
 					   Foreground="Black"/>
-			
-			
+
 			<Button Name="SelectFile"
 					Click="Button_Click_SelectFile"
 					CornerRadius="10"
@@ -73,7 +155,7 @@
 						   HorizontalAlignment="Center"
 						   VerticalAlignment="Center"/>
 			</Button>
-			
+
 			<Button Name="LogOut"
 					Click="Button_Click_LogOut"
 					CornerRadius="10"
