@@ -207,28 +207,6 @@ namespace GOST_Control
                             ErrorControlNumberPage.Foreground = Brushes.Gray;
                         }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                         // Проверка обязательных разделов (Введение, Заключение)
                         bool sectionsValid = true;
                         if (!string.IsNullOrEmpty(gost.RequiredSections))
@@ -236,9 +214,15 @@ namespace GOST_Control
                             sectionsValid = CheckRequiredSections(gost, body);
                         }
 
+
+
+
+
+
+
+
                         // Общий результат проверки
-                        if (fontNameValid && fontSizeValid && marginsValid && lineSpacingValid &&
-                            firstLineIndentValid && textAlignmentValid && pageNumberingValid && sectionsValid)
+                        if (fontNameValid && fontSizeValid && marginsValid && lineSpacingValid && firstLineIndentValid && textAlignmentValid && pageNumberingValid && sectionsValid)
                         {
                             GostControl.Text = "Документ соответствует ГОСТу.";
                             GostControl.Foreground = Brushes.Green;
@@ -266,10 +250,7 @@ namespace GOST_Control
             if (string.IsNullOrEmpty(gost.RequiredSections))
                 return true;
 
-            var requiredSections = gost.RequiredSections.Split(',')
-                .Select(s => s.Trim())
-                .Where(s => !string.IsNullOrEmpty(s))
-                .ToList();
+            var requiredSections = gost.RequiredSections.Split(',').Select(s => s.Trim()).Where(s => !string.IsNullOrEmpty(s)).ToList();
 
             if (!requiredSections.Any())
                 return true;
@@ -390,10 +371,8 @@ namespace GOST_Control
                     var fontName = run.RunProperties?.RunFonts?.Ascii?.Value;
                     if (fontName != null && fontName != requiredFontName)
                     {
-                        Dispatcher.UIThread.Post(() => {
-                            ErrorControlFont.Text = "Неверный шрифт в основном тексте";
-                            ErrorControlFont.Foreground = Brushes.Red;
-                        });
+                        Dispatcher.UIThread.Post(() => { ErrorControlFont.Text = "Неверный шрифт в основном тексте";
+                                                         ErrorControlFont.Foreground = Brushes.Red; });
                         isValid = false;
                         break;
                     }
@@ -428,10 +407,8 @@ namespace GOST_Control
                         double fontSizeValue = double.Parse(fontSize.Val.Value) / 2;
                         if (Math.Abs(fontSizeValue - requiredFontSize) > 0.1)
                         {
-                            Dispatcher.UIThread.Post(() => {
-                                ErrorControlFontSize.Text = "Ошибка: неверный размер шрифта";
-                                ErrorControlFontSize.Foreground = Brushes.Red;
-                            });
+                            Dispatcher.UIThread.Post(() => { ErrorControlFontSize.Text = "Ошибка: неверный размер шрифта";
+                                                             ErrorControlFontSize.Foreground = Brushes.Red; });
                             isValid = false;
                             break;
                         }
@@ -461,10 +438,8 @@ namespace GOST_Control
 
                 if (currentAlignment != requiredAlignment)
                 {
-                    Dispatcher.UIThread.Post(() => {
-                        ErrorControlViravnivanie.Text = $"Ошибка: выравнивание {currentAlignment} (требуется {requiredAlignment})";
-                        ErrorControlViravnivanie.Foreground = Brushes.Red;
-                    });
+                    Dispatcher.UIThread.Post(() => { ErrorControlViravnivanie.Text = $"Ошибка: выравнивание {currentAlignment} (требуется {requiredAlignment})";
+                                                     ErrorControlViravnivanie.Foreground = Brushes.Red; });
                     isValid = false;
                     break;
                 }
@@ -515,8 +490,7 @@ namespace GOST_Control
                 if (justification != null)
                 {
                     string alignment = GetAlignmentString(justification);
-                    string requiredAlignment = style.Type == StyleValues.Paragraph ?
-                        gost.TextAlignment : gost.HeaderAlignment;
+                    string requiredAlignment = style.Type == StyleValues.Paragraph ? gost.TextAlignment : gost.HeaderAlignment;
 
                     if (alignment != requiredAlignment)
                     {
@@ -570,10 +544,7 @@ namespace GOST_Control
             if (string.IsNullOrEmpty(gost.RequiredSections))
                 return new List<string>();
 
-            return gost.RequiredSections.Split(',')
-                .Select(s => s.Trim())
-                .Where(s => !string.IsNullOrEmpty(s))
-                .ToList();
+            return gost.RequiredSections.Split(',').Select(s => s.Trim()).Where(s => !string.IsNullOrEmpty(s)).ToList();
         }
 
         /// <summary>
@@ -582,8 +553,7 @@ namespace GOST_Control
         /// <summary>
         /// Проверка нумерации страниц и её расположения
         /// </summary>
-        private bool CheckPageNumbering(WordprocessingDocument wordDoc, bool requiredNumbering,
-                                      string requiredAlignment, string requiredPosition)
+        private bool CheckPageNumbering(WordprocessingDocument wordDoc, bool requiredNumbering, string requiredAlignment, string requiredPosition)
         {
             if (!requiredNumbering) return true;
 
@@ -600,8 +570,7 @@ namespace GOST_Control
                 {
                     foreach (var paragraph in headerPart.Header.Elements<Paragraph>())
                     {
-                        var pageField = paragraph.Descendants<SimpleField>()
-                            .FirstOrDefault(f => f.Instruction?.Value?.Contains("PAGE") == true);
+                        var pageField = paragraph.Descendants<SimpleField>().FirstOrDefault(f => f.Instruction?.Value?.Contains("PAGE") == true);
 
                         if (pageField != null)
                         {
@@ -610,10 +579,8 @@ namespace GOST_Control
                             string position = "Top";
 
                             // Проверяем, соответствует ли текущая нумерация требованиям
-                            bool positionMatch = string.IsNullOrEmpty(requiredPosition) ||
-                                               position.Equals(requiredPosition, StringComparison.OrdinalIgnoreCase);
-                            bool alignmentMatch = string.IsNullOrEmpty(requiredAlignment) ||
-                                                alignment.Equals(requiredAlignment, StringComparison.OrdinalIgnoreCase);
+                            bool positionMatch = string.IsNullOrEmpty(requiredPosition) || position.Equals(requiredPosition, StringComparison.OrdinalIgnoreCase);
+                            bool alignmentMatch = string.IsNullOrEmpty(requiredAlignment) || alignment.Equals(requiredAlignment, StringComparison.OrdinalIgnoreCase);
 
                             if (positionMatch && alignmentMatch)
                             {
@@ -637,8 +604,7 @@ namespace GOST_Control
                 {
                     foreach (var paragraph in footerPart.Footer.Elements<Paragraph>())
                     {
-                        var pageField = paragraph.Descendants<SimpleField>()
-                            .FirstOrDefault(f => f.Instruction?.Value?.Contains("PAGE") == true);
+                        var pageField = paragraph.Descendants<SimpleField>().FirstOrDefault(f => f.Instruction?.Value?.Contains("PAGE") == true);
 
                         if (pageField != null)
                         {
@@ -647,10 +613,8 @@ namespace GOST_Control
                             string position = "Bottom";
 
                             // Проверяем, соответствует ли текущая нумерация требованиям
-                            bool positionMatch = string.IsNullOrEmpty(requiredPosition) ||
-                                               position.Equals(requiredPosition, StringComparison.OrdinalIgnoreCase);
-                            bool alignmentMatch = string.IsNullOrEmpty(requiredAlignment) ||
-                                                alignment.Equals(requiredAlignment, StringComparison.OrdinalIgnoreCase);
+                            bool positionMatch = string.IsNullOrEmpty(requiredPosition) || position.Equals(requiredPosition, StringComparison.OrdinalIgnoreCase);
+                            bool alignmentMatch = string.IsNullOrEmpty(requiredAlignment) || alignment.Equals(requiredAlignment, StringComparison.OrdinalIgnoreCase);
 
                             if (positionMatch && alignmentMatch)
                             {
@@ -681,9 +645,8 @@ namespace GOST_Control
             if (hasCorrectNumbering && !hasExtraNumbering)
             {
                 Dispatcher.UIThread.Post(() => {
-                    string message = string.IsNullOrEmpty(requiredAlignment) && string.IsNullOrEmpty(requiredPosition)
-                        ? "Нумерация страниц присутствует"
-                        : $"Нумерация соответствует ({actualCorrectPosition}, {actualCorrectAlignment})";
+                    string message = string.IsNullOrEmpty(requiredAlignment) && string.IsNullOrEmpty(requiredPosition) ? "Нумерация страниц присутствует" :
+                                                                            $"Нумерация соответствует ({actualCorrectPosition}, {actualCorrectAlignment})";
 
                     ErrorControlNumberPage.Text = message;
                     ErrorControlNumberPage.Foreground = Brushes.Green;
@@ -695,7 +658,7 @@ namespace GOST_Control
             {
                 Dispatcher.UIThread.Post(() => {
                     ErrorControlNumberPage.Text = $"Нумерация соответствует ({actualCorrectPosition}, {actualCorrectAlignment}), " +
-                                                $"но есть лишняя нумерация в: {string.Join("; ", extraNumberings)}";
+                                                  $"но есть лишняя нумерация в: {string.Join("; ", extraNumberings)}";
                     ErrorControlNumberPage.Foreground = Brushes.Red;
                 });
                 return false;
@@ -751,15 +714,9 @@ namespace GOST_Control
         /// <summary>
         /// Проверка полей документа
         /// </summary>
-        private bool CheckMargins(
-            double? requiredMarginTop, double? requiredMarginBottom,
-            double? requiredMarginLeft, double? requiredMarginRight,
-            Body body)
+        private bool CheckMargins(double? requiredMarginTop, double? requiredMarginBottom, double? requiredMarginLeft, double? requiredMarginRight, Body body)
         {
-            var pageMargin = body.Elements<SectionProperties>()
-                .FirstOrDefault()?
-                .Elements<PageMargin>()
-                .FirstOrDefault();
+            var pageMargin = body.Elements<SectionProperties>().FirstOrDefault()?.Elements<PageMargin>().FirstOrDefault();
 
             if (pageMargin == null) return false;
 
@@ -770,20 +727,16 @@ namespace GOST_Control
             double marginRightInCm = pageMargin.Right.Value / 567.0;
 
             // Проверка с погрешностью 0.01 см
-            if (requiredMarginTop.HasValue &&
-                Math.Abs(marginTopInCm - requiredMarginTop.Value) > 0.01)
+            if (requiredMarginTop.HasValue && Math.Abs(marginTopInCm - requiredMarginTop.Value) > 0.01)
                 return false;
 
-            if (requiredMarginBottom.HasValue &&
-                Math.Abs(marginBottomInCm - requiredMarginBottom.Value) > 0.01)
+            if (requiredMarginBottom.HasValue && Math.Abs(marginBottomInCm - requiredMarginBottom.Value) > 0.01)
                 return false;
 
-            if (requiredMarginLeft.HasValue &&
-                Math.Abs(marginLeftInCm - requiredMarginLeft.Value) > 0.01)
+            if (requiredMarginLeft.HasValue && Math.Abs(marginLeftInCm - requiredMarginLeft.Value) > 0.01)
                 return false;
 
-            if (requiredMarginRight.HasValue &&
-                Math.Abs(marginRightInCm - requiredMarginRight.Value) > 0.01)
+            if (requiredMarginRight.HasValue && Math.Abs(marginRightInCm - requiredMarginRight.Value) > 0.01)
                 return false;
 
             return true;

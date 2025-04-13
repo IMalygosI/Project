@@ -39,8 +39,7 @@
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAoAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
               "WhenOpened": "2025-04-12T22:38:11.143Z",
-              "IsPinned": true,
-              "EditorCaption": ""
+              "IsPinned": true
             },
             {
               "$type": "Document",
@@ -53,8 +52,7 @@
               "ViewState": "AgIAAA0AAAAAAAAAAAAmwB4AAAAsAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-04-12T10:58:49.097Z",
-              "IsPinned": true,
-              "EditorCaption": ""
+              "IsPinned": true
             },
             {
               "$type": "Document",
@@ -64,7 +62,7 @@
               "RelativeDocumentMoniker": "GOST_Control\\GOST_\u0421heck.axaml.cs",
               "ToolTip": "C:\\Users\\dimau\\Desktop\\\u0414\u0438\u043F\u043B\u043E\u043C\\Project\\GOST_Control\\GOST_\u0421heck.axaml.cs",
               "RelativeToolTip": "GOST_Control\\GOST_\u0421heck.axaml.cs",
-              "ViewState": "AgIAADACAAAAAAAAAAAwwEcCAAAWAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAJAAAAA3AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-02-01T14:23:39.632Z",
               "IsPinned": true,
@@ -87,8 +85,7 @@
               "ToolTip": "C:\\Users\\dimau\\Desktop\\\u0414\u0438\u043F\u043B\u043E\u043C\\Project\\GOST_Control\\GOST_\u0421heck.axaml",
               "RelativeToolTip": "GOST_Control\\GOST_\u0421heck.axaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2025-04-12T12:52:20.887Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-04-12T12:52:20.887Z"
             }
           ]
         }
