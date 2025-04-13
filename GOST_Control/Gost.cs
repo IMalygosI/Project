@@ -26,7 +26,10 @@ namespace GOST_Control
         public double? MarginRight { get; set; }
 
         // Нумерация ГОСТа
-        public bool? PageNumbering { get; set; }
+        public bool? PageNumbering { get; set; }// Нумерация
+        public string? PageNumberingAlignment { get; set; } // Left/Center/Right
+        public string? PageNumberingPosition { get; set; }  // Top/Bottom
+
         // Межстрочный интервал
         public double? LineSpacing { get; set; }
         // Отступ первой строки

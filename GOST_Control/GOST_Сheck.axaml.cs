@@ -197,7 +197,7 @@ namespace GOST_Control
                         // Проверка нумерации страниц
                         if (gost.PageNumbering.HasValue)
                         {
-                            pageNumberingValid = CheckPageNumbering(wordDoc, gost.PageNumbering.Value);
+                            pageNumberingValid = CheckPageNumbering(wordDoc, gost.PageNumbering.Value, gost.PageNumberingAlignment, gost.PageNumberingPosition);
                             ErrorControlNumberPage.Text = pageNumberingValid ? "Нумерация страниц соответствует ГОСТу." : "Нумерация страниц не соответствует ГОСТу.";
                             ErrorControlNumberPage.Foreground = pageNumberingValid ? Brushes.Green : Brushes.Red;
                         }
@@ -206,6 +206,28 @@ namespace GOST_Control
                             ErrorControlNumberPage.Text = "Нумерация страниц не требуется.";
                             ErrorControlNumberPage.Foreground = Brushes.Gray;
                         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
                         // Проверка обязательных разделов (Введение, Заключение)
                         bool sectionsValid = true;
@@ -555,36 +577,137 @@ namespace GOST_Control
         }
 
         /// <summary>
-        /// Проверка нумерации страниц
+        /// Проверка нумерации страниц и её расположения
         /// </summary>
-        private bool CheckPageNumbering(WordprocessingDocument wordDoc, bool requiredNumbering)
+        /// <summary>
+        /// Проверка нумерации страниц и её расположения
+        /// </summary>
+        private bool CheckPageNumbering(WordprocessingDocument wordDoc, bool requiredNumbering,
+                                      string requiredAlignment, string requiredPosition)
         {
             if (!requiredNumbering) return true;
 
-            // Проверка верхних колонтитулов
+            bool hasCorrectNumbering = false;
+            bool hasExtraNumbering = false;
+            string actualCorrectPosition = "";
+            string actualCorrectAlignment = "";
+            List<string> extraNumberings = new List<string>();
+
+            // Проверяем все колонтитулы на наличие номеров страниц
             if (wordDoc.MainDocumentPart.HeaderParts != null)
             {
                 foreach (var headerPart in wordDoc.MainDocumentPart.HeaderParts)
                 {
-                    if (headerPart.Header.Descendants<SimpleField>()
-                        .Any(f => f.Instruction?.Value?.Contains("PAGE") == true))
+                    foreach (var paragraph in headerPart.Header.Elements<Paragraph>())
                     {
-                        return true;
+                        var pageField = paragraph.Descendants<SimpleField>()
+                            .FirstOrDefault(f => f.Instruction?.Value?.Contains("PAGE") == true);
+
+                        if (pageField != null)
+                        {
+                            var justification = paragraph.ParagraphProperties?.Justification;
+                            string alignment = GetAlignmentString(justification);
+                            string position = "Top";
+
+                            // Проверяем, соответствует ли текущая нумерация требованиям
+                            bool positionMatch = string.IsNullOrEmpty(requiredPosition) ||
+                                               position.Equals(requiredPosition, StringComparison.OrdinalIgnoreCase);
+                            bool alignmentMatch = string.IsNullOrEmpty(requiredAlignment) ||
+                                                alignment.Equals(requiredAlignment, StringComparison.OrdinalIgnoreCase);
+
+                            if (positionMatch && alignmentMatch)
+                            {
+                                hasCorrectNumbering = true;
+                                actualCorrectPosition = position;
+                                actualCorrectAlignment = alignment;
+                            }
+                            else
+                            {
+                                hasExtraNumbering = true;
+                                extraNumberings.Add($"{position}, {alignment}");
+                            }
+                        }
                     }
                 }
             }
 
-            // Проверка нижних колонтитулов
             if (wordDoc.MainDocumentPart.FooterParts != null)
             {
                 foreach (var footerPart in wordDoc.MainDocumentPart.FooterParts)
                 {
-                    if (footerPart.Footer.Descendants<SimpleField>()
-                        .Any(f => f.Instruction?.Value?.Contains("PAGE") == true))
+                    foreach (var paragraph in footerPart.Footer.Elements<Paragraph>())
                     {
-                        return true;
+                        var pageField = paragraph.Descendants<SimpleField>()
+                            .FirstOrDefault(f => f.Instruction?.Value?.Contains("PAGE") == true);
+
+                        if (pageField != null)
+                        {
+                            var justification = paragraph.ParagraphProperties?.Justification;
+                            string alignment = GetAlignmentString(justification);
+                            string position = "Bottom";
+
+                            // Проверяем, соответствует ли текущая нумерация требованиям
+                            bool positionMatch = string.IsNullOrEmpty(requiredPosition) ||
+                                               position.Equals(requiredPosition, StringComparison.OrdinalIgnoreCase);
+                            bool alignmentMatch = string.IsNullOrEmpty(requiredAlignment) ||
+                                                alignment.Equals(requiredAlignment, StringComparison.OrdinalIgnoreCase);
+
+                            if (positionMatch && alignmentMatch)
+                            {
+                                hasCorrectNumbering = true;
+                                actualCorrectPosition = position;
+                                actualCorrectAlignment = alignment;
+                            }
+                            else
+                            {
+                                hasExtraNumbering = true;
+                                extraNumberings.Add($"{position}, {alignment}");
+                            }
+                        }
                     }
                 }
+            }
+
+            // Формируем сообщение для пользователя
+            if (!hasCorrectNumbering && !hasExtraNumbering)
+            {
+                Dispatcher.UIThread.Post(() => {
+                    ErrorControlNumberPage.Text = "Нумерация страниц отсутствует";
+                    ErrorControlNumberPage.Foreground = Brushes.Red;
+                });
+                return false;
+            }
+
+            if (hasCorrectNumbering && !hasExtraNumbering)
+            {
+                Dispatcher.UIThread.Post(() => {
+                    string message = string.IsNullOrEmpty(requiredAlignment) && string.IsNullOrEmpty(requiredPosition)
+                        ? "Нумерация страниц присутствует"
+                        : $"Нумерация соответствует ({actualCorrectPosition}, {actualCorrectAlignment})";
+
+                    ErrorControlNumberPage.Text = message;
+                    ErrorControlNumberPage.Foreground = Brushes.Green;
+                });
+                return true;
+            }
+
+            if (hasCorrectNumbering && hasExtraNumbering)
+            {
+                Dispatcher.UIThread.Post(() => {
+                    ErrorControlNumberPage.Text = $"Нумерация соответствует ({actualCorrectPosition}, {actualCorrectAlignment}), " +
+                                                $"но есть лишняя нумерация в: {string.Join("; ", extraNumberings)}";
+                    ErrorControlNumberPage.Foreground = Brushes.Red;
+                });
+                return false;
+            }
+
+            if (!hasCorrectNumbering && hasExtraNumbering)
+            {
+                Dispatcher.UIThread.Post(() => {
+                    ErrorControlNumberPage.Text = $"Не найдена требуемая нумерация, но есть лишняя в: {string.Join("; ", extraNumberings)}";
+                    ErrorControlNumberPage.Foreground = Brushes.Red;
+                });
+                return false;
             }
 
             return false;

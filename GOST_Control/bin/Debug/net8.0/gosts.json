@@ -10,6 +10,8 @@
         "MarginLeft": 3.0,
         "MarginRight": 1.5,
         "PageNumbering": true,
+        "PageNumberingAlignment": "Center",
+        "PageNumberingPosition": "Bottom",
         "LineSpacing": 1.5,
         "FirstLineIndent": 1.25,
         "TextAlignment": "Both",
