@@ -6,8 +6,10 @@
 		x:CompileBindings="False"
         x:Class="GOST_Control.GOST_Сheck"
         Title="Проверка на ГОСТ">
+	
 	<Border BorderThickness="2"
 			BorderBrush="Aqua">
+		
 		<Grid Name="GostControl_Сheck_Okko"
 			  ColumnDefinitions="*,*,*"
 			  RowDefinitions="*,*,*"
@@ -33,99 +35,173 @@
 						   Margin="0 5 0 0"
 						   Text="1---"
 						   FontWeight="Bold"
-						   FontSize="30"/>				
+						   FontSize="18"/>				
 				
 				<!-- Проверка Удалось ли открыть документ -->
 				<TextBlock Name="ErrorControl"
 						   Margin="0 5 0 0"
 						   Text="2---"
 						   FontWeight="Bold"
-						   FontSize="30"/>
+						   FontSize="18"/>
 
 				<TextBlock Margin="0 5 0 0"
 						   Text="---"
 						   FontWeight="Bold"
-						   FontSize="30"/>
+						   FontSize="18"/>
 
 				<!-- Проверка на соответствие шрифта -->
 				<TextBlock Name="ErrorControlFont"
 						   Margin="0 5 0 0"
 						   Text="3---"
 						   FontWeight="Bold"
-						   FontSize="30"/>
+						   FontSize="18"/>
 
 				<!-- Проверка на соответствие размера шрифта -->
 				<TextBlock Name="ErrorControlFontSize"
 						   Margin="0 5 0 0"
 						   Text="4---"
 						   FontWeight="Bold"
-						   FontSize="30"/>
+						   FontSize="18"/>
 
 				<!-- Проверка на Поля документа -->
 				<TextBlock Name="ErrorControlMargins"
 						   Margin="0 5 0 0"
 						   Text="5---"
 						   FontWeight="Bold"
-						   FontSize="30"/>
+						   FontSize="18"/>
 
 				<TextBlock Margin="0 5 0 0"
 						   Text="6-!-"
 						   Name="ErrorControlViravnivanie"
 						   FontWeight="Bold"
-						   FontSize="30"/>
+						   FontSize="18"/>
 				<TextBlock Margin="0 5 0 0"
 						   Name="ErrorControlMnochitel"
 						   Text="7---"
 						   FontWeight="Bold"
-						   FontSize="30"/>
+						   FontSize="18"/>
 
 				<TextBlock Name="ErrorControlFirstLineIndent"
 						   Margin="0 5 0 0"
 						   Text="8---"
 						   FontWeight="Bold"
-						   FontSize="30"/>
+						   FontSize="18"/>
 
 				<TextBlock Name="ErrorControlNumberPage"
 						   Margin="0 5 0 0"
 						   Text="9---"
 						   FontWeight="Bold"
-						   FontSize="30"/>
+						   FontSize="18"/>
 
 				<TextBlock Margin="0 5 0 0"
 						   Text="10---Заголовки"
 						   FontWeight="Bold"
-						   FontSize="30"/>
+						   FontSize="20"/>
 
 				<TextBlock Margin="0 5 0 0"
 						   Name="ErrorControlSections"
 						   Text="11---"
 						   FontWeight="Bold"
-						   FontSize="30"/>
+						   FontSize="18"/>
 
 				<TextBlock Margin="0 5 0 0"
 						   Text="12---"
 						   FontWeight="Bold"
-						   FontSize="30"/>
+						   FontSize="18"/>
 
 				<TextBlock Margin="0 5 0 0"
 						   Text="13---"
 						   FontWeight="Bold"
-						   FontSize="30"/>
+						   FontSize="18"/>
 
 				<TextBlock Margin="0 5 0 0"
 						   Text="14---"
 						   FontWeight="Bold"
-						   FontSize="30"/>
+						   FontSize="18"/>
 
 				<TextBlock Margin="0 5 0 0"
 						   Text="15---"
 						   FontWeight="Bold"
-						   FontSize="30"/>
+						   FontSize="18"/>
 
+				<TextBlock Margin="0 5 0 0"
+						   Text="16---"
+						   FontWeight="Bold"
+						   FontSize="18"/>
+
+				<TextBlock Margin="0 5 0 0"
+						   Text="17---"
+						   FontWeight="Bold"
+						   FontSize="18"/>
+
+				<TextBlock Margin="0 5 0 0"
+						   Text="18---"
+						   FontWeight="Bold"
+						   FontSize="18"/>
+
+				<TextBlock Margin="0 5 0 0"
+						   Text="19---"
+						   FontWeight="Bold"
+						   FontSize="18"/>
+
+				<TextBlock Margin="0 5 0 0"
+						   Text="20---"
+						   FontWeight="Bold"
+						   FontSize="18"/>
+
+				<TextBlock Margin="0 5 0 0"
+						   Text="21---"
+						   FontWeight="Bold"
+						   FontSize="18"/>
+
+				<TextBlock Margin="0 5 0 0"
+						   Text="22---"
+						   FontWeight="Bold"
+						   FontSize="18"/>
+
+				<TextBlock Margin="0 5 0 0"
+						   Text="23---"
+						   FontWeight="Bold"
+						   FontSize="18"/>
+
+				<TextBlock Margin="0 5 0 0"
+						   Text="24---"
+						   FontWeight="Bold"
+						   FontSize="18"/>
+
+				<TextBlock Margin="0 5 0 0"
+						   Text="25---"
+						   FontWeight="Bold"
+						   FontSize="18"/>
+
+				<TextBlock Margin="0 5 0 0"
+						   Text="26---"
+						   FontWeight="Bold"
+						   FontSize="18"/>
+
+				<TextBlock Margin="0 5 0 0"
+						   Text="27---"
+						   FontWeight="Bold"
+						   FontSize="18"/>
+
+				<TextBlock Margin="0 5 0 0"
+						   Text="28---"
+						   FontWeight="Bold"
+						   FontSize="18"/>
+
+				<TextBlock Margin="0 5 0 0"
+						   Text="29---"
+						   FontWeight="Bold"
+						   FontSize="18"/>
+
+				<TextBlock Margin="0 5 0 0"
+						   Text="30---"
+						   FontWeight="Bold"
+						   FontSize="18"/>
 				<TextBlock Margin="0 5 0 0"
 						   Text="---"
 						   FontWeight="Bold"
-						   FontSize="30"/>
+						   FontSize="18"/>
 
 			</StackPanel>
 
@@ -143,11 +219,9 @@
 					Click="Button_Click_SelectFile"
 					CornerRadius="10"
 					BorderThickness="2"
-					BorderBrush="Aqua"
 					Height="33"
 					VerticalAlignment="Bottom"
 					HorizontalAlignment="Center"
-					Background="Wheat"
 					Grid.Column="1"
 					Grid.Row="1">
 				<TextBlock Text="Проверить на ГОСТ"
@@ -160,12 +234,10 @@
 					Click="Button_Click_LogOut"
 					CornerRadius="10"
 					BorderThickness="2"
-					BorderBrush="Aqua"
 					Height="33"
 					Margin="10"
 					VerticalAlignment="Top"
 					HorizontalAlignment="Right"
-					Background="Wheat"
 					Grid.Column="2"
 					Grid.Row="0">
 				<TextBlock Text="Закрыть"
