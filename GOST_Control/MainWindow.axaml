@@ -3,18 +3,21 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
-        x:Class="GOST_Control.MainWindow"
+        x:Class="GOST_Control.MainWindow"		
+        Background="Transparent"
         Title="Главное окно">
+	
 	<Border BorderThickness="2"
 			BorderBrush="Aqua">
 		<Grid Name="GostControl_Okko"
 			  ColumnDefinitions="*,*,*"
 			  RowDefinitions="*,*,*"
-			  ShowGridLines="False">
+			  ShowGridLines="False"
+			  Background="#D4F5F7">
 
 			<TextBlock Grid.ColumnSpan="3"
 					   Grid.Row="0"
-					   Text="Проверка соответствия ГОСТ"
+					   Text="Выберите документ для проверки на ГОСТ"
 					   FontWeight="Bold"
 					   FontSize="30"
 					   HorizontalAlignment="Center"
@@ -24,8 +27,7 @@
 					CornerRadius="10"
 					BorderThickness="2"
 					Click="Button_Click_SelectFile"
-					Height="33"
-					Width="130"
+					Width="140"
 					VerticalAlignment="Bottom"
 					HorizontalAlignment="Center"
 					Grid.Column="1"
@@ -37,10 +39,10 @@
 			</Button>
 
 			<Button Name="Setting"
+					Click="Button_Click_Setting"
 					CornerRadius="10"
 					BorderThickness="2"
-					Height="40"
-					Width="150"
+					Width="140"
 					Margin="10"
 					VerticalAlignment="Top"
 					HorizontalAlignment="Right"

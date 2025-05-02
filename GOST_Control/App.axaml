@@ -65,7 +65,15 @@
 		<Style Selector="Grid.ThemeBlack">
 			<Setter Property="Background" Value="#181368"/>
 		</Style>
-				
+
+		<!-- Эффект размытия -->
+		<Style Selector="Window.blur-effect">
+			<Setter Property="Background" Value="Transparent"/>
+			<Setter Property="Effect">
+				<BlurEffect Radius="5"/>
+			</Setter>
+		</Style>
+
 		<FluentTheme />
     </Application.Styles>
 </Application>

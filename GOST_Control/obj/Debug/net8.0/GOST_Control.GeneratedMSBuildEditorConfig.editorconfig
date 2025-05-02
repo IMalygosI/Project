@@ -37,3 +37,6 @@ build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
 [C:/Users/dimau/Desktop/Диплом/Project/GOST_Control/MainWindow.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
+[C:/Users/dimau/Desktop/Диплом/Project/GOST_Control/SettingGost.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml

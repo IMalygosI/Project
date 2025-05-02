@@ -1,0 +1,62 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1820" d:DesignHeight="980"
+		MaxWidth="1720" MaxHeight="880"
+		MinWidth="1720" MinHeight="880"
+		WindowState="Normal"
+		x:CompileBindings="False"
+		x:Class="GOST_Control.SettingGost"
+        Title="Настройки">
+
+	<Border BorderThickness="2"
+			BorderBrush="Aqua">
+
+		<Grid Name="GostControl_Okko"
+			  ColumnDefinitions="*,*,*"
+			  RowDefinitions="*,*,*"
+			  ShowGridLines="False">
+
+
+			<Border>
+				
+			</Border>
+
+
+
+
+			<DockPanel VerticalAlignment="Top"
+					   HorizontalAlignment="Right"
+					   Grid.Column="2"
+					   Grid.Row="0"
+					   Margin="10">
+
+				<Button Name="Save"
+						Click="Button_Click_Save"
+						CornerRadius="10"
+						BorderThickness="2">
+					<TextBlock Text="Сохранить"
+							   FontWeight="Bold"
+							   HorizontalAlignment="Center"
+							   VerticalAlignment="Center"/>
+				</Button>
+
+				<Button Name="Setting"
+						Click="Button_Click_Setting_Out"
+						CornerRadius="10"
+						BorderThickness="2"
+						Margin="10 0 0 0">
+					<TextBlock Text="Выйти"
+							   FontWeight="Bold"
+							   HorizontalAlignment="Center"
+							   VerticalAlignment="Center"/>
+				</Button>
+
+			</DockPanel>
+
+		</Grid>
+
+	</Border>
+
+</Window>

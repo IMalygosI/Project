@@ -55,5 +55,20 @@ namespace GOST_Control
                 Console.WriteLine($"Ошибка: {ex.Message}");
             }
         }
+
+        /// <summary>
+        /// Настройка ГОСТа
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void Button_Click_Setting(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        {
+            this.Classes.Add("blur-effect");
+
+            SettingGost settingGost = new SettingGost();
+            await settingGost.ShowDialog(this);
+
+            this.Classes.Remove("blur-effect");
+        }
     }
 }
