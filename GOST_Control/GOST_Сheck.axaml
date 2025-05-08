@@ -6,19 +6,23 @@
 		x:CompileBindings="False"
         x:Class="GOST_Control.GOST_Сheck"
         Title="Проверка на ГОСТ">
-	
+
 	<Border BorderThickness="2"
 			BorderBrush="Aqua">
-		
+
 		<Grid Name="GostControl_Сheck_Okko"
 			  ColumnDefinitions="*,*,*"
 			  RowDefinitions="*,*,*"
 			  ShowGridLines="True">
 
-			<StackPanel Grid.ColumnSpan="3"
-						Grid.Row="0"
-						HorizontalAlignment="Left"
-						VerticalAlignment="Center">
+			<ScrollViewer Grid.ColumnSpan="3"
+						  Grid.RowSpan="3"
+						  Grid.Column="0"
+						  Grid.Row="0"
+						  VerticalScrollBarVisibility="Auto"
+						  HorizontalScrollBarVisibility="Disabled">
+				
+				<StackPanel HorizontalAlignment="Left">
 
 					<TextBlock Name="GostControl"
 							   Text="Проверка соответствия ГОСТ"
@@ -35,74 +39,99 @@
 							   Margin="0 5 0 0"
 							   Text="1---"
 							   FontWeight="Bold"
-							   FontSize="18"/>
+							   FontSize="15"/>
 
 					<!-- Проверка Удалось ли открыть документ -->
 					<TextBlock Name="ErrorControl"
 							   Margin="0 5 0 0"
 							   Text="2---"
 							   FontWeight="Bold"
-							   FontSize="18"/>
+							   FontSize="15"/>
 
 					<TextBlock Margin="0 5 0 0"
 							   Text="---"
 							   FontWeight="Bold"
-							   FontSize="18"/>
+							   FontSize="15"/>
 
 					<!-- Проверка на соответствие шрифта -->
 					<TextBlock Name="ErrorControlFont"
 							   Margin="0 5 0 0"
 							   Text="3---"
 							   FontWeight="Bold"
-							   FontSize="18"/>
+							   FontSize="15"/>
 
 					<!-- Проверка на соответствие размера шрифта -->
 					<TextBlock Name="ErrorControlFontSize"
 							   Margin="0 5 0 0"
 							   Text="4---"
 							   FontWeight="Bold"
-							   FontSize="18"/>
+							   FontSize="15"/>
 
 					<!-- Проверка на Поля документа -->
 					<TextBlock Name="ErrorControlMargins"
 							   Margin="0 5 0 0"
 							   Text="5---"
 							   FontWeight="Bold"
-							   FontSize="18"/>
+							   FontSize="15"/>
 
 					<TextBlock Margin="0 5 0 0"
 							   Text="6-!-"
 							   Name="ErrorControlViravnivanie"
 							   FontWeight="Bold"
-							   FontSize="18"/>
+							   FontSize="15"/>
 					<TextBlock Margin="0 5 0 0"
 							   Name="ErrorControlMnochitel"
 							   Text="7---"
 							   FontWeight="Bold"
-							   FontSize="18"/>
+							   FontSize="15"/>
+
+					<TextBlock Margin="0 5 0 0"
+								   Name="ErrorControlIndents"
+								   Text="19-Проверка отступов-"
+								   FontWeight="Bold"
+								   FontSize="15"/>
+
+					<TextBlock Margin="0 5 0 0"
+							   Name="ErrorControlParagraphSpacing_Unique"
+							   Text="20-Проверка отступов абзацев-"
+							   FontWeight="Bold"
+							   FontSize="15"/>
 
 					<TextBlock Name="ErrorControlFirstLineIndent"
 							   Margin="0 5 0 0"
 							   Text="8---"
 							   FontWeight="Bold"
-							   FontSize="18"/>
+							   FontSize="15"/>
 
 					<TextBlock Name="ErrorControlNumberPage"
 							   Margin="0 5 0 0"
 							   Text="9---"
 							   FontWeight="Bold"
-							   FontSize="18"/>
+							   FontSize="15"/>
 
 					<TextBlock Margin="0 5 0 0"
 							   Text="10---Заголовки"
 							   FontWeight="Bold"
-							   FontSize="20"/>
+							   FontSize="15"/>
+
+					<TextBlock Margin="0 5 0 0"
+							   Name="ErrorControlHeaderIndents"
+							   Text="-Отступы в заголовках-"
+							   FontWeight="Bold"
+							   FontSize="15"/>
+
 
 					<TextBlock Margin="0 5 0 0"
 							   Name="ErrorControlSections"
 							   Text="11---"
 							   FontWeight="Bold"
-							   FontSize="18"/>
+							   FontSize="15"/>
+
+					<TextBlock Margin="0 5 0 0"
+							   Name="ErrorControlHeaderSpacing"
+							   Text="---Абзацные отступы заголовков---"
+							   FontWeight="Bold"
+							   FontSize="15"/>
 
 					<TextBlock Margin="0 5 0 0"
 							   Text="---"
@@ -113,13 +142,13 @@
 							   Margin="0 5 0 0"
 							   Text="12.Формат бумаги: не проверено"
 							   FontWeight="Bold"
-							   FontSize="18"/>
+							   FontSize="15"/>
 
 					<TextBlock Name="ErrorControlOrientation"
 							   Margin="0 5 0 0"
 							   Text="13.Ориентация: не проверено"
 							   FontWeight="Bold"
-							   FontSize="18"/>
+							   FontSize="15"/>
 
 					<TextBlock Margin="0 5 0 0"
 							   Text="---"
@@ -128,10 +157,51 @@
 
 					<TextBlock Margin="0 5 0 0"
 							   Text="Оглавление"
-							   Name="ErrorControlTOC"
+							   Name="ErrorControlTOC_Unique"
+							   FontWeight="Bold"
+							   FontSize="15"/>
+
+					<TextBlock Margin="0 5 0 0"
+							   Name="Error_ControlToc_Spacing"
+							   Text="---Абзацные отступы Оглавление---"
+							   FontWeight="Bold"
+							   FontSize="15"/>
+
+					<TextBlock Margin="0 5 0 0"
+							   Name="ErrorControlTocIndents"
+							   Text="--- Отступы Слева, справа, первая строка у Оглавление---"
+							   FontWeight="Bold"
+							   FontSize="15"/>
+
+					<TextBlock Margin="0 5 0 0"
+							   Name="ErrorControlTocLineSpacing"
+							   Text="---Междустрочный интервал Оглавление---"
+							   FontWeight="Bold"
+							   FontSize="15"/>
+
+					<TextBlock Margin="0 5 0 0"
+							   Text="---"
 							   FontWeight="Bold"
 							   FontSize="18"/>
 
+					<TextBlock Margin="0 5 0 0"
+							   Name="Error_ControlListParagraphSpacing"
+							   Text="-проверять межстрочные интервалы и интервалы до и после для списков-"
+							   FontWeight="Bold"
+							   FontSize="18"/>
+
+					<TextBlock Margin="0 5 0 0"
+							   Name="Error_ControlBulletedLists"
+							   Text="-проверять шрифт и размер шрифта для списков-"
+							   FontWeight="Bold"
+							   FontSize="18"/>
+
+					<TextBlock Margin="0 5 0 0"
+							   Name="Error_ControlListIndents"
+							   Text="-проверять отступы для списков для списков-"
+							   FontWeight="Bold"
+							   FontSize="18"/>
+					
 					<TextBlock Margin="0 5 0 0"
 							   Text="---"
 							   FontWeight="Bold"
@@ -141,87 +211,42 @@
 							   Name="ErrorControlBulletedLists"
 							   Text="16-Проверка маркированного списка-"
 							   FontWeight="Bold"
-							   FontSize="18"/>
+							   FontSize="15"/>
 
 					<TextBlock Margin="0 5 0 0"
 							   Name="ErrorControlNumberedList"
 							   Text="17-Проверка нумерованного списка-"
 							   FontWeight="Bold"
-							   FontSize="18"/>
+							   FontSize="15"/>
 
 					<TextBlock Margin="0 5 0 0"
 							   Name="ErrorControlMultilevelList"
 							   Text="18-Проверка многоуровневого списка-"
 							   FontWeight="Bold"
-							   FontSize="18"/>
+							   FontSize="15"/>
 
 					<TextBlock Margin="0 5 0 0"
-							   Text="19---"
+							   Name="ErrorControlListSpacing"
+							   Text="---Абзацные отступы интервалов в Списках---"
 							   FontWeight="Bold"
-							   FontSize="18"/>
+							   FontSize="15"/>
 
 					<TextBlock Margin="0 5 0 0"
-							   Text="20---"
+							   Name="ErrorControlListIndents"
+							   Text="--- Отступы левой и правой строки с 1 стр Списков---"
 							   FontWeight="Bold"
-							   FontSize="18"/>
+							   FontSize="15"/>
 
-					<TextBlock Margin="0 5 0 0"
-							   Text="21---"
-							   FontWeight="Bold"
-							   FontSize="18"/>
-
-					<TextBlock Margin="0 5 0 0"
-							   Text="22---"
-							   FontWeight="Bold"
-							   FontSize="18"/>
-
-					<TextBlock Margin="0 5 0 0"
-							   Text="23---"
-							   FontWeight="Bold"
-							   FontSize="18"/>
-
-					<TextBlock Margin="0 5 0 0"
-							   Text="24---"
-							   FontWeight="Bold"
-							   FontSize="18"/>
-
-					<TextBlock Margin="0 5 0 0"
-							   Text="25---"
-							   FontWeight="Bold"
-							   FontSize="18"/>
-
-					<TextBlock Margin="0 5 0 0"
-							   Text="26---"
-							   FontWeight="Bold"
-							   FontSize="18"/>
-
-					<TextBlock Margin="0 5 0 0"
-							   Text="27---"
-							   FontWeight="Bold"
-							   FontSize="18"/>
-
-					<TextBlock Margin="0 5 0 0"
-							   Text="28---"
-							   FontWeight="Bold"
-							   FontSize="18"/>
-
-					<TextBlock Margin="0 5 0 0"
-							   Text="29---"
-							   FontWeight="Bold"
-							   FontSize="18"/>
-
-					<TextBlock Margin="0 5 0 0"
-							   Text="30---"
-							   FontWeight="Bold"
-							   FontSize="18"/>
 					<TextBlock Margin="0 5 0 0"
 							   Text="---"
 							   FontWeight="Bold"
-							   FontSize="18"/>
+							   FontSize="15"/>
 
 
-			</StackPanel>
+				</StackPanel>
 
+			</ScrollViewer>
+				
 			<TextBlock Grid.ColumnSpan="3"
 					   Grid.Row="1"
 					   Name="FilePathTextBlock"

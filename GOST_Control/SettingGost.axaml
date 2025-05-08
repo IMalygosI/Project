@@ -14,21 +14,286 @@
 			BorderBrush="Aqua">
 
 		<Grid Name="GostControl_Okko"
-			  ColumnDefinitions="*,*,*"
-			  RowDefinitions="*,*,*"
+			  ColumnDefinitions="0.2*,*,*,*,0.2*"
+			  RowDefinitions="0.2*,*,*,*,0.2*"
 			  ShowGridLines="False">
+			
+			<Border BorderThickness="2"
+					BorderBrush="Black" 
+					Grid.Column="1"
+					Grid.Row="1"
+					Grid.ColumnSpan="3"
+					Grid.RowSpan="3">
 
+				<Grid Grid.ColumnSpan="3"
+					  Grid.RowSpan="3"
+					  ColumnDefinitions="*,*,*"
+					  RowDefinitions="*,*,*"
+					  ShowGridLines="False">
 
-			<Border>
-				
+					<Border BorderThickness="0 0 2 0"
+							BorderBrush="Black"
+							Grid.Column="0"
+							Grid.Row="0"
+							Grid.RowSpan="3">
+						
+						<Grid Grid.RowSpan="3"
+							  Grid.Column="0"
+							  Grid.Row="0"
+							  ColumnDefinitions="*,1*"
+							  RowDefinitions="*,*,*,*,*,*,*,*,*,*,*,*,*,*,*,*,*,*"
+							  ShowGridLines="True">
+
+							<TextBlock Text="Настройки простого текста"
+									   FontWeight="Bold"
+									   FontSize="16"
+									   HorizontalAlignment="Center"
+									   VerticalAlignment="Center"
+									   Grid.Column="0"
+									   Grid.Row="0"
+									   Grid.ColumnSpan="2"/>
+							
+							<TextBlock Text="Тип Шрифта"
+									   HorizontalAlignment="Center"
+									   VerticalAlignment="Center"
+									   Grid.Column="0"
+									   Grid.Row="1"/>
+
+							<ComboBox HorizontalAlignment="Center"
+									  VerticalAlignment="Center"
+									  Width="240"
+									  Height="30"
+									  Grid.Column="1"
+									  Grid.Row="1"
+									  SelectedIndex="0">
+
+								<ComboBoxItem Content="Arial"/>
+								<ComboBoxItem Content="Arial Black"/>
+								<ComboBoxItem Content="Asana"/>
+								<ComboBoxItem Content="Asana Math"/>
+								<ComboBoxItem Content="Bahnschrift"/>
+								<ComboBoxItem Content="Caladea"/>
+								<ComboBoxItem Content="Calibri"/>
+								<ComboBoxItem Content="Calibri Light"/>
+								
+								<ComboBoxItem Content="Times New Roman"/>
+								<ComboBoxItem Content="..."/>
+								
+							</ComboBox>
+
+							<TextBlock Text="Размер Шрифта"
+									   HorizontalAlignment="Center"
+									   VerticalAlignment="Center"
+									   Grid.Column="0"
+									   Grid.Row="2"/>
+
+							<ComboBox HorizontalAlignment="Center"
+									  VerticalAlignment="Center"
+									  Width="240"
+									  Height="30"
+									  Grid.Column="1"
+									  Grid.Row="2"
+									  SelectedIndex="0">
+
+								<ComboBoxItem Content="8"/>
+								<ComboBoxItem Content="9"/>
+								<ComboBoxItem Content="10"/>
+								<ComboBoxItem Content="11"/>
+								<ComboBoxItem Content="12"/>
+								<ComboBoxItem Content="14"/>
+								<ComboBoxItem Content="16"/>
+								<ComboBoxItem Content="18"/>								
+								<ComboBoxItem Content="20"/>
+								<ComboBoxItem Content="22"/>
+								<ComboBoxItem Content="24"/>
+								<ComboBoxItem Content="26"/>
+								<ComboBoxItem Content="28"/>
+								<ComboBoxItem Content="36"/>
+								<ComboBoxItem Content="48"/>
+								<ComboBoxItem Content="72"/>
+								<ComboBoxItem Content="96"/>
+								
+							</ComboBox>
+
+							<TextBlock Text="Выравнивание текста"
+									   HorizontalAlignment="Center"
+									   VerticalAlignment="Center"
+									   Grid.Column="0"
+									   Grid.Row="3"/>
+
+							<ComboBox HorizontalAlignment="Center"
+									  VerticalAlignment="Center"
+									  Width="240"
+									  Height="30"
+									  Grid.Column="1"
+									  Grid.Row="3"
+									  SelectedIndex="0">
+
+								<ComboBoxItem Content="По левому краю"/>
+								<ComboBoxItem Content="По центру"/>
+								<ComboBoxItem Content="По правому краю"/>
+								<ComboBoxItem Content="По ширине"/>
+								
+							</ComboBox>
+
+							<TextBlock Text="Интервалы"
+									   FontSize="16"
+									   HorizontalAlignment="Center"
+									   VerticalAlignment="Center"
+									   Grid.Column="0"
+									   Grid.Row="4"
+									   Grid.ColumnSpan="2"/>
+
+							<TextBlock Text="Междустрочный интервал 'Тип'"
+									   HorizontalAlignment="Center"
+									   VerticalAlignment="Center"
+									   Grid.Column="0"
+									   Grid.Row="5"/>
+
+							<ComboBox HorizontalAlignment="Center"
+									  VerticalAlignment="Center"
+									  Width="240"
+									  Height="30"
+									  Grid.Column="1"
+									  Grid.Row="5"
+									  SelectedIndex="0">
+
+								<ComboBoxItem Content="Множитель"/>
+								<ComboBoxItem Content="Минимум"/>
+								<ComboBoxItem Content="Точно"/>
+
+							</ComboBox>
+
+							<TextBlock Text="Междустрочный интервал"
+									   HorizontalAlignment="Center"
+									   VerticalAlignment="Center"
+									   Grid.Column="0"
+									   Grid.Row="6"/>
+
+							<TextBox Watermark="Междустрочный интервал"
+									 Width="240"
+									 Height="30"
+									 HorizontalAlignment="Center"
+									 VerticalAlignment="Center"
+									 Grid.Column="1"
+									 Grid.Row="6"/>
+
+							<TextBlock Text="Интервал между абзацами"
+									   FontSize="16"
+									   HorizontalAlignment="Center"
+									   VerticalAlignment="Center"
+									   Grid.Column="0"
+									   Grid.Row="7"
+									   Grid.ColumnSpan="2"/>
+
+							<TextBlock Text="Перед"
+									   HorizontalAlignment="Center"
+									   VerticalAlignment="Center"
+									   Grid.Column="0"
+									   Grid.Row="8"/>
+
+							<TextBox Watermark="Перед"
+									 Width="240"
+									 Height="30"
+									 HorizontalAlignment="Center"
+									 VerticalAlignment="Center"
+									 Grid.Column="1"
+									 Grid.Row="8"/>
+
+							<TextBlock Text="После"
+									   HorizontalAlignment="Center"
+									   VerticalAlignment="Center"
+									   Grid.Column="0"
+									   Grid.Row="9"/>
+
+							<TextBox Watermark="После"
+									 Width="240"
+									 Height="30"
+									 HorizontalAlignment="Center"
+									 VerticalAlignment="Center"
+									 Grid.Column="1"
+									 Grid.Row="9"/>
+
+							<TextBlock Text="Первая строка"
+									   FontSize="16"
+									   HorizontalAlignment="Center"
+									   VerticalAlignment="Center"
+									   Grid.Column="0"
+									   Grid.Row="10"
+									   Grid.ColumnSpan="2"/>
+
+							<TextBlock Text="Отступ первой строки 'Тип'"
+									   HorizontalAlignment="Center"
+									   VerticalAlignment="Center"
+									   Grid.Column="0"
+									   Grid.Row="11"/>
+
+							<ComboBox HorizontalAlignment="Center"
+									  VerticalAlignment="Center"
+									  Width="240"
+									  Height="30"
+									  Grid.Column="1"
+									  Grid.Row="11"
+									  SelectedIndex="0">
+
+								<ComboBoxItem Content="Отступ"/>
+								<ComboBoxItem Content="Выступ"/>
+								<ComboBoxItem Content="(Нет)"/>
+
+							</ComboBox>
+
+							<TextBlock Text="Отступ первой строки"
+									   HorizontalAlignment="Center"
+									   VerticalAlignment="Center"
+									   Grid.Column="0"
+									   Grid.Row="12"/>
+
+							<TextBox Watermark="Отступ первой строки"
+									 Width="240"
+									 Height="30"
+									 HorizontalAlignment="Center"
+									 VerticalAlignment="Center"
+									 Grid.Column="1"
+									 Grid.Row="12"/>
+
+							<TextBlock Text="Отступ слева"
+									   HorizontalAlignment="Center"
+									   VerticalAlignment="Center"
+									   Grid.Column="0"
+									   Grid.Row="13"/>
+
+							<TextBox Watermark="Отступ слева"
+									 Width="240"
+									 Height="30"
+									 HorizontalAlignment="Center"
+									 VerticalAlignment="Center"
+									 Grid.Column="1"
+									 Grid.Row="13"/>
+
+							<TextBlock Text="Отступ справа"
+									   HorizontalAlignment="Center"
+									   VerticalAlignment="Center"
+									   Grid.Column="0"
+									   Grid.Row="14"/>
+
+							<TextBox Watermark="Отступ справа"
+									 Width="240"
+									 Height="30"
+									 HorizontalAlignment="Center"
+									 VerticalAlignment="Center"
+									 Grid.Column="1"
+									 Grid.Row="14"/>
+
+						</Grid>
+					</Border>
+
+				</Grid>
 			</Border>
-
-
-
 
 			<DockPanel VerticalAlignment="Top"
 					   HorizontalAlignment="Right"
-					   Grid.Column="2"
+					   Grid.Column="3"
+					   Grid.ColumnSpan="2"
 					   Grid.Row="0"
 					   Margin="10">
 

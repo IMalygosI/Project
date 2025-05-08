@@ -31,8 +31,194 @@ namespace GOST_Control
         private JsonGostService _gostService; // Сервис для работы с данными ГОСТов из JSON-файла
         private readonly Task _initializationTask; // Задача инициализации сервиса ГОСТов, запускаемая при создании экземпляра класса
 
+        // ======================= СТАНДАРТНЫЕ ЗНАЧЕНИЯ ДЛЯ ПРОСТОГО ТЕКСТА =======================
+        private const string DefaultTextFont = "Arial";
+        private const double DefaultTextSize = 11.0;
+        private const string DefaultTextAlignment = "Left";
+        private const string DefaultTextLineSpacingType = "Множитель";
+        private const double DefaultTextLineSpacingValue = 1.15;
+        private const double DefaultTextSpacingBefore = 0.0;
+        private const double DefaultTextSpacingAfter = 0.35;
+        private const string DefaultTextFirstLineType = "Нет";
+        private const double DefaultTextFirstLineIndent = 1.25;
+        private const double DefaultTextLeftIndent = 0.0;
+        private const double DefaultTextRightIndent = 0.0;
+
+        // ======================= СТАНДАРТНЫЕ ЗНАЧЕНИЯ ДЛЯ ЗАГОЛОВКОВ =======================
+        private const string DefaultHeaderFont = "Arial";
+        private const double DefaultHeaderSize = 20.0;
+        private const string DefaultHeaderAlignment = "Left";
+        private const string DefaultHeaderLineSpacingType = "Множитель";
+        private const double DefaultHeaderLineSpacingValue = 1.15;
+        private const double DefaultHeaderSpacingBefore = 0.85;
+        private const double DefaultHeaderSpacingAfter = 0.35;
+        private const string DefaultHeaderFirstLineType = "Нет";
+        private const double DefaultHeaderFirstLineIndent = 0.0;
+        private const double DefaultHeaderLeftIndent = 0.0;
+        private const double DefaultHeaderRightIndent = 0.0;
+
+        // ======================= СТАНДАРТНЫЕ ЗНАЧЕНИЯ ДЛЯ СПИСКОВ =======================
+        private const string DefaultListFont = "Arial";
+        private const double DefaultListSize = 11.0;
+        private const string DefaultListLineSpacingType = "Множитель";
+        private const double DefaultListLineSpacingValue = 1.15;
+        private const double DefaultListSpacingBefore = 0.0;
+        private const double DefaultListSpacingAfter = 0.35;
+        private const string DefaultListFirstLineType = "Выступ";
+        private const double DefaultListHangingIndent = 0.64;
+        private const double DefaultListLeftIndent = 0.62;
+        private const double DefaultListRightIndent = 0.0;
+        // для многоуровневых
+        private const double DefaultListLevel1BulletIndentLeft = 1.87;
+        private const double DefaultListLevel2BulletIndentLeft = 2.5;
+        private const double DefaultListLevel3BulletIndentLeft = 3.14;
+        private const double DefaultListLevel4BulletIndentLeft = 3.77;
+        private const double DefaultListLevel5BulletIndentLeft = 4.41;
+        private const double DefaultListLevel6BulletIndentLeft = 5.04;
+        private const double DefaultListLevel7BulletIndentLeft = 5.68;
+        private const double DefaultListLevel8BulletIndentLeft = 6.31;
+        private const double DefaultListLevel9BulletIndentLeft = 6.95;
+        private const double DefaultListLevel1BulletIndentRight = 0;
+        private const double DefaultListLevel2BulletIndentRight = 0;
+        private const double DefaultListLevel3BulletIndentRight = 0;
+        private const double DefaultListLevel4BulletIndentRight = 0;
+        private const double DefaultListLevel5BulletIndentRight = 0;
+        private const double DefaultListLevel6BulletIndentRight = 0;
+        private const double DefaultListLevel7BulletIndentRight = 0;
+        private const double DefaultListLevel8BulletIndentRight = 0;
+        private const double DefaultListLevel9BulletIndentRight = 0;
+        private const double DefaultListLevel1Indent = 0.64;
+        private const double DefaultListLevel2Indent = 0.76;
+        private const double DefaultListLevel3Indent = 0.89;
+        private const double DefaultListLevel4Indent = 1.14;
+        private const double DefaultListLevel5Indent = 1.4;
+        private const double DefaultListLevel6Indent = 1.65;
+        private const double DefaultListLevel7Indent = 1.91;
+        private const double DefaultListLevel8Indent = 2.16;
+        private const double DefaultListLevel9Indent = 2.54;
+        private const string DefaultListLevel1NumberFormat = "1.";
+        private const string DefaultListLevel2NumberFormat = "1.1";
+        private const string DefaultListLevel3NumberFormat = "1.1.1";
+        private const string DefaultListLevel4NumberFormat = "1.1.1.1";
+        private const string DefaultListLevel5NumberFormat = "1.1.1.1.1";
+        private const string DefaultListLevel6NumberFormat = "1.1.1.1.1.1";
+        private const string DefaultListLevel7NumberFormat = "1.1.1.1.1.1.1";
+        private const string DefaultListLevel8NumberFormat = "1.1.1.1.1.1.1.1";
+        private const string DefaultListLevel9NumberFormat = "1.1.1.1.1.1.1.1.1";
+        private const string DefaultListLevel1IndentOrOutdent = "Выступ";
+        private const string DefaultListLevel2IndentOrOutdent = "Выступ";
+        private const string DefaultListLevel3IndentOrOutdent = "Выступ";
+        private const string DefaultListLevel4IndentOrOutdent = "Выступ";
+        private const string DefaultListLevel5IndentOrOutdent = "Выступ";
+        private const string DefaultListLevel6IndentOrOutdent = "Выступ";
+        private const string DefaultListLevel7IndentOrOutdent = "Выступ";
+        private const string DefaultListLevel8IndentOrOutdent = "Выступ";
+        private const string DefaultListLevel9IndentOrOutdent = "Выступ";
+
         /// <summary>
-        // Конструктор по умолчанию класса GOST_Сheck. Инициализирует компоненты окна.
+        /// Вспомогательный метод для получения требуемого типа отступа в списках
+        /// </summary>
+        /// <param name="gost"></param>
+        /// <param name="level"></param>
+        /// <returns></returns>
+        private string GetRequiredIndentType(Gost gost, int level)
+        {
+            return level switch
+            {
+                1 => gost.ListLevel1IndentOrOutdent ?? gost.BulletIndentOrOutdent,
+                2 => gost.ListLevel2IndentOrOutdent ?? gost.BulletIndentOrOutdent,
+                3 => gost.ListLevel3IndentOrOutdent ?? gost.BulletIndentOrOutdent,
+                4 => gost.ListLevel4IndentOrOutdent ?? gost.BulletIndentOrOutdent,
+                5 => gost.ListLevel5IndentOrOutdent ?? gost.BulletIndentOrOutdent,
+                6 => gost.ListLevel6IndentOrOutdent ?? gost.BulletIndentOrOutdent,
+                7 => gost.ListLevel7IndentOrOutdent ?? gost.BulletIndentOrOutdent,
+                8 => gost.ListLevel8IndentOrOutdent ?? gost.BulletIndentOrOutdent,
+                9 => gost.ListLevel9IndentOrOutdent ?? gost.BulletIndentOrOutdent,
+                _ => gost.BulletIndentOrOutdent
+            };
+        }
+
+        /// <summary>
+        /// Вспомогательный метод для получения требуемого левого отступа в списках
+        /// </summary>
+        /// <param name="level"></param>
+        /// <returns></returns>
+        private double GetListLevelIndentLeft(int level)
+        {
+            switch (level)
+            {
+                case 1: return DefaultListLevel1BulletIndentLeft;
+                case 2: return DefaultListLevel2BulletIndentLeft;
+                case 3: return DefaultListLevel3BulletIndentLeft;
+                case 4: return DefaultListLevel4BulletIndentLeft;
+                case 5: return DefaultListLevel5BulletIndentLeft;
+                case 6: return DefaultListLevel6BulletIndentLeft;
+                case 7: return DefaultListLevel7BulletIndentLeft;
+                case 8: return DefaultListLevel8BulletIndentLeft;
+                case 9: return DefaultListLevel9BulletIndentLeft;
+                default: return DefaultListLevel1BulletIndentLeft; // по умолчанию уровень 1
+            }
+        }
+
+        /// <summary>
+        /// Вспомогательный метод для получения требуемого правого отступа в списках
+        /// </summary>
+        /// <param name="level"></param>
+        /// <returns></returns>
+        private double GetListLevelIndentRight(int level)
+        {
+            switch (level)
+            {
+                case 1: return DefaultListLevel1BulletIndentRight;
+                case 2: return DefaultListLevel2BulletIndentRight;
+                case 3: return DefaultListLevel3BulletIndentRight;
+                case 4: return DefaultListLevel4BulletIndentRight;
+                case 5: return DefaultListLevel5BulletIndentRight;
+                case 6: return DefaultListLevel6BulletIndentRight;
+                case 7: return DefaultListLevel7BulletIndentRight;
+                case 8: return DefaultListLevel8BulletIndentRight;
+                case 9: return DefaultListLevel9BulletIndentRight;
+                default: return DefaultListLevel1BulletIndentRight; // по умолчанию уровень 1
+            }
+        }
+
+        /// <summary>
+        /// Вспомогательный метод для получения требуемого отступа первой строки в списках
+        /// </summary>
+        /// <param name="level"></param>
+        /// <returns></returns>
+        private double GetListLevelIndent(int level)
+        {
+            switch (level)
+            {
+                case 1: return DefaultListLevel1Indent;
+                case 2: return DefaultListLevel2Indent;
+                case 3: return DefaultListLevel3Indent;
+                case 4: return DefaultListLevel4Indent;
+                case 5: return DefaultListLevel5Indent;
+                case 6: return DefaultListLevel6Indent;
+                case 7: return DefaultListLevel7Indent;
+                case 8: return DefaultListLevel8Indent;
+                case 9: return DefaultListLevel9Indent;
+                default: return DefaultListLevel1Indent; // по умолчанию уровень 1
+            }
+        }
+
+        // ======================= СТАНДАРТНЫЕ ЗНАЧЕНИЯ ДЛЯ ОГЛАВЛЕНИЯ =======================
+        private string DefaultTocFont = "Arial";
+        private const double DefaultTocSize = 11.0;
+        private const string DefaultTocAlignment = "Left";
+        private const string DefaultTocLineSpacingType = "Множитель";
+        private const double DefaultTocLineSpacingValue = 1.15;
+        private const double DefaultTocSpacingBefore = 0.0;
+        private const double DefaultTocSpacingAfter = 0.1;
+        private const string DefaultTocFirstLineType = "Нет";
+        private const double DefaultTocFirstLineIndent = 0.0;
+        private const double DefaultTocLeftIndent = 0.0;
+        private const double DefaultTocRightIndent = 0.0;
+
+        /// <summary>
+        /// Конструктор по умолчанию класса GOST_Сheck. Инициализирует компоненты окна.
         /// </summary>
         public GOST_Сheck()
         {
@@ -158,66 +344,80 @@ namespace GOST_Control
                         bool tocValid = true;
                         bool bulletedListsValid = true;
                         bool sectionsValid = true;
+                        bool textIndentsValid = true;
+                        bool paragraphSpacingValid = true;
+                        bool headerSpacingValid = true;
+                        bool tocSpacingValid = true;
+                        bool listSpacingValid = true;
+                        bool listHangingValid = true;
+                        bool headerIndentsValid = true;
+                        bool tocIndentsValid = true;
 
-                        // Список для хранения ошибок
+                        // Список хранения ошибок
                         var errors = new List<string>();
 
-                        // Проверка типа шрифта (игнорируя заголовки разделов)
+                        // ======================= ПРОСТОЙ ТЕКСТ =======================
                         if (!string.IsNullOrEmpty(gost.FontName))
                         {
-                            fontNameValid = CheckFontName(gost.FontName, body, gost);
+                            fontNameValid = CheckFontName(gost.FontName, body, gost, wordDoc);// Проверка типа шрифта
                             ErrorControlFont.Text = fontNameValid ? "Тип шрифта соответствует ГОСТу." : "Тип шрифта не соответствует.";
                             ErrorControlFont.Foreground = fontNameValid ? Brushes.Green : Brushes.Red;
                             if (!fontNameValid) errors.Add("Тип шрифта не соответствует ГОСТу");
                         }
-
-                        // Проверка размера шрифта (игнорируя заголовки разделов)
+                        
                         if (gost.FontSize.HasValue)
                         {
-                            fontSizeValid = CheckFontSize(gost.FontSize.Value, body, gost);
+                            fontSizeValid = CheckFontSize(gost.FontSize.Value, body, gost, wordDoc);// Проверка размера шрифта 
                             ErrorControlFontSize.Text = fontSizeValid ? "Размер шрифта соответствует ГОСТу!" : "Размер шрифта не соответствует!";
                             ErrorControlFontSize.Foreground = fontSizeValid ? Brushes.Green : Brushes.Red;
                             if (!fontSizeValid) errors.Add("Размер шрифта не соответствует ГОСТу");
                         }
 
-                        // Проверка полей документа
-                        if (gost.MarginTop.HasValue || gost.MarginBottom.HasValue || gost.MarginLeft.HasValue || gost.MarginRight.HasValue)
-                        {
-                            marginsValid = CheckMargins(gost.MarginTop, gost.MarginBottom, gost.MarginLeft, gost.MarginRight, body);
-                            ErrorControlMargins.Text = marginsValid ? "Поля документа соответствуют ГОСТу." : "Поля документа не соответствуют ГОСТу.";
-                            ErrorControlMargins.Foreground = marginsValid ? Brushes.Green : Brushes.Red;
-                            if (!marginsValid) errors.Add("Поля документа не соответствуют ГОСТу");
-                        }
-
-                        // Проверка межстрочного интервала
-                        if (gost.LineSpacing.HasValue)
-                        {
-                            lineSpacingValid = CheckLineSpacing(gost.LineSpacing.Value, body, gost);
-                            ErrorControlMnochitel.Text = lineSpacingValid ? "Межстрочный интервал соответствует ГОСТу." : "Межстрочный интервал не соответствует ГОСТу.";
-                            ErrorControlMnochitel.Foreground = lineSpacingValid ? Brushes.Green : Brushes.Red;
-                            if (!lineSpacingValid) errors.Add("Межстрочный интервал не соответствует ГОСТу");
-                        }
-                                
-                        // Проверка отступа первой строки
-                        if (gost.FirstLineIndent.HasValue)
-                        {
-                            firstLineIndentValid = CheckFirstLineIndent(gost.FirstLineIndent.Value, body, gost); // Добавлен параметр gost
-                            ErrorControlFirstLineIndent.Text = firstLineIndentValid ? "Отступ соответствует ГОСТу." : "Отступ не соответствует ГОСТу.";
-                            ErrorControlFirstLineIndent.Foreground = firstLineIndentValid ? Brushes.Green : Brushes.Red;
-                            if (!firstLineIndentValid) errors.Add("Отступ первой строки не соответствует ГОСТу");
-                        }
-
-                        // Проверка выравнивания текста (игнорируя заголовки разделов)
                         if (!string.IsNullOrEmpty(gost.TextAlignment))
                         {
-                            textAlignmentValid = CheckTextAlignment(gost.TextAlignment, body, gost);
+                            textAlignmentValid = CheckTextAlignment(gost.TextAlignment, body, gost);// Проверка выравнивания текст
                             ErrorControlViravnivanie.Text = textAlignmentValid ? "Выравнивание текста соответствует ГОСТу." : "Выравнивание текста не соответствует ГОСТу.";
                             ErrorControlViravnivanie.Foreground = textAlignmentValid ? Brushes.Green : Brushes.Red;
                             if (!textAlignmentValid) errors.Add("Выравнивание текста не соответствует ГОСТу");
                         }
 
-                        // Проверка нумерации страниц
-                        if (gost.PageNumbering.HasValue)
+                        if (gost.LineSpacingValue.HasValue)
+                        {
+                            lineSpacingValid = CheckLineSpacing(gost.LineSpacingValue ?? 1.5, body, gost, wordDoc);// Проверка межстрочного интервала
+                            ErrorControlMnochitel.Text = lineSpacingValid ? "Межстрочный интервал соответствует ГОСТу." : "Межстрочный интервал не соответствует ГОСТу.";
+                            ErrorControlMnochitel.Foreground = lineSpacingValid ? Brushes.Green : Brushes.Red;
+                            if (!lineSpacingValid) errors.Add("Межстрочный интервал не соответствует ГОСТу");
+                        }
+
+                        
+                        paragraphSpacingValid = CheckParagraphSpacing(body, gost, wordDoc);// Проверка интервалов между абзацами для простого текста
+                        if (gost.LineSpacingBefore.HasValue || gost.LineSpacingAfter.HasValue)
+                        {
+                            if (!paragraphSpacingValid)
+                            {
+                                errors.Add("Интервалы между абзацами не соответствуют ГОСТу");
+                            }
+                        }
+                        
+                        if (gost.FirstLineIndent.HasValue)
+                        {
+                            firstLineIndentValid = CheckFirstLineIndent(gost.FirstLineIndent.Value, body, gost, wordDoc);// Проверка отступов у простого текста
+                            ErrorControlFirstLineIndent.Text = firstLineIndentValid ? "Отступ соответствует ГОСТу." : "Отступ не соответствует ГОСТу.";
+                            ErrorControlFirstLineIndent.Foreground = firstLineIndentValid ? Brushes.Green : Brushes.Red;
+                            if (!firstLineIndentValid) errors.Add("Отступ первой строки не соответствует ГОСТу");
+                        }
+
+                        // ======================= ПОЛЯ ДОКУМЕНТА =======================
+                        if (gost.MarginTop.HasValue || gost.MarginBottom.HasValue || gost.MarginLeft.HasValue || gost.MarginRight.HasValue)
+                        {
+                            marginsValid = CheckMargins(gost.MarginTop, gost.MarginBottom, gost.MarginLeft, gost.MarginRight, body);// Проверка полей документа
+                            ErrorControlMargins.Text = marginsValid ? "Поля документа соответствуют ГОСТу." : "Поля документа не соответствуют ГОСТу.";
+                            ErrorControlMargins.Foreground = marginsValid ? Brushes.Green : Brushes.Red;
+                            if (!marginsValid) errors.Add("Поля документа не соответствуют ГОСТу");
+                        }
+
+                        // ======================= НУМЕРАЦИЯ =======================
+                        if (gost.PageNumbering.HasValue)// Проверка нумерации страниц
                         {
                             pageNumberingValid = CheckPageNumbering(wordDoc, gost.PageNumbering.Value, gost.PageNumberingAlignment, gost.PageNumberingPosition);
                             ErrorControlNumberPage.Text = pageNumberingValid ? "Нумерация страниц соответствует ГОСТу." : "Нумерация страниц не соответствует ГОСТу.";
@@ -230,44 +430,95 @@ namespace GOST_Control
                             ErrorControlNumberPage.Foreground = Brushes.Gray;
                         }
 
-                        // Проверка обязательных разделов (Введение, Заключение)
+                        // ======================= ЗАГОЛОВКИ =======================
                         if (!string.IsNullOrEmpty(gost.RequiredSections))
                         {
-                            sectionsValid = CheckRequiredSections(gost, body);
+                            sectionsValid = CheckRequiredSections(gost, body, wordDoc);// Проверка обязательных разделов (Введение, Заключение) ЗАГОЛОВКИ
                             if (!sectionsValid) errors.Add("Отсутствуют обязательные разделы");
                         }
+                        
+                        if (gost.HeaderLineSpacingBefore.HasValue || gost.HeaderLineSpacingAfter.HasValue)
+                        {
+                            headerSpacingValid = CheckHeaderParagraphSpacing(wordDoc, body, gost);// Проверка интервалов для заголовков
+                            if (!headerSpacingValid) errors.Add("Интервалы заголовков не соответствуют ГОСТу");
+                        }
+                        
+                        if (gost.HeaderIndentLeft.HasValue || gost.HeaderIndentRight.HasValue || gost.HeaderFirstLineIndent.HasValue)
+                        {
+                            headerIndentsValid = CheckHeaderIndents(body, gost);// Проверка отступов для заголовков
+                            if (!headerIndentsValid) errors.Add("Отступы заголовков не соответствуют ГОСТу");
+                        }
 
-                        // Проверка формата
+                        // ======================= ФОРМАТ ЛИСТА =======================
                         if (gost.PaperWidthMm.HasValue && gost.PaperHeightMm.HasValue)
                         {
-                            paperSizeValid = CheckPaperSize(wordDoc, gost);
+                            paperSizeValid = CheckPaperSize(wordDoc, gost);// Проверка формата 
                             if (!paperSizeValid) errors.Add("Размер бумаги не соответствует ГОСТу");
                         }
 
-                        // Проверка Ориентации
+                        // ======================= ОРИЕНТАЦИИ ЛИСТА =======================
                         if (!string.IsNullOrEmpty(gost.PageOrientation))
                         {
-                            orientationValid = CheckPageOrientation(wordDoc, gost);
+                            orientationValid = CheckPageOrientation(wordDoc, gost);// Проверка Ориентации документа
                             if (!orientationValid) errors.Add("Ориентация страницы не соответствует ГОСТу");
                         }
 
-                        // Оглавление
+                        // ======================= ОГЛАВЛЕНИЯ =======================
                         if (gost.RequireTOC.HasValue && gost.RequireTOC.Value)
                         {
-                            tocValid = CheckTableOfContents(wordDoc, gost);
+                            tocValid = CheckTableOfContents(wordDoc, gost);// Проверка оглавления
                             if (!tocValid) errors.Add("Оглавление не соответствует ГОСТу");
                         }
-
-                        // Проверка маркированных списков
-                        if (gost.RequireBulletedLists.HasValue && gost.RequireBulletedLists.Value)
+                        
+                        if (gost.TocIndentLeft.HasValue || gost.TocIndentRight.HasValue || gost.TocFirstLineIndent.HasValue)
                         {
-                            bulletedListsValid = CheckBulletedLists(body, gost);
-                            if (!bulletedListsValid) errors.Add("Маркированные списки не соответствуют ГОСТу");
+                            tocIndentsValid = CheckTocIndents(body, gost);// Проверка отступов в оглавлении
+                            if (!tocIndentsValid) errors.Add("Отступы Оглавления не соответствуют ГОСТу");
                         }
 
+                        // ======================= СПИСКИ =======================
+                        
+                        bool hasLists = body.Descendants<Paragraph>().Any(IsListItem);// Проверка списков (если они есть в документе)
+                        if (hasLists)
+                        {
+                            bulletedListsValid = CheckBulletedLists(body, gost);// Проверка базовых параметров списков
+                            if (!bulletedListsValid) errors.Add("Списки не соответствуют ГОСТу");
+                            
+                            if (gost.BulletLineSpacingBefore.HasValue || gost.BulletLineSpacingAfter.HasValue || gost.BulletLineSpacingValue.HasValue)
+                            {
+                                listSpacingValid = CheckListParagraphSpacing(body, gost);// Проверка интервалов списков
+                                if (!listSpacingValid) errors.Add("Интервалы списков не соответствуют ГОСТу");
+                            }
+                            
+                            if (gost.BulletIndentLeft.HasValue || gost.BulletIndentRight.HasValue || gost.ListHangingIndent.HasValue ||
+                                gost.ListLevel1Indent.HasValue || gost.ListLevel2Indent.HasValue || gost.ListLevel3Indent.HasValue)
+                            {
+                                listHangingValid = CheckListIndents(body, gost);// Проверка отступов списков
+                                if (!listHangingValid) errors.Add("Отступы списков не соответствуют ГОСТу");
+                            }
+                        }
+                        else
+                        {
+                            // Если списков нет, просто отмечаем что проверка не требуется
+                            Dispatcher.UIThread.Post(() => {
+                                ErrorControlBulletedLists.Text = "Списки не обнаружены - проверка не требуется";
+                                ErrorControlBulletedLists.Foreground = Brushes.Gray;
+                            });
+                        }
+
+                        // ======================= ПРОВЕРКА *** =======================
+
+
+
+
+
+
+
+
                         // Общий результат проверки
-                        if (fontNameValid && fontSizeValid && marginsValid && lineSpacingValid && firstLineIndentValid && textAlignmentValid && pageNumberingValid && 
-                            sectionsValid && paperSizeValid && orientationValid && tocValid && bulletedListsValid )
+                        if (fontNameValid && fontSizeValid && marginsValid && lineSpacingValid && firstLineIndentValid && textAlignmentValid && pageNumberingValid && sectionsValid && 
+                            paperSizeValid && orientationValid && tocValid && bulletedListsValid && textIndentsValid && paragraphSpacingValid && headerSpacingValid && tocSpacingValid && 
+                            listSpacingValid && listHangingValid && headerIndentsValid && tocIndentsValid)
                         {
                             GostControl.Text = "Документ соответствует ГОСТу.";
                             GostControl.Foreground = Brushes.Green;
@@ -290,482 +541,22 @@ namespace GOST_Control
             }
         }
 
-
         /// <summary>
-        /// Проверка маркированных списков с выделением ошибок
+        /// Метод что вызывает другие методы выделения ошибок в полях и создает документ с помечеными красным цветом ошибками
         /// </summary>
-        private bool CheckBulletedLists(Body body, Gost gost)
-        {
-            if (!(gost.RequireBulletedLists ?? false))
-            {
-                UpdateBulletedListsUI(new List<string>(), true, false);
-                return true;
-            }
-
-            var errors = new List<string>();
-            bool hasLists = false;
-            bool listsValid = true;
-            var listLevels = new Dictionary<int, int>();
-            bool hasMultiLevelLists = false;
-
-            // Сначала определяем, есть ли в документе многоуровневые списки
-            foreach (var paragraph in body.Descendants<Paragraph>())
-            {
-                if (!IsListItem(paragraph) || IsEmptyParagraph(paragraph))
-                    continue;
-
-                int level = GetListLevel(paragraph, gost);
-                if (level > 1)
-                {
-                    hasMultiLevelLists = true;
-                    break;
-                }
-            }
-
-            foreach (var paragraph in body.Descendants<Paragraph>())
-            {
-                if (!IsListItem(paragraph) || IsEmptyParagraph(paragraph))
-                    continue;
-
-                hasLists = true;
-                bool paragraphHasError = false;
-                var runsWithText = paragraph.Elements<Run>().Where(r => !string.IsNullOrWhiteSpace(r.InnerText)).ToList();
-
-                // Определяем уровень списка
-                int listLevel = GetListLevel(paragraph, gost);
-                if (!listLevels.ContainsKey(listLevel))
-                    listLevels[listLevel] = 0;
-                listLevels[listLevel]++;
-
-                // Проверка межстрочного интервала
-                if (gost.BulletLineSpacing.HasValue)
-                {
-                    var spacing = paragraph.ParagraphProperties?.SpacingBetweenLines;
-                    if (spacing?.Line == null || Math.Abs(double.Parse(spacing.Line.Value) / 240.0 - gost.BulletLineSpacing.Value) > 0.01)
-                    {
-                        errors.Add($"Межстрочный интервал не соответствует {gost.BulletLineSpacing.Value}");
-                        paragraphHasError = true;
-                    }
-                }
-
-                // Проверка отступов
-                double? requiredIndent = null;
-
-                // Если есть многоуровневые списки ИЛИ явно указаны отступы для уровней
-                if (hasMultiLevelLists ||
-                    (listLevel == 1 && gost.ListLevel1Indent.HasValue) ||
-                    (listLevel == 2 && gost.ListLevel2Indent.HasValue) ||
-                    (listLevel == 3 && gost.ListLevel3Indent.HasValue))
-                {
-                    requiredIndent = listLevel switch
-                    {
-                        1 => gost.ListLevel1Indent ?? gost.ListHangingIndent,
-                        2 => gost.ListLevel2Indent ?? gost.ListHangingIndent,
-                        3 => gost.ListLevel3Indent ?? gost.ListHangingIndent,
-                        _ => gost.ListHangingIndent
-                    };
-                }
-                else
-                {
-                    // Для простых списков используем общий отступ
-                    requiredIndent = gost.ListHangingIndent;
-                }
-
-                if (requiredIndent.HasValue)
-                {
-                    var indent = paragraph.ParagraphProperties?.Indentation;
-                    bool indentValid = false;
-
-                    if (indent?.Hanging != null && Math.Abs(double.Parse(indent.Hanging.Value) / 567.0 - requiredIndent.Value) <= 0.05)
-                    {
-                        indentValid = true;
-                    }
-                    else if (indent?.FirstLine != null && Math.Abs(double.Parse(indent.FirstLine.Value) / 567.0 - requiredIndent.Value) <= 0.05)
-                    {
-                        indentValid = true;
-                    }
-
-                    if (!indentValid)
-                    {
-                        errors.Add($"Отступ не соответствует {requiredIndent.Value} см");
-                        paragraphHasError = true;
-                    }
-                }
-
-                // Проверка формата нумерации только для нумерованных списков
-                if (IsNumberedList(paragraph))
-                {
-                    // Проверяем формат только если есть многоуровневые списки ИЛИ указаны форматы для уровней
-                    if (hasMultiLevelLists ||
-                        (listLevel == 1 && !string.IsNullOrEmpty(gost.ListLevel1NumberFormat)) ||
-                        (listLevel == 2 && !string.IsNullOrEmpty(gost.ListLevel2NumberFormat)) ||
-                        (listLevel == 3 && !string.IsNullOrEmpty(gost.ListLevel3NumberFormat)))
-                    {
-                        string? requiredFormat = listLevel switch
-                        {
-                            1 => gost.ListLevel1NumberFormat,
-                            2 => gost.ListLevel2NumberFormat,
-                            3 => gost.ListLevel3NumberFormat,
-                            _ => null
-                        };
-
-                        if (!string.IsNullOrEmpty(requiredFormat))
-                        {
-                            var firstRunText = runsWithText.FirstOrDefault()?.InnerText.Trim();
-                            if (firstRunText != null && !CheckNumberFormat(firstRunText, requiredFormat))
-                            {
-                                errors.Add($"Неверный формат нумерации '{firstRunText}' (требуется '{requiredFormat}')");
-                                paragraphHasError = true;
-                            }
-                        }
-                    }
-                }
-
-                // Проверка шрифта и размера
-                foreach (var run in runsWithText)
-                {
-                    bool runHasError = false;
-
-                    if (!string.IsNullOrEmpty(gost.BulletFontName))
-                    {
-                        var font = run.RunProperties?.RunFonts?.Ascii?.Value;
-                        if (font != null && font != gost.BulletFontName)
-                        {
-                            errors.Add($"Шрифт списка '{font}' вместо '{gost.BulletFontName}'");
-                            runHasError = true;
-                        }
-                    }
-
-                    if (gost.BulletFontSize.HasValue)
-                    {
-                        var fontSize = run.RunProperties?.FontSize;
-                        if (fontSize != null)
-                        {
-                            double actualSize = double.Parse(fontSize.Val.Value) / 2;
-                            if (Math.Abs(actualSize - gost.BulletFontSize.Value) > 0.1)
-                            {
-                                errors.Add($"Размер шрифта списка {actualSize}pt вместо {gost.BulletFontSize.Value}pt");
-                                runHasError = true;
-                            }
-                        }
-                    }
-
-                    if (runHasError)
-                    {
-                        paragraphHasError = true;
-                        HighlightRun(run);
-                    }
-                }
-
-                if (paragraphHasError)
-                {
-                    listsValid = false;
-                    HighlightParagraph(paragraph);
-                }
-            }
-
-            // Проверяем наличие списков разных уровней только если в документе есть многоуровневые списки
-            if (hasMultiLevelLists)
-            {
-                if (gost.ListLevel1Indent.HasValue && !listLevels.ContainsKey(1))
-                {
-                    errors.Add("Отсутствуют списки 1-го уровня");
-                    listsValid = false;
-                }
-
-                if (gost.ListLevel2Indent.HasValue && !listLevels.ContainsKey(2))
-                {
-                    errors.Add("Отсутствуют списки 2-го уровня");
-                    listsValid = false;
-                }
-
-                if (gost.ListLevel3Indent.HasValue && !listLevels.ContainsKey(3))
-                {
-                    errors.Add("Отсутствуют списки 3-го уровня");
-                    listsValid = false;
-                }
-            }
-
-            if (!hasLists && gost.RequireBulletedLists == true)
-            {
-                errors.Add("Отсутствуют обязательные маркированные списки");
-                listsValid = false;
-            }
-
-            UpdateBulletedListsUI(errors.Distinct().ToList(), listsValid, hasLists);
-            return listsValid;
-        }
-
-        // Вспомогательные методы для выделения
-        private int GetListLevel(Paragraph paragraph, Gost gost)
-        {
-            var numberingProps = paragraph.ParagraphProperties?.NumberingProperties;
-            if (numberingProps?.NumberingLevelReference?.Val?.Value != null)
-            {
-                return numberingProps.NumberingLevelReference.Val.Value + 1; // Уровни обычно 0-based
-            }
-
-            // Эвристика для определения уровня по отступу
-            var indent = paragraph.ParagraphProperties?.Indentation;
-            if (indent?.Left != null)
-            {
-                double leftIndent = double.Parse(indent.Left.Value) / 567.0; // в см
-
-                if (gost.ListLevel3Indent.HasValue && leftIndent >= gost.ListLevel3Indent.Value - 0.5)
-                    return 3;
-                if (gost.ListLevel2Indent.HasValue && leftIndent >= gost.ListLevel2Indent.Value - 0.5)
-                    return 2;
-            }
-
-            return 1; // По умолчанию считаем первым уровнем
-        }
-
-        private bool IsNumberedList(Paragraph paragraph)
-        {
-            var firstRun = paragraph.Elements<Run>().FirstOrDefault();
-            if (firstRun == null) return false;
-
-            var text = firstRun.InnerText.Trim();
-
-            // Проверяем форматы нумерации: 1., 1), a., a), I., и т.д.
-            return Regex.IsMatch(text, @"^(\d+[\.\)]|[a-z]\)|[A-Z]\.|I+\.|V+\.|X+\.)");
-        }
-
-        private bool CheckNumberFormat(string text, string requiredFormat)
-        {
-            // Простая проверка соответствия формата
-            if (requiredFormat.EndsWith(".") && text.EndsWith("."))
-                return true;
-            if (requiredFormat.EndsWith(")") && text.EndsWith(")"))
-                return true;
-
-            // Более сложные проверки могут быть добавлены здесь
-
-            return false;
-        }
-        private void HighlightParagraph(Paragraph p)
-        {
-            foreach (var run in p.Elements<Run>())
-            {
-                HighlightRun(run);
-            }
-        }
-
-        private void HighlightRun(Run run, IBrush? highlightColor = null)
-        {
-            run.RunProperties ??= new RunProperties();
-            // Удаляем все существующие выделения
-            run.RunProperties.RemoveAllChildren<Highlight>();
-            // Добавляем красное выделение фона
-            run.RunProperties.Append(new Highlight { Val = HighlightColorValues.Red });
-            run.RunProperties.RemoveAllChildren<DocumentFormat.OpenXml.Wordprocessing.Color>();
-        }
-
-        private void HighlightTocErrorsInReport(WordprocessingDocument doc, Gost gost)
-        {
-            double requiredSpacing = gost.LineSpacing ?? 1.5;
-            string requiredFont = gost.FontName ?? "Times New Roman";
-            double requiredSize = gost.FontSize ?? 14.0;
-
-            // Находим автоматическое оглавление
-            var tocField = doc.MainDocumentPart.Document.Body.Descendants<FieldCode>().FirstOrDefault(f => f.Text.Contains(" TOC ") || f.Text.Contains("TOC \\"));
-
-            if (tocField == null) return;
-
-            var tocContainer = tocField.Ancestors<Paragraph>().FirstOrDefault()?.Parent;
-            if (tocContainer == null) return;
-
-            bool hasSpacingError = false;
-
-            // Сначала проверяем межстрочный интервал во всем оглавлении
-            foreach (var para in tocContainer.Descendants<Paragraph>())
-            {
-                if (IsEmptyParagraph(para)) continue;
-
-                var spacing = para.ParagraphProperties?.SpacingBetweenLines;
-                if (spacing?.Line != null)
-                {
-                    double actualSpacing = double.Parse(spacing.Line.Value) / 240.0;
-                    if (Math.Abs(actualSpacing - requiredSpacing) > 0.01)
-                    {
-                        hasSpacingError = true;
-                        break;
-                    }
-                }
-                else
-                {
-                    hasSpacingError = true;
-                    break;
-                }
-            }
-
-            // Обрабатываем все параграфы
-            foreach (var para in tocContainer.Descendants<Paragraph>())
-            {
-                if (IsEmptyParagraph(para)) continue;
-
-                // Если есть ошибка интервала - выделяем весь параграф
-                if (hasSpacingError)
-                {
-                    HighlightEntireParagraph(para);
-                }
-                else
-                {
-                    // Иначе проверяем шрифт и размер для каждого Run
-                    foreach (var run in para.Descendants<Run>())
-                    {
-                        if (!string.IsNullOrWhiteSpace(run.InnerText))
-                        {
-                            bool hasFontError = false;
-                            var font = run.RunProperties?.RunFonts?.Ascii?.Value;
-                            var fontSize = run.RunProperties?.FontSize?.Val?.Value;
-
-                            if ((font != null && font != requiredFont) ||
-                                (fontSize != null && Math.Abs(double.Parse(fontSize) / 2 - requiredSize) > 0.1))
-                            {
-                                hasFontError = true;
-                            }
-
-                            if (hasFontError)
-                            {
-                                HighlightRun(run);
-                            }
-                        }
-                    }
-                }
-            }
-
-            doc.MainDocumentPart.Document.Save();
-        }
-
-        private void HighlightEntireParagraph(Paragraph para)
-        {
-            foreach (var run in para.Descendants<Run>())
-            {
-                HighlightRun(run);
-            }
-        }
-
-        private bool IsEmptyParagraph(Paragraph p)
-        {
-            return !p.Descendants<Run>().Any(r => !string.IsNullOrWhiteSpace(r.InnerText));
-        }
-
-        /// <summary>
-        /// Проверка оглавления
-        /// </summary>
-        private bool CheckTableOfContents(WordprocessingDocument doc, Gost gost)
-        {
-            // НОВОЕ: Приоритет TocFontName > FontName
-            string requiredFont = gost.TocFontName ?? gost.FontName ?? "Times New Roman";
-
-            // НОВОЕ: Приоритет TocFontSize > FontSize
-            double requiredSize = gost.TocFontSize ?? gost.FontSize ?? 14.0;
-
-            // НОВОЕ: Приоритет TocLineSpacing > LineSpacing
-            double requiredSpacing = gost.TocLineSpacing ?? gost.LineSpacing ?? 1.5;
-
-            bool hasErrors = false;
-            var errorDetails = new List<string>();
-
-            var tocField = doc.MainDocumentPart.Document.Body
-                .Descendants<FieldCode>()
-                .FirstOrDefault(f => f.Text.Contains(" TOC ") || f.Text.Contains("TOC \\"));
-
-            if (tocField == null)
-            {
-                ShowTocError("Автоматическое оглавление не найдено! Создайте через 'Ссылки → Оглавление'");
-                return false;
-            }
-
-            var tocContainer = tocField.Ancestors<Paragraph>().FirstOrDefault()?.Parent;
-            if (tocContainer == null)
-            {
-                ShowTocError("Не удалось определить границы оглавления");
-                return false;
-            }
-
-            foreach (var para in tocContainer.Descendants<Paragraph>())
-            {
-                if (IsEmptyParagraph(para)) continue;
-
-                var spacing = para.ParagraphProperties?.SpacingBetweenLines;
-                double actualSpacing = spacing?.Line != null ? double.Parse(spacing.Line.Value) / 240.0 : 0;
-                if (Math.Abs(actualSpacing - requiredSpacing) > 0.01)
-                {
-                    errorDetails.Add($"Неверный межстрочный интервал: {actualSpacing:0.##} (требуется {requiredSpacing})");
-                    hasErrors = true;
-                }
-
-                foreach (var run in para.Descendants<Run>().Where(r => !string.IsNullOrWhiteSpace(r.InnerText)))
-                {
-                    bool runHasError = false;
-
-                    var font = run.RunProperties?.RunFonts?.Ascii?.Value;
-                    if (font != requiredFont)
-                    {
-                        errorDetails.Add($"Неверный шрифт: '{font}' (требуется '{requiredFont}')");
-                        runHasError = true;
-                    }
-
-                    var size = run.RunProperties?.FontSize?.Val?.Value;
-                    if (size != null)
-                    {
-                        double actualSize = double.Parse(size) / 2;
-                        if (Math.Abs(actualSize - requiredSize) > 0.1)
-                        {
-                            errorDetails.Add($"Неверный размер шрифта: {actualSize:0.##}pt (требуется {requiredSize}pt)");
-                            runHasError = true;
-                        }
-                    }
-
-                    if (runHasError) hasErrors = true;
-                }
-            }
-
-            if (hasErrors)
-            {
-                string errorMessage = $"Ошибки в оглавлении:\n{string.Join("\n", errorDetails.Distinct().Take(3))}";
-                if (errorDetails.Count > 3) errorMessage += $"\n...и ещё {errorDetails.Count - 3} ошибок";
-                ShowTocError(errorMessage);
-            }
-            else
-            {
-                ShowTocSuccess("Оглавление соответствует требованиям ГОСТ");
-            }
-
-            return !hasErrors;
-        }
-
-        // Вспомогательные методы
-        private void ShowTocError(string message)
-        {
-            Dispatcher.UIThread.Post(() => {
-                ErrorControlTOC.Text = message;
-                ErrorControlTOC.Foreground = Brushes.Red;
-            });
-        }
-
-        private void ShowTocSuccess(string message)
-        {
-            Dispatcher.UIThread.Post(() => {
-                ErrorControlTOC.Text = message;
-                ErrorControlTOC.Foreground = Brushes.Green;
-            });
-        }
-
+        /// <param name="originalDoc"></param>
+        /// <param name="gost"></param>
+        /// <param name="errors"></param>
+        /// <param name="originalFilePath"></param>
+        /// <returns></returns>
         private async Task CreateErrorReportDocument(WordprocessingDocument originalDoc, Gost gost, List<string> errors, string originalFilePath)
         {
-            // 1. Сначала показываем диалог подтверждения
+            // 1. Сначала показываем диалог подтверждения после красим и сохраняем
             var mainWindow = (Application.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow;
-
-            bool confirmSave = await ShowConfirmationDialog(mainWindow,
-                "Сохранить отчет об ошибках",
-                "Документ не соответствует ГОСТу. Хотите сохранить отчет с выделенными ошибками?");
+            bool confirmSave = await ShowConfirmationDialog(mainWindow, "Сохранить отчет об ошибках", "Документ не соответствует ГОСТу. Хотите сохранить отчет с выделенными ошибками?");
 
             if (!confirmSave) return;
 
-            // 2. Создаем временную копию с правами на запись
             string tempPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.docx");
             File.Copy(originalFilePath, tempPath, true);
 
@@ -786,20 +577,19 @@ namespace GOST_Control
             {
                 var body = errorDoc.MainDocumentPart.Document.Body;
 
-                // Выделение ошибок в оглавлении
-                HighlightTocErrorsInReport(errorDoc, gost);
+                // Выделение ошибок ПРОСТОГО ТЕКСТА  
+                HighlightFormattingErrors(body, gost, errors);// Ммежстрочный интервал, отступы - (левый/правый) и первой строки, типа первой строки, выравнивания
+                HighlightErrorText(errorDoc, gost);//            Выделение обычного текста с ошибками
+                CheckAndHighlightParagraphSpacing(body, gost);// Выделение ошибок в интервалах между абзацами в ТЕКСТЕ
 
-                // Выделение обязательных разделов
-                HighlightRequiredSections(body, gost, errors);
+                // Выделение ошибок в заголовках
+                HighlightHeaderErrors(errorDoc, gost, errors);
 
-                // Выделение ошибок форматирования
-                HighlightFormattingErrors(body, gost, errors);
+                // Выделение ошибок в Оглавлении
+                HighlightTocErrors(errorDoc, gost);
 
-                // Выделение обычного текста с ошибками
-                HighlightErrorText(body, errors);
-
-                //  Выделение ошибок в Маркированных списках
-                CheckBulletedLists(body, gost);
+                // Выделение ошибок в списках
+                HighlightListErrors(errorDoc, gost, errors);
 
                 // Выделение ошибок в нумерации страниц
                 if (gost.PageNumbering.HasValue)
@@ -810,7 +600,7 @@ namespace GOST_Control
                 errorDoc.MainDocumentPart.Document.Save();
             }
 
-            // 5. Сохранение и открытие
+            // 5. Сохранение и открытие документа
             try
             {
                 File.Copy(tempPath, saveResult, true);
@@ -823,13 +613,1908 @@ namespace GOST_Control
         }
 
         /// <summary>
-        /// Новый метод для выделения ошибок форматирования
+        /// Проверка интервалов для заголовков
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <param name="body"></param>
+        /// <param name="gost"></param>
+        /// <returns></returns>
+        private bool CheckHeaderParagraphSpacing(WordprocessingDocument doc, Body body, Gost gost)
+        {
+            if (!gost.HeaderLineSpacingValue.HasValue && !gost.HeaderLineSpacingBefore.HasValue && !gost.HeaderLineSpacingAfter.HasValue)
+                return true;
+
+            bool hasErrors = false;
+            var headerTexts = GetHeaderTexts(body, gost);
+            var errors = new List<string>();
+            var stylesPart = doc.MainDocumentPart?.StyleDefinitionsPart;
+            var styles = stylesPart?.Styles;
+
+            foreach (var paragraph in body.Descendants<Paragraph>())
+            {
+                if (!headerTexts.Contains(paragraph.InnerText.Trim()))
+                    continue;
+
+                bool paragraphHasErrors = false;
+                var paraErrors = new List<string>();
+                var explicitSpacing = paragraph.ParagraphProperties?.SpacingBetweenLines;
+                Style style = null;
+                var styleId = paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value;
+
+                if (styleId != null && styles != null)
+                {
+                    style = styles.Elements<Style>().FirstOrDefault(s => s.StyleId?.Value == styleId);
+                }
+
+                var styleSpacing = style?.StyleParagraphProperties?.SpacingBetweenLines;
+
+                // Проверка межстрочного интервала
+                if (gost.HeaderLineSpacingValue.HasValue)
+                {
+                    double actualSpacing = DefaultHeaderLineSpacingValue;
+                    string actualSpacingType = DefaultHeaderLineSpacingType;
+                    LineSpacingRuleValues? actualRule = LineSpacingRuleValues.Auto;
+
+                    // фактическое значение
+                    var spacingSource = explicitSpacing ?? styleSpacing;
+                    if (spacingSource?.Line != null)
+                    {
+                        if (spacingSource.LineRule?.Value == LineSpacingRuleValues.Exact)
+                        {
+                            actualSpacing = double.Parse(spacingSource.Line.Value) / 20.0;
+                            actualSpacingType = "Точно";
+                            actualRule = LineSpacingRuleValues.Exact;
+                        }
+                        else if (spacingSource.LineRule?.Value == LineSpacingRuleValues.AtLeast)
+                        {
+                            actualSpacing = double.Parse(spacingSource.Line.Value) / 20.0;
+                            actualSpacingType = "Минимум";
+                            actualRule = LineSpacingRuleValues.AtLeast;
+                        }
+                        else
+                        {
+                            actualSpacing = double.Parse(spacingSource.Line.Value) / 240.0;
+                            actualSpacingType = "Множитель";
+                            actualRule = LineSpacingRuleValues.Auto;
+                        }
+                    }
+
+                    LineSpacingRuleValues requiredRule = (gost.HeaderLineSpacingType ?? DefaultHeaderLineSpacingType) switch
+                    {
+                        "Минимум" => LineSpacingRuleValues.AtLeast,
+                        "Точно" => LineSpacingRuleValues.Exact,
+                        _ => LineSpacingRuleValues.Auto
+                    };
+
+                    string requiredType = gost.HeaderLineSpacingType ?? DefaultHeaderLineSpacingType;
+
+                    // Проверка типа интервала
+                    if (actualRule != requiredRule)
+                    {
+                        paraErrors.Add($"тип интервала: '{actualSpacingType}' (требуется '{requiredType}')");
+                        paragraphHasErrors = true;
+                    }
+
+                    // Проверка значения интервала
+                    if (Math.Abs(actualSpacing - (gost.HeaderLineSpacingValue ?? DefaultHeaderLineSpacingValue)) > 0.1)
+                    {
+                        paraErrors.Add($"межстрочный интервал: {actualSpacing:F2} (требуется {(gost.HeaderLineSpacingValue ?? DefaultHeaderLineSpacingValue):F2})");
+                        paragraphHasErrors = true;
+                    }
+                }
+
+                // Проверка интервала "Перед"
+                if (gost.HeaderLineSpacingBefore.HasValue)
+                {
+                    double actualBefore = DefaultHeaderSpacingBefore;
+
+                    if (explicitSpacing?.Before?.Value != null)
+                    {
+                        actualBefore = ConvertTwipsToPoints(explicitSpacing.Before.Value);
+                    }
+                    else if (styleSpacing?.Before?.Value != null)
+                    {
+                        actualBefore = ConvertTwipsToPoints(styleSpacing.Before.Value);
+                    }
+
+                    if (Math.Abs(actualBefore - (gost.HeaderLineSpacingBefore ?? DefaultHeaderSpacingBefore)) > 0.1)
+                    {
+                        paraErrors.Add($"интервал перед: {actualBefore:F1} pt (требуется {(gost.HeaderLineSpacingBefore ?? DefaultHeaderSpacingBefore):F1} pt)");
+                        paragraphHasErrors = true;
+                    }
+                }
+
+                // Проверка интервала "После"
+                if (gost.HeaderLineSpacingAfter.HasValue)
+                {
+                    double actualAfter = DefaultHeaderSpacingAfter;
+
+                    if (explicitSpacing?.After?.Value != null)
+                    {
+                        actualAfter = ConvertTwipsToPoints(explicitSpacing.After.Value);
+                    }
+                    else if (styleSpacing?.After?.Value != null)
+                    {
+                        actualAfter = ConvertTwipsToPoints(styleSpacing.After.Value);
+                    }
+
+                    if (Math.Abs(actualAfter - (gost.HeaderLineSpacingAfter ?? DefaultHeaderSpacingAfter)) > 0.1)
+                    {
+                        paraErrors.Add($"интервал после: {actualAfter:F1} pt (требуется {(gost.HeaderLineSpacingAfter ?? DefaultHeaderSpacingAfter):F1} pt)");
+                        paragraphHasErrors = true;
+                    }
+                }
+
+                // Проверка выравнивания заголовка
+                if (!string.IsNullOrEmpty(gost.HeaderAlignment))
+                {
+                    var currentAlignment = GetAlignmentString(paragraph.ParagraphProperties?.Justification);
+                    string requiredAlignment = gost.HeaderAlignment ?? DefaultHeaderAlignment;
+
+                    if (currentAlignment != requiredAlignment)
+                    {
+                        paraErrors.Add($"выравнивание: {currentAlignment} (требуется {requiredAlignment})");
+                        paragraphHasErrors = true;
+                    }
+                }
+
+                if (paragraphHasErrors)
+                {
+                    string headerText = paragraph.InnerText.Trim();
+                    errors.Add($"Заголовок '{headerText}': {string.Join(", ", paraErrors)}");
+                    hasErrors = true;
+                }
+            }
+
+            if (hasErrors)
+            {
+                string errorMessage = $"Ошибки в заголовках:\n{string.Join("\n", errors.Take(3))}";
+                if (errors.Count > 3) errorMessage += $"\n...и ещё {errors.Count - 3} ошибок";
+                ShowHeaderError(errorMessage);
+            }
+            else
+            {
+                ShowHeaderSuccess("Интервалы и выравнивание в заголовках соответствуют ГОСТу");
+            }
+
+            return !hasErrors;
+        }
+
+        /// <summary>
+        /// Проверяет соответствие отступов заголовков требованиям ГОСТа
+        /// </summary>
+        /// <param name="body"></param>
+        /// <param name="gost"></param>
+        /// <returns></returns>
+        private bool CheckHeaderIndents(Body body, Gost gost)
+        {
+            if (!gost.HeaderIndentLeft.HasValue && !gost.HeaderIndentRight.HasValue && !gost.HeaderFirstLineIndent.HasValue)
+            {
+                Dispatcher.UIThread.Post(() => {
+
+                    ErrorControlHeaderIndents.Text = "Проверка отступов заголовков не требуется";
+                    ErrorControlHeaderIndents.Foreground = Brushes.Gray;
+
+                });
+                return true;
+            }
+
+            bool isValid = true;
+            var errors = new List<string>();
+            var headerTexts = GetHeaderTexts(body, gost);
+
+            foreach (var paragraph in body.Descendants<Paragraph>())
+            {
+                if (!headerTexts.Contains(paragraph.InnerText.Trim()))
+                    continue;
+
+                var indent = paragraph.ParagraphProperties?.Indentation;
+                bool hasError = false;
+                var errorDetails = new List<string>();
+
+                // Проверка левого отступа
+                if (gost.HeaderIndentLeft.HasValue)
+                {
+                    double actualLeft = indent?.Left?.Value != null ? TwipsToCm(double.Parse(indent.Left.Value)) : DefaultHeaderLeftIndent;
+
+                    if (Math.Abs(actualLeft - gost.HeaderIndentLeft.Value) > 0.05)
+                    {
+                        errorDetails.Add($"левый отступ: {actualLeft:F2} см (требуется {gost.HeaderIndentLeft.Value:F2} см)");
+                        hasError = true;
+                    }
+                }
+
+                // Проверка правого отступа
+                if (gost.HeaderIndentRight.HasValue)
+                {
+                    double actualRight = indent?.Right?.Value != null ? TwipsToCm(double.Parse(indent.Right.Value)) : DefaultHeaderRightIndent;
+
+                    if (Math.Abs(actualRight - gost.HeaderIndentRight.Value) > 0.05)
+                    {
+                        errorDetails.Add($"правый отступ: {actualRight:F2} см (требуется {gost.HeaderIndentRight.Value:F2} см)");
+                        hasError = true;
+                    }
+                }
+
+                // Проверка отступа/выступа первой строки
+                if (gost.HeaderFirstLineIndent.HasValue)
+                {
+                    string currentType = DefaultHeaderFirstLineType;
+                    double? currentValue = null;
+
+                    if (indent?.Hanging != null)
+                    {
+                        currentType = "выступ";
+                        currentValue = TwipsToCm(double.Parse(indent.Hanging.Value));
+                    }
+                    else if (indent?.FirstLine != null)
+                    {
+                        currentType = "отступ";
+                        currentValue = TwipsToCm(double.Parse(indent.FirstLine.Value));
+                    }
+
+                    if (!string.IsNullOrEmpty(gost.HeaderIndentOrOutdent) && gost.HeaderIndentOrOutdent != "нет")
+                    {
+                        string requiredType = gost.HeaderIndentOrOutdent == "Выступ" ? "выступ" : "отступ";
+
+                        if (currentType != requiredType)
+                        {
+                            errorDetails.Add($"тип первой строки: {currentType} (требуется {requiredType})");
+                            hasError = true;
+                        }
+                    }
+
+                    if (currentValue.HasValue)
+                    {
+                        if (Math.Abs(currentValue.Value - gost.HeaderFirstLineIndent.Value) > 0.05)
+                        {
+                            errorDetails.Add($"{currentType} первой строки: {currentValue.Value:F2} см (требуется {gost.HeaderFirstLineIndent.Value:F2} см)");
+                            hasError = true;
+                        }
+                    }
+                    else if (!string.IsNullOrEmpty(gost.HeaderIndentOrOutdent) && gost.HeaderIndentOrOutdent != "нет")
+                    {
+                        errorDetails.Add($"отсутствует {gost.HeaderIndentOrOutdent} первой строки");
+                        hasError = true;
+                    }
+                }
+
+                if (hasError)
+                {
+                    string headerText = GetShortText2(paragraph.InnerText?.Trim() ?? "");
+                    errors.Add($"Заголовок '{headerText}': {string.Join(", ", errorDetails)}");
+                    isValid = false;
+                }
+            }
+
+            Dispatcher.UIThread.Post(() => {
+                if (errors.Any())
+                {
+                    string errorMessage = $"Ошибки в отступах заголовков:\n{string.Join("\n", errors.Take(3))}";
+                    if (errors.Count > 3) errorMessage += $"\n...и ещё {errors.Count - 3} ошибок";
+                    ErrorControlHeaderIndents.Text = errorMessage;
+                    ErrorControlHeaderIndents.Foreground = Brushes.Red;
+                }
+                else
+                {
+                    ErrorControlHeaderIndents.Text = "Отступы заголовков соответствуют ГОСТу";
+                    ErrorControlHeaderIndents.Foreground = Brushes.Green;
+                }
+            });
+
+            return isValid;
+        }
+
+        /// <summary>
+        /// Выделение обязательных разделов в заголовках
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <param name="gost"></param>
+        /// <param name="errors"></param>
+        private void HighlightHeaderErrors(WordprocessingDocument doc, Gost gost, List<string> errors)
+        {
+            var body = doc.MainDocumentPart.Document.Body;
+            bool hasAnyErrors = false;
+
+            // Получаем все стили документа
+            var stylesPart = doc.MainDocumentPart?.StyleDefinitionsPart;
+            var styles = stylesPart?.Styles?.Elements<Style>().ToDictionary(s => s.StyleId.Value);
+
+            // Получаем список обязательных заголовков
+            var requiredSections = GetRequiredSectionsList(gost);
+            var normalizedSections = requiredSections.Select(s => Regex.Replace(s, @"^[\d\.\s]+", "").Trim()).ToList();
+
+            foreach (var paragraph in body.Descendants<Paragraph>())
+            {
+                var paragraphText = paragraph.InnerText.Trim();
+                string cleanText = Regex.Replace(paragraphText, @"^[\d\.\s]+", "").Trim();
+                bool isHeader = requiredSections.Contains(paragraphText) || normalizedSections.Contains(cleanText) || IsHeaderByStyle(paragraph, styles);// Проверяем является ли параграф заголовком
+
+                if (!isHeader) continue;
+
+                bool hasError = false;
+                var errorDetails = new List<string>();
+                var indent = paragraph.ParagraphProperties?.Indentation;
+                var spacing = paragraph.ParagraphProperties?.SpacingBetweenLines;
+                var justification = paragraph.ParagraphProperties?.Justification;
+                Style style = null;
+                var styleId = paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value;
+
+                if (styleId != null && styles != null && styles.TryGetValue(styleId, out var s))
+                {
+                    style = s;
+                }
+
+                // Проверка шрифта
+                if (!string.IsNullOrEmpty(gost.HeaderFontName))
+                {
+                    foreach (var run in paragraph.Elements<Run>())
+                    {
+                        if (string.IsNullOrWhiteSpace(run.InnerText)) continue;
+
+                        var font = run.RunProperties?.RunFonts?.Ascii?.Value ?? style?.StyleRunProperties?.RunFonts?.Ascii?.Value;
+
+                        if (font != null && !string.Equals(font, gost.HeaderFontName, StringComparison.OrdinalIgnoreCase))
+                        {
+                            errorDetails.Add($"неверный шрифт: '{font}' (требуется '{gost.HeaderFontName}')");
+                            hasError = true;
+                            HighlightRun(run);  // Выделение ошибочного участка
+                        }
+                    }
+                }
+
+                // Проверка межстрочного интервала и интервалов перед и после 
+                if (gost.HeaderLineSpacingValue.HasValue || gost.HeaderLineSpacingBefore.HasValue || gost.HeaderLineSpacingAfter.HasValue)
+                {
+                    var explicitSpacing = paragraph.ParagraphProperties?.SpacingBetweenLines;
+                    var styleSpacing = style?.StyleParagraphProperties?.SpacingBetweenLines;
+                    double actualSpacing = DefaultHeaderLineSpacingValue;
+                    string actualSpacingType = DefaultHeaderLineSpacingType;
+                    LineSpacingRuleValues? actualRule = LineSpacingRuleValues.Auto;
+
+                    var spacingSource = explicitSpacing ?? styleSpacing;
+
+                    if (spacingSource?.Line != null)
+                    {
+                        if (spacingSource.LineRule?.Value == LineSpacingRuleValues.Exact)
+                        {
+                            actualSpacing = double.Parse(spacingSource.Line.Value) / 20.0;
+                            actualSpacingType = "Точно";
+                            actualRule = LineSpacingRuleValues.Exact;
+                        }
+                        else if (spacingSource.LineRule?.Value == LineSpacingRuleValues.AtLeast)
+                        {
+                            actualSpacing = double.Parse(spacingSource.Line.Value) / 20.0;
+                            actualSpacingType = "Минимум";
+                            actualRule = LineSpacingRuleValues.AtLeast;
+                        }
+                        else
+                        {
+                            actualSpacing = double.Parse(spacingSource.Line.Value) / 240.0;
+                            actualSpacingType = "Множитель";
+                            actualRule = LineSpacingRuleValues.Auto;
+                        }
+                    }
+
+                    LineSpacingRuleValues requiredRule = (gost.HeaderLineSpacingType ?? DefaultHeaderLineSpacingType) switch
+                    {
+                        "Минимум" => LineSpacingRuleValues.AtLeast,
+                        "Точно" => LineSpacingRuleValues.Exact,
+                        _ => LineSpacingRuleValues.Auto
+                    };
+
+                    string requiredType = gost.HeaderLineSpacingType ?? DefaultHeaderLineSpacingType;
+
+                    if (actualRule != requiredRule)
+                    {
+                        errorDetails.Add($"тип интервала: '{actualSpacingType}' (требуется '{requiredType}')");
+                        hasError = true;
+                    }
+
+                    if (Math.Abs(actualSpacing - (gost.HeaderLineSpacingValue ?? DefaultHeaderLineSpacingValue)) > 0.1)
+                    {
+                        errorDetails.Add($"межстрочный интервал: {actualSpacing:F2} (требуется {(gost.HeaderLineSpacingValue ?? DefaultHeaderLineSpacingValue):F2})");
+                        hasError = true;
+                    }
+                }
+
+                // Проверка выравнивания заголовка
+                if (!string.IsNullOrEmpty(gost.HeaderAlignment))
+                {
+                    var currentAlignment = GetAlignmentString(paragraph.ParagraphProperties?.Justification);
+                    string requiredAlignment = gost.HeaderAlignment ?? DefaultHeaderAlignment;
+
+                    if (currentAlignment != requiredAlignment)
+                    {
+                        errorDetails.Add($"выравнивание: {currentAlignment} (требуется {requiredAlignment})");
+                        hasError = true;
+                    }
+                }
+
+                // Проверка отступа первой строки
+                if (gost.HeaderFirstLineIndent.HasValue)
+                {
+                    string currentType = DefaultHeaderFirstLineType;
+                    double? currentValue = null;
+
+                    if (indent?.Hanging != null)
+                    {
+                        currentType = "выступ";
+                        currentValue = TwipsToCm(double.Parse(indent.Hanging.Value));
+                    }
+                    else if (indent?.FirstLine != null)
+                    {
+                        currentType = "отступ";
+                        currentValue = TwipsToCm(double.Parse(indent.FirstLine.Value));
+                    }
+
+                    if (!string.IsNullOrEmpty(gost.HeaderIndentOrOutdent) && gost.HeaderIndentOrOutdent != "нет")
+                    {
+                        string requiredType = gost.HeaderIndentOrOutdent == "Выступ" ? "выступ" : "отступ";
+
+                        if (currentType != requiredType)
+                        {
+                            errorDetails.Add($"тип первой строки: {currentType} (требуется {requiredType})");
+                            hasError = true;
+                        }
+                    }
+
+                    if (currentValue.HasValue)
+                    {
+                        if (Math.Abs(currentValue.Value - gost.HeaderFirstLineIndent.Value) > 0.05)
+                        {
+                            errorDetails.Add($"{currentType} первой строки: {currentValue.Value:F2} см (требуется {gost.HeaderFirstLineIndent.Value:F2} см)");
+                            hasError = true;
+                        }
+                    }
+                    else if (!string.IsNullOrEmpty(gost.HeaderIndentOrOutdent) && gost.HeaderIndentOrOutdent != "нет")
+                    {
+                        errorDetails.Add($"отсутствует {gost.HeaderIndentOrOutdent} первой строки");
+                        hasError = true;
+                    }
+                }
+
+                // Проверка левого отступа
+                if (gost.HeaderIndentLeft.HasValue)
+                {
+                    double actualLeft = indent?.Left?.Value != null ? TwipsToCm(double.Parse(indent.Left.Value)) : DefaultHeaderLeftIndent;
+
+                    if (Math.Abs(actualLeft - gost.HeaderIndentLeft.Value) > 0.05)
+                    {
+                        errorDetails.Add($"левый отступ: {actualLeft:F2} см (требуется {gost.HeaderIndentLeft.Value:F2} см)");
+                        hasError = true;
+                    }
+                }
+
+                // Проверка правого отступа
+                if (gost.HeaderIndentRight.HasValue)
+                {
+                    double actualRight = indent?.Right?.Value != null ? TwipsToCm(double.Parse(indent.Right.Value)) : DefaultHeaderRightIndent;
+
+                    if (Math.Abs(actualRight - gost.HeaderIndentRight.Value) > 0.05)
+                    {
+                        errorDetails.Add($"правый отступ: {actualRight:F2} см (требуется {gost.HeaderIndentRight.Value:F2} см)");
+                        hasError = true;
+                    }
+                }
+
+                if (hasError)
+                {
+                    hasAnyErrors = true;
+                    string shortText = paragraphText.Length > 50 ? paragraphText.Substring(0, 47) + "..." : paragraphText;
+                    errors.Add($"Заголовок '{shortText}': {string.Join(", ", errorDetails.Distinct())}");
+
+                    // Выделяем ошибочные участки
+                    foreach (var run in paragraph.Descendants<Run>())
+                    {
+                        if (!string.IsNullOrWhiteSpace(run.InnerText))
+                        {
+                            if (run.RunProperties == null)
+                            {
+                                run.RunProperties = new RunProperties();
+                            }
+
+                            run.RunProperties.RemoveAllChildren<Highlight>();
+                            run.RunProperties.Append(new Highlight { Val = HighlightColorValues.Red });
+                        }
+                    }
+                }
+            }
+
+            if (hasAnyErrors)
+            {
+                doc.MainDocumentPart.Document.Save();
+            }
+        }
+
+        /// <summary>
+        /// Вспомогательный метод для проверки, является ли параграф заголовком по стилю
+        /// </summary>
+        /// <param name="paragraph"></param>
+        /// <param name="styles"></param>
+        /// <returns></returns>
+        private bool IsHeaderByStyle(Paragraph paragraph, Dictionary<string, Style> styles)
+        {
+            var styleId = paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value;
+            if (styleId == null || styles == null) return false;
+
+            if (styles.TryGetValue(styleId, out var style))
+            {
+                return style.Type == StyleValues.Paragraph && (style.StyleName?.Val?.Value?.Contains("Heading") == true || (style.StyleParagraphProperties?.OutlineLevel?.Val?.Value ?? 10) <= 1);
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Проверяет соответствие отступов оглавления требованиям ГОСТа
+        /// </summary>
+        /// <param name="body"></param>
+        /// <param name="gost"></param>
+        /// <returns></returns>
+        private bool CheckTocIndents(Body body, Gost gost)
+        {
+            // Если параметры отступов не заданы, проверка не требуется
+            if (!gost.TocIndentLeft.HasValue && !gost.TocIndentRight.HasValue && !gost.TocFirstLineIndent.HasValue)
+            {
+                Dispatcher.UIThread.Post(() => {
+
+                    ErrorControlTocIndents.Text = "Проверка отступов оглавления не требуется";
+                    ErrorControlTocIndents.Foreground = Brushes.Gray;
+
+                });
+                return true;
+            }
+
+            bool isValid = true;
+            var errors = new List<string>();
+
+            // Находим оглавление
+            var tocField = body.Descendants<FieldCode>().FirstOrDefault(f => f.Text.Contains(" TOC ") || f.Text.Contains("TOC \\"));
+
+            if (tocField == null)
+            {
+                Dispatcher.UIThread.Post(() => {
+
+                    ErrorControlTocIndents.Text = "Автоматическое оглавление не найдено";
+                    ErrorControlTocIndents.Foreground = Brushes.Red;
+
+                });
+                return false;
+            }
+
+            var tocContainer = tocField.Ancestors<Table>().FirstOrDefault() ?? tocField.Ancestors<Paragraph>().FirstOrDefault()?.Parent;
+
+            if (tocContainer == null) return false;
+
+            foreach (var paragraph in tocContainer.Descendants<Paragraph>())
+            {
+                if (IsEmptyParagraph(paragraph)) continue;
+
+                var indent = paragraph.ParagraphProperties?.Indentation;
+                bool hasError = false;
+                var errorDetails = new List<string>();
+
+                // 1. Проверка левого отступа оглавления
+                if (gost.TocIndentLeft.HasValue)
+                {
+                    double actualLeft = indent?.Left?.Value != null ? TwipsToCm(double.Parse(indent.Left.Value)) : DefaultTocLeftIndent;
+
+                    if (Math.Abs(actualLeft - gost.TocIndentLeft.Value) > 0.05)
+                    {
+                        errorDetails.Add($"левый отступ: {actualLeft:F2} см (требуется {gost.TocIndentLeft.Value:F2} см)");
+                        hasError = true;
+                    }
+                }
+
+                // 2. Проверка правого отступа оглавления
+                if (gost.TocIndentRight.HasValue)
+                {
+                    double actualRight = indent?.Right?.Value != null ? TwipsToCm(double.Parse(indent.Right.Value)) : DefaultTocRightIndent;
+
+                    if (Math.Abs(actualRight - gost.TocIndentRight.Value) > 0.05)
+                    {
+                        errorDetails.Add($"правый отступ: {actualRight:F2} см (требуется {gost.TocIndentRight.Value:F2} см)");
+                        hasError = true;
+                    }
+                }
+
+                // 3. Проверка отступа/выступа первой строки оглавления
+                if (gost.TocFirstLineIndent.HasValue)
+                {
+                    string currentType = "не определен";
+                    double? currentValue = null;
+
+                    if (indent?.Hanging != null)
+                    {
+                        currentType = "выступ";
+                        currentValue = TwipsToCm(double.Parse(indent.Hanging.Value));
+                    }
+                    else if (indent?.FirstLine != null)
+                    {
+                        currentType = "отступ";
+                        currentValue = TwipsToCm(double.Parse(indent.FirstLine.Value));
+                    }
+
+                    // Проверка типа отступа (отступ/выступ)
+                    if (!string.IsNullOrEmpty(gost.TocIndentOrOutdent) && gost.TocIndentOrOutdent != "нет")
+                    {
+                        string requiredType = gost.TocIndentOrOutdent == "Выступ" ? "выступ" : "отступ";
+
+                        if (currentType != requiredType)
+                        {
+                            errorDetails.Add($"тип первой строки: {currentType} (требуется {requiredType})");
+                            hasError = true;
+                        }
+                    }
+
+                    // Проверка значения отступа
+                    if (currentValue.HasValue)
+                    {
+                        if (Math.Abs(currentValue.Value - gost.TocFirstLineIndent.Value) > 0.05)
+                        {
+                            errorDetails.Add($"{currentType} первой строки: {currentValue.Value:F2} см (требуется {gost.TocFirstLineIndent.Value:F2} см)");
+                            hasError = true;
+                        }
+                    }
+                    else if (!string.IsNullOrEmpty(gost.TocIndentOrOutdent) && gost.TocIndentOrOutdent != "нет")
+                    {
+                        errorDetails.Add($"отсутствует {gost.TocIndentOrOutdent} первой строки");
+                        hasError = true;
+                    }
+                }
+
+                if (hasError)
+                {
+                    string tocText = GetShortText2(paragraph.InnerText?.Trim() ?? "");
+                    errors.Add($"Оглавление '{tocText}': {string.Join(", ", errorDetails)}");
+                    isValid = false;
+                }
+            }
+
+            Dispatcher.UIThread.Post(() => {
+                if (errors.Any())
+                {
+                    string errorMessage = $"Ошибки в отступах оглавления:\n{string.Join("\n", errors.Take(3))}";
+                    if (errors.Count > 3) errorMessage += $"\n...и ещё {errors.Count - 3} ошибок";
+
+                    ErrorControlTocIndents.Text = errorMessage;
+                    ErrorControlTocIndents.Foreground = Brushes.Red;
+                }
+                else
+                {
+                    ErrorControlTocIndents.Text = "Отступы оглавления соответствуют ГОСТу";
+                    ErrorControlTocIndents.Foreground = Brushes.Green;
+                }
+            });
+
+            return isValid;
+        }
+
+        /// <summary>
+        /// Метод проверки, является ли параграф частью оглавления
+        /// </summary>
+        /// <param name="paragraph"></param>
+        /// <returns></returns>
+        private bool IsTocParagraph(Paragraph paragraph)
+        {
+            // 1. Проверка по полю TOC (автоматическое оглавление)
+            if (paragraph.Descendants<FieldCode>().Any(f => f.Text.Contains(" TOC ") || f.Text.Contains("TOC \\")))
+                return true;
+
+            // 2. Проверка по стилю
+            var style = paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value;
+            if (!string.IsNullOrEmpty(style) && (style.Contains("TOC") || style.Contains("Contents") || style.Contains("Table")))
+                return true;
+
+            // 3. Проверка по характерным признакам
+            string text = paragraph.InnerText;
+            if (text.Contains(".........") ||          // Точечные заполнители
+                text.Contains("\t") ||                 // Табуляция
+                Regex.IsMatch(text, @"\.{3,}\s*\d+$")) // Многоточие с номером страницы
+                return true;
+
+            // 4. Проверка по родительскому элементу (таблица оглавления)
+            var parentTable = paragraph.Ancestors<Table>().FirstOrDefault();
+            if (parentTable != null)
+            {
+                // Проверяем, есть ли в таблице поле TOC
+                return parentTable.Descendants<FieldCode>().Any(f => f.Text.Contains(" TOC ") || f.Text.Contains("TOC \\"));
+            }
+
+            // 5. Проверка по соседним элементам TOC
+            var prevSibling = paragraph.PreviousSibling();
+            if (prevSibling != null && prevSibling.Descendants<FieldCode>().Any(f => f.Text.Contains(" TOC ") || f.Text.Contains("TOC \\")))
+                return true;
+
+            var nextSibling = paragraph.NextSibling();
+            if (nextSibling != null && nextSibling.Descendants<FieldCode>().Any(f => f.Text.Contains(" TOC ") || f.Text.Contains("TOC \\")))
+                return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// Проверяет соответствие интервалов в списках требованиям ГОСТа
+        /// </summary>
+        /// <param name="body"></param>
+        /// <param name="gost"></param>
+        /// <returns></returns>
+        private bool CheckListParagraphSpacing(Body body, Gost gost)
+        {
+            var lineSpacingTypeNames = new Dictionary<LineSpacingRuleValues, string>
+            {
+                { LineSpacingRuleValues.Auto, "Множитель" },
+                { LineSpacingRuleValues.AtLeast, "Минимум" },
+                { LineSpacingRuleValues.Exact, "Точно" }
+            };
+
+            bool isValid = true;
+            var errors = new List<string>();
+
+            foreach (var paragraph in body.Descendants<Paragraph>())
+            {
+                if (!IsListItem(paragraph)) continue;
+
+                var spacing = paragraph.ParagraphProperties?.SpacingBetweenLines;
+                bool hasError = false;
+                var errorDetails = new List<string>();
+
+                // Проверка межстрочного интервала
+                if (gost.BulletLineSpacingValue.HasValue)
+                {
+                    double actualSpacing = DefaultListLineSpacingValue;
+                    string actualSpacingType = DefaultListLineSpacingType;
+                    LineSpacingRuleValues? actualRule = LineSpacingRuleValues.Auto;
+
+                    if (spacing?.Line != null)
+                    {
+                        if (spacing.LineRule?.Value == LineSpacingRuleValues.Exact)
+                        {
+                            actualSpacing = double.Parse(spacing.Line.Value) / 20.0;
+                            actualSpacingType = "Точно";
+                            actualRule = LineSpacingRuleValues.Exact;
+                        }
+                        else if (spacing.LineRule?.Value == LineSpacingRuleValues.AtLeast)
+                        {
+                            actualSpacing = double.Parse(spacing.Line.Value) / 20.0;
+                            actualSpacingType = "Минимум";
+                            actualRule = LineSpacingRuleValues.AtLeast;
+                        }
+                        else
+                        {
+                            actualSpacing = double.Parse(spacing.Line.Value) / 240.0;
+                            actualSpacingType = "Множитель";
+                            actualRule = LineSpacingRuleValues.Auto;
+                        }
+                    }
+
+                    // Определяем требуемый тип интервала
+                    LineSpacingRuleValues requiredRule = (gost.BulletLineSpacingType ?? DefaultListLineSpacingType) switch
+                    {
+                        "Минимум" => LineSpacingRuleValues.AtLeast,
+                        "Точно" => LineSpacingRuleValues.Exact,
+                        _ => LineSpacingRuleValues.Auto
+                    };
+
+                    string requiredType = gost.BulletLineSpacingType ?? DefaultListLineSpacingType;
+
+                    // Проверка типа интервала
+                    if (actualRule != requiredRule)
+                    {
+                        errorDetails.Add($"тип интервала: '{actualSpacingType}' (требуется '{requiredType}')");
+                        hasError = true;
+                    }
+
+                    // Проверка значения интервала
+                    double requiredSpacingValue = gost.BulletLineSpacingValue ?? DefaultListLineSpacingValue;
+                    if (Math.Abs(actualSpacing - requiredSpacingValue) > 0.01)
+                    {
+                        errorDetails.Add($"межстрочный интервал: {actualSpacing:F2} (требуется {requiredSpacingValue:F2})");
+                        hasError = true;
+                    }
+                }
+
+                // Проверка интервалов перед/после
+                if (gost.BulletLineSpacingBefore.HasValue || gost.BulletLineSpacingAfter.HasValue)
+                {
+                    double actualBefore = spacing?.Before?.Value != null ? ConvertTwipsToPoints(spacing.Before.Value) : DefaultListSpacingBefore;
+                    double actualAfter = spacing?.After?.Value != null ? ConvertTwipsToPoints(spacing.After.Value) : DefaultListSpacingAfter;
+
+                    if (gost.BulletLineSpacingBefore.HasValue && Math.Abs(actualBefore - gost.BulletLineSpacingBefore.Value) > 0.01)
+                    {
+                        errorDetails.Add($"интервал перед: {actualBefore:F1} pt (требуется {gost.BulletLineSpacingBefore.Value:F1} pt)");
+                        hasError = true;
+                    }
+
+                    if (gost.BulletLineSpacingAfter.HasValue && Math.Abs(actualAfter - gost.BulletLineSpacingAfter.Value) > 0.01)
+                    {
+                        errorDetails.Add($"интервал после: {actualAfter:F1} pt (требуется {gost.BulletLineSpacingAfter.Value:F1} pt)");
+                        hasError = true;
+                    }
+                }
+
+                if (hasError)
+                {
+                    string shortText = GetShortText(paragraph);
+                    errors.Add($"Список '{shortText}': {string.Join(", ", errorDetails)}");
+                    isValid = false;
+                }
+            }
+
+            Dispatcher.UIThread.Post(() => {
+                if (errors.Any())
+                {
+                    string errorMessage = $"Ошибки в интервалах списков:\n{string.Join("\n", errors.Take(3))}";
+                    if (errors.Count > 3) errorMessage += $"\n...и ещё {errors.Count - 3} ошибок";
+                    ErrorControlListSpacing.Text = errorMessage;
+                    ErrorControlListSpacing.Foreground = Brushes.Red;
+                }
+                else
+                {
+                    ErrorControlListSpacing.Text = "Интервалы списков соответствуют ГОСТу";
+                    ErrorControlListSpacing.Foreground = Brushes.Green;
+                }
+            });
+
+            return isValid;
+        }
+
+        /// <summary>
+        /// Метод проверки отступов списков
+        /// </summary>
+        /// <param name="body"></param>
+        /// <param name="gost"></param>
+        /// <returns></returns>
+        private bool CheckListIndents(Body body, Gost gost)
+        {
+            if (!gost.ListHangingIndent.HasValue && !gost.ListLevel1Indent.HasValue && !gost.ListLevel2Indent.HasValue &&
+                !gost.ListLevel3Indent.HasValue && !gost.ListLevel4Indent.HasValue && !gost.ListLevel5Indent.HasValue &&
+                !gost.ListLevel6Indent.HasValue && !gost.ListLevel7Indent.HasValue && !gost.ListLevel8Indent.HasValue &&
+                !gost.ListLevel9Indent.HasValue && !gost.BulletIndentLeft.HasValue && !gost.BulletIndentRight.HasValue)
+            {
+                Dispatcher.UIThread.Post(() => {
+
+                    ErrorControlListIndents.Text = "Проверка отступов списков не требуется";
+                    ErrorControlListIndents.Foreground = Brushes.Gray;
+
+                });
+                return true;
+            }
+
+            bool isValid = true;
+            var errors = new List<string>();
+
+            foreach (var paragraph in body.Descendants<Paragraph>())
+            {
+                if (!IsStrictListItem(paragraph)) continue;
+
+                int level = GetListLevel(paragraph, gost);
+                var indent = paragraph.ParagraphProperties?.Indentation;
+                bool hasError = false;
+                var errorDetails = new List<string>();
+
+                // 1. Получаем ТРЕБУЕМЫЕ значения из ГОСТа для текущего уровня
+                double? gostRequiredIndent = level switch
+                {
+                    1 => gost.ListLevel1Indent,
+                    2 => gost.ListLevel2Indent,
+                    3 => gost.ListLevel3Indent,
+                    4 => gost.ListLevel4Indent,
+                    5 => gost.ListLevel5Indent,
+                    6 => gost.ListLevel6Indent,
+                    7 => gost.ListLevel7Indent,
+                    8 => gost.ListLevel8Indent,
+                    9 => gost.ListLevel9Indent,
+                    _ => null
+                };
+
+                // Если для уровня нет специфичного требования, используем общее значение
+                if (!gostRequiredIndent.HasValue)
+                {
+                    gostRequiredIndent = gost.ListHangingIndent;
+                }
+
+                // 2. Получаем ФАКТИЧЕСКИЕ значения из документа
+                string currentType = "не определен";
+                double? currentValue = null;
+
+                if (indent?.Hanging != null)
+                {
+                    currentType = "выступ";
+                    currentValue = TwipsToCm(double.Parse(indent.Hanging.Value));
+                }
+                else if (indent?.FirstLine != null)
+                {
+                    currentType = "отступ";
+                    currentValue = TwipsToCm(double.Parse(indent.FirstLine.Value));
+                }
+                else // Если в документе не заданы отступы, используем значения по умолчанию
+                {
+                    string defaultType = GetRequiredIndentType(gost, level).ToLower();
+                    currentType = defaultType;
+                    currentValue = GetListLevelIndent(level);
+                }
+
+                // 3. Проверяем только если в ГОСТе есть требования для отступов
+                if (gostRequiredIndent.HasValue)
+                {
+                    string requiredType = GetRequiredIndentType(gost, level).ToLower();// Получаем требуемый тип отступа из ГОСТа
+
+                    if (!string.IsNullOrEmpty(requiredType) && currentType != requiredType)
+                    {
+                        errorDetails.Add($"тип первой строки: {currentType} (требуется {requiredType})");
+                        hasError = true;
+                    }
+
+                    if (currentValue.HasValue && Math.Abs(currentValue.Value - gostRequiredIndent.Value) > 0.05)
+                    {
+                        errorDetails.Add($"{currentType} первой строки: {currentValue.Value:F2} см (требуется {gostRequiredIndent.Value:F2} см)");
+                        hasError = true;
+                    }
+                }
+
+                // 4. Проверка левого отступа 
+                if (gost.BulletIndentLeft.HasValue)
+                {
+                    double actualLeft = indent?.Left?.Value != null ? TwipsToCm(double.Parse(indent.Left.Value)) : GetListLevelIndentLeft(level);
+
+                    if (Math.Abs(actualLeft - gost.BulletIndentLeft.Value) > 0.05)
+                    {
+                        errorDetails.Add($"Левый отступ: {actualLeft:F2} см (требуется {gost.BulletIndentLeft.Value:F2} см)");
+                        hasError = true;
+                    }
+                }
+
+                // 5. Проверка правого отступа 
+                if (gost.BulletIndentRight.HasValue)
+                {
+                    double actualRight = indent?.Right?.Value != null ? TwipsToCm(double.Parse(indent.Right.Value)) : GetListLevelIndentRight(level);
+
+                    if (Math.Abs(actualRight - gost.BulletIndentRight.Value) > 0.05)
+                    {
+                        errorDetails.Add($"Правый отступ: {actualRight:F2} см (требуется {gost.BulletIndentRight.Value:F2} см)");
+                        hasError = true;
+                    }
+                }
+
+                if (hasError)
+                {
+                    string shortText = GetShortText2(paragraph.InnerText?.Trim() ?? "");
+                    errors.Add($"Список ур. {level} '{shortText}': {string.Join(", ", errorDetails)}");
+                    isValid = false;
+
+                    // Выделение ошибки
+                    foreach (var run in paragraph.Descendants<Run>())
+                    {
+                        if (!string.IsNullOrWhiteSpace(run.InnerText))
+                        {
+                            run.RunProperties ??= new RunProperties();
+                            run.RunProperties.RemoveAllChildren<Highlight>();// Удаляем выделение
+                            run.RunProperties.Append(new Highlight { Val = HighlightColorValues.Red });// Красное выделение
+                        }
+                    }
+                }
+            }
+
+            Dispatcher.UIThread.Post(() => {
+                if (errors.Any())
+                {
+                    string errorMessage = $"Ошибки в отступах списков:\n{string.Join("\n", errors.Take(3))}";
+                    if (errors.Count > 3) errorMessage += $"\n...и ещё {errors.Count - 3} ошибок";
+                    ErrorControlListIndents.Text = errorMessage;
+                    ErrorControlListIndents.Foreground = Brushes.Red;
+                }
+                else
+                {
+                    ErrorControlListIndents.Text = "Отступы списков соответствуют ГОСТу";
+                    ErrorControlListIndents.Foreground = Brushes.Green;
+                }
+            });
+
+            return isValid;
+        }
+
+        /// <summary>
+        /// Выделяет ошибки в списках на основе существующих проверок
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <param name="gost"></param>
+        /// <param name="errors"></param>
+        private void HighlightListErrors(WordprocessingDocument doc, Gost gost, List<string> errors)
+        {
+            var body = doc.MainDocumentPart.Document.Body;
+            bool hasAnyErrors = false;
+
+            foreach (var paragraph in body.Descendants<Paragraph>())
+            {
+                if (!IsListItem(paragraph)) continue;
+
+                bool hasError = false;
+                var errorDetails = new List<string>();
+                int level = GetListLevel(paragraph, gost);
+
+                // 1. Проверка формата нумерации (из CheckBulletedLists)
+                if (IsNumberedList(paragraph))
+                {
+                    string? requiredFormat = level switch
+                    {
+                        1 => gost.ListLevel1NumberFormat,
+                        2 => gost.ListLevel2NumberFormat,
+                        3 => gost.ListLevel3NumberFormat,
+                        4 => gost.ListLevel4NumberFormat,
+                        5 => gost.ListLevel5NumberFormat,
+                        6 => gost.ListLevel6NumberFormat,
+                        7 => gost.ListLevel7NumberFormat,
+                        8 => gost.ListLevel8NumberFormat,
+                        9 => gost.ListLevel9NumberFormat,
+                        _ => null
+                    };
+
+                    if (!string.IsNullOrEmpty(requiredFormat))
+                    {
+                        var firstRunText = paragraph.Elements<Run>().FirstOrDefault()?.InnerText?.Trim();
+                        if (firstRunText != null && !CheckNumberFormat(firstRunText, requiredFormat))
+                        {
+                            errorDetails.Add($"Неверный формат нумерации уровня {level}: '{firstRunText}' (требуется '{requiredFormat}')");
+                            hasError = true;
+                        }
+                    }
+                }
+
+                // 2. Проверка шрифта и размера (из CheckBulletedLists)
+                if (!string.IsNullOrEmpty(gost.BulletFontName) || gost.BulletFontSize.HasValue)
+                {
+                    foreach (var run in paragraph.Descendants<Run>())
+                    {
+                        if (string.IsNullOrWhiteSpace(run.InnerText)) continue;
+
+                        // Проверка шрифта
+                        if (!string.IsNullOrEmpty(gost.BulletFontName))
+                        {
+                            var font = run.RunProperties?.RunFonts?.Ascii?.Value ?? DefaultListFont;
+                            if (font != gost.BulletFontName)
+                            {
+                                errorDetails.Add($"Неверный шрифт списка: '{font}' (требуется '{gost.BulletFontName}')");
+                                hasError = true;
+                                break;
+                            }
+                        }
+
+                        // Проверка размера шрифта
+                        if (gost.BulletFontSize.HasValue)
+                        {
+                            var fontSizeVal = run.RunProperties?.FontSize?.Val?.Value;
+                            double actualSize = fontSizeVal != null ? double.Parse(fontSizeVal) / 2 : DefaultListSize;
+
+                            if (Math.Abs(actualSize - gost.BulletFontSize.Value) > 0.1)
+                            {
+                                errorDetails.Add($"Неверный размер шрифта: {actualSize:F1} pt (требуется {gost.BulletFontSize.Value:F1} pt)");
+                                hasError = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                // 3. Проверка отступов (из CheckListIndents)
+                var indent = paragraph.ParagraphProperties?.Indentation;
+                if (gost.BulletIndentLeft.HasValue || gost.BulletIndentRight.HasValue || gost.ListHangingIndent.HasValue || (level >= 1 && level <= 9))
+                {
+                    // Левый отступ
+                    if (gost.BulletIndentLeft.HasValue && indent?.Left != null)
+                    {
+                        double actualLeft = TwipsToCm(double.Parse(indent.Left.Value));
+                        if (Math.Abs(actualLeft - gost.BulletIndentLeft.Value) > 0.05)
+                        {
+                            errorDetails.Add($"Левый отступ списка: {actualLeft:F2} см (требуется {gost.BulletIndentLeft.Value:F2} см)");
+                            hasError = true;
+                        }
+                    }
+
+                    // Правый отступ
+                    if (gost.BulletIndentRight.HasValue && indent?.Right != null)
+                    {
+                        double actualRight = TwipsToCm(double.Parse(indent.Right.Value));
+                        if (Math.Abs(actualRight - gost.BulletIndentRight.Value) > 0.05)
+                        {
+                            errorDetails.Add($"Правый отступ списка: {actualRight:F2} см (требуется {gost.BulletIndentRight.Value:F2} см)");
+                            hasError = true;
+                        }
+                    }
+
+                    // Отступ/выступ первой строки
+                    if (gost.ListHangingIndent.HasValue || (level >= 1 && level <= 9))
+                    {
+                        double? requiredIndent = level switch
+                        {
+                            1 => gost.ListLevel1Indent ?? gost.ListHangingIndent,
+                            2 => gost.ListLevel2Indent ?? gost.ListHangingIndent,
+                            3 => gost.ListLevel3Indent ?? gost.ListHangingIndent,
+                            4 => gost.ListLevel4Indent ?? gost.ListHangingIndent,
+                            5 => gost.ListLevel5Indent ?? gost.ListHangingIndent,
+                            6 => gost.ListLevel6Indent ?? gost.ListHangingIndent,
+                            7 => gost.ListLevel7Indent ?? gost.ListHangingIndent,
+                            8 => gost.ListLevel8Indent ?? gost.ListHangingIndent,
+                            9 => gost.ListLevel9Indent ?? gost.ListHangingIndent,
+                            _ => gost.ListHangingIndent
+                        };
+
+                        if (requiredIndent.HasValue)
+                        {
+                            bool indentValid = false;
+                            if (indent?.Hanging != null &&
+                                Math.Abs(TwipsToCm(double.Parse(indent.Hanging.Value)) - requiredIndent.Value) <= 0.05)
+                            {
+                                indentValid = true;
+                            }
+                            else if (indent?.FirstLine != null &&
+                                     Math.Abs(TwipsToCm(double.Parse(indent.FirstLine.Value)) - requiredIndent.Value) <= 0.05)
+                            {
+                                indentValid = true;
+                            }
+
+                            if (!indentValid)
+                            {
+                                errorDetails.Add($"Неверный отступ/выступ: требуется {requiredIndent.Value:F2} см");
+                                hasError = true;
+                            }
+                        }
+                    }
+                }
+
+                // 4. Проверка интервалов (из CheckListParagraphSpacing)
+                var spacing = paragraph.ParagraphProperties?.SpacingBetweenLines;
+                if (gost.BulletLineSpacingBefore.HasValue || gost.BulletLineSpacingAfter.HasValue || gost.BulletLineSpacingValue.HasValue)
+                {
+                    if (gost.BulletLineSpacingBefore.HasValue)
+                    {
+                        double beforeValue = spacing?.Before?.Value != null ? ConvertTwipsToPoints(spacing.Before.Value) : DefaultListSpacingBefore;
+
+                        if (Math.Abs(beforeValue - gost.BulletLineSpacingBefore.Value) > 0.01)
+                        {
+                            errorDetails.Add($"Интервал перед: {beforeValue:F1} pt (требуется {gost.BulletLineSpacingBefore.Value:F1} pt)");
+                            hasError = true;
+                        }
+                    }
+
+                    if (gost.BulletLineSpacingAfter.HasValue)
+                    {
+                        double afterValue = spacing?.After?.Value != null ? ConvertTwipsToPoints(spacing.After.Value) : DefaultListSpacingAfter;
+
+                        if (Math.Abs(afterValue - gost.BulletLineSpacingAfter.Value) > 0.01)
+                        {
+                            errorDetails.Add($"Интервал после: {afterValue:F1} pt (требуется {gost.BulletLineSpacingAfter.Value:F1} pt)");
+                            hasError = true;
+                        }
+                    }
+
+                    if (gost.BulletLineSpacingValue.HasValue && spacing?.Line != null)
+                    {
+                        double actualSpacing = spacing.LineRule?.Value == LineSpacingRuleValues.Auto ? double.Parse(spacing.Line.Value) / 240.0 : double.Parse(spacing.Line.Value) / 20.0;
+
+                        if (Math.Abs(actualSpacing - gost.BulletLineSpacingValue.Value) > 0.01)
+                        {
+                            errorDetails.Add($"Межстрочный интервал: {actualSpacing:F2} (требуется {gost.BulletLineSpacingValue.Value:F2})");
+                            hasError = true;
+                        }
+                    }
+                }
+
+                if (hasError)
+                {
+                    string shortText = GetShortText(paragraph);
+                    errors.Add($"Список ур. {level} '{shortText}': {string.Join(", ", errorDetails)}");
+                    hasAnyErrors = true;
+
+                    // Выделение всех Run элементов в параграфе
+                    foreach (var run in paragraph.Descendants<Run>())
+                    {
+                        if (!string.IsNullOrWhiteSpace(run.InnerText))
+                        {
+                            run.RunProperties ??= new RunProperties();
+                            run.RunProperties.RemoveAllChildren<Highlight>();
+                            run.RunProperties.Append(new Highlight { Val = HighlightColorValues.Red });
+                        }
+                    }
+                }
+            }
+
+            if (hasAnyErrors)
+            {
+                doc.MainDocumentPart.Document.Save();
+            }
+        }
+
+        /// <summary>
+        /// Строгая проверка определяющая что параграф является элементом списка
+        /// </summary>
+        /// <param name="paragraph"></param>
+        /// <returns></returns>
+        private bool IsStrictListItem(Paragraph paragraph)
+        {
+            // 1. Проверка явных свойств нумерации
+            if (paragraph.ParagraphProperties?.NumberingProperties != null)
+                return true;
+
+            // 2. Проверка стилей списка
+            var styleId = paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value;
+            if (!string.IsNullOrEmpty(styleId) && (styleId.Contains("List") || styleId.Contains("Bullet") || styleId.Contains("Numbering")))
+                return true;
+
+            // 3. Проверка по содержимому (маркеры или нумерация)
+            var firstRun = paragraph.Elements<Run>().FirstOrDefault();
+            if (firstRun != null)
+            {
+                string text = firstRun.InnerText?.Trim() ?? "";
+
+                // Маркированные списки
+                if (text.StartsWith("•") || text.StartsWith("-") || text.StartsWith("—"))
+                    return true;
+
+                // Нумерованные списки
+                if (Regex.IsMatch(text, @"^\d+[\.\)]") ||   // 1. 1) 
+                    Regex.IsMatch(text, @"^[a-z]\)") ||     // a) b)
+                    Regex.IsMatch(text, @"^[IVXLCDM]+\.", RegexOptions.IgnoreCase))  // I. II.
+                    return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Проверка базовых параметров списков
+        /// </summary>
+        /// <param name="body"></param>
+        /// <param name="gost"></param>
+        /// <returns></returns>
+        private bool CheckBulletedLists(Body body, Gost gost)
+        {
+            var errors = new List<string>();
+            bool listsValid = true;
+
+            foreach (var paragraph in body.Descendants<Paragraph>())
+            {
+                if (!IsListItem(paragraph)) continue;
+
+                bool paragraphHasError = false;
+                var runsWithText = paragraph.Elements<Run>().Where(r => !string.IsNullOrWhiteSpace(r.InnerText)).ToList();
+
+                // Проверка формата нумерации
+                if (IsNumberedList(paragraph))
+                {
+                    int level = GetListLevel(paragraph, gost);
+                    string? requiredFormat = level switch
+                    {
+                        1 => gost.ListLevel1NumberFormat,
+                        2 => gost.ListLevel2NumberFormat,
+                        3 => gost.ListLevel3NumberFormat,
+                        4 => gost.ListLevel4NumberFormat,
+                        5 => gost.ListLevel5NumberFormat,
+                        6 => gost.ListLevel6NumberFormat,
+                        7 => gost.ListLevel7NumberFormat,
+                        8 => gost.ListLevel8NumberFormat,
+                        9 => gost.ListLevel9NumberFormat,
+                        _ => null
+                    };
+
+                    if (!string.IsNullOrEmpty(requiredFormat))
+                    {
+                        var firstRunText = runsWithText.FirstOrDefault()?.InnerText?.Trim();
+                        if (firstRunText != null && !CheckNumberFormat(firstRunText, requiredFormat))
+                        {
+                            errors.Add($"Неверный формат нумерации уровня {level}: '{firstRunText}' (требуется '{requiredFormat}')");
+                            paragraphHasError = true;
+                        }
+                    }
+                }
+
+                // Проверка типа шрифта
+                if (!string.IsNullOrEmpty(gost.BulletFontName))
+                {
+                    foreach (var run in runsWithText)
+                    {
+                        var font = run.RunProperties?.RunFonts?.Ascii?.Value ?? DefaultListFont;
+                        if (font != null && font != gost.BulletFontName)
+                        {
+                            errors.Add($"Неверный шрифт списка: '{font}' (требуется '{gost.BulletFontName}')");
+                            paragraphHasError = true;
+                            break;
+                        }
+                    }
+                }
+
+                // Проверка размера шрифта
+                if (gost.BulletFontSize.HasValue)
+                {
+                    foreach (var run in runsWithText)
+                    {
+                        var fontSize = run.RunProperties?.FontSize?.Val?.Value ?? DefaultListSize.ToString();
+
+                        if (fontSize != null)
+                        {
+                            double actualSize = -1;
+                            var fontSizeVal = run.RunProperties?.FontSize?.Val?.Value;
+
+                            if (fontSizeVal != null)
+                            {
+                                actualSize = double.Parse(fontSizeVal) / 2;
+                            }
+                            else
+                            {
+                                actualSize = DefaultTocSize;
+                            }
+
+                            if (Math.Abs(actualSize - gost.BulletFontSize.Value) > 0.1)
+                            {
+                                errors.Add($"Неверный размер шрифта: {actualSize}pt (требуется {gost.BulletFontSize.Value}pt) в параграфе: '{GetShortText(paragraph)}'");
+                                paragraphHasError = true;
+                                break;
+                            }
+                        }
+                        else if (gost.BulletFontSize.Value != 0) // 0 - значение по умолчанию
+                        {
+                            errors.Add("Отсутствует размер шрифта");
+                            paragraphHasError = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (paragraphHasError)
+                {
+                    listsValid = false;
+                    foreach (var run in runsWithText)
+                    {
+                        run.RunProperties ??= new RunProperties();
+                        run.RunProperties.RemoveAllChildren<Highlight>();
+                        run.RunProperties.Append(new Highlight { Val = HighlightColorValues.Red });
+                    }
+                }
+            }
+
+            UpdateBulletedListsUI(errors.Distinct().ToList(), listsValid, true);
+            return listsValid;
+        }
+
+        /// <summary>
+        /// Метод проверки оглавления с поиском всех ошибок
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <param name="gost"></param>
+        /// <returns></returns>
+        private bool CheckTableOfContents(WordprocessingDocument doc, Gost gost)
+        {
+            bool hasErrors = false;
+            var tocErrors = new List<string>();
+
+            // Получение всех стилей оглавления
+            var tocStyles = doc.MainDocumentPart?.StyleDefinitionsPart?.Styles.Elements<Style>().Where(s => s.StyleId?.Value?.StartsWith("TOC") == true).ToDictionary(s => s.StyleId.Value);
+
+            // Поиск поля оглавления
+            var tocField = doc.MainDocumentPart.Document.Body.Descendants<FieldCode>().FirstOrDefault(f => f.Text.Contains(" TOC ") || f.Text.Contains("TOC \\"));
+
+            if (tocField == null)
+            {
+                Dispatcher.UIThread.Post(() => {
+                    Error_ControlToc_Spacing.Text = "Автоматическое оглавление не найдено! Создайте через 'Ссылки → Оглавление'";
+                    Error_ControlToc_Spacing.Foreground = Brushes.Red;
+                });
+                return false;
+            }
+
+            var tocContainer = tocField.Ancestors<Table>().FirstOrDefault() ?? tocField.Ancestors<Paragraph>().FirstOrDefault()?.Parent;
+
+            if (tocContainer == null) return false;
+
+            foreach (var paragraph in tocContainer.Descendants<Paragraph>())
+            {
+                if (IsEmptyParagraph(paragraph)) continue;
+
+                bool hasError = false;
+                var errorDetails = new List<string>();
+                var indent = paragraph.ParagraphProperties?.Indentation;
+                var spacing = paragraph.ParagraphProperties?.SpacingBetweenLines;
+                Style paragraphStyle = null;
+                var styleId = paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value;
+
+                if (styleId != null && tocStyles.TryGetValue(styleId, out var style))
+                {
+                    paragraphStyle = style;
+                }
+
+                // 1. Проверка шрифта и размера
+                foreach (var run in paragraph.Descendants<Run>())
+                {
+                    if (string.IsNullOrWhiteSpace(run.InnerText) || run.InnerText.Contains("\t") || run.InnerText.Contains("..."))
+                        continue;
+
+                    // Получаем текущий шрифт из Run или стиля
+                    var font = run.RunProperties?.RunFonts?.Ascii?.Value ?? paragraphStyle?.StyleRunProperties?.RunFonts?.Ascii?.Value ?? DefaultTocFont;
+
+                    if (font == null)
+                    {
+                        font = "не задан";
+                    }
+
+                    if (!string.Equals(font, gost.TocFontName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        errorDetails.Add($"шрифт: '{font}' (требуется '{gost.TocFontName}')");
+                        hasError = true;
+                    }
+
+                    // Получаем размер шрифта
+                    double actualSize = -1;
+                    var fontSizeVal = run.RunProperties?.FontSize?.Val?.Value ?? paragraphStyle?.StyleRunProperties?.FontSize?.Val?.Value;
+
+                    if (fontSizeVal != null)
+                    {
+                        actualSize = double.Parse(fontSizeVal) / 2;
+                    }
+                    else
+                    {
+                        actualSize = DefaultTocSize;
+                    }
+
+                    if (Math.Abs(actualSize - gost.TocFontSize.Value) > 0.1)
+                    {
+                        string errorMessage = $"размер: {actualSize:F1} pt (требуется {gost.TocFontSize.Value:F1} pt)";
+
+                        if (!errorDetails.Contains(errorMessage))
+                        {
+                            errorDetails.Add(errorMessage);
+                            hasError = true;
+                        }
+                    }
+                }
+
+                // 3. Проверка выравнивания
+                var actualAlignment = GetAlignmentString(paragraph.ParagraphProperties?.Justification);
+
+                if (actualAlignment != (gost.TocAlignment ?? DefaultTocAlignment))
+                {
+                    errorDetails.Add($"выравнивание: {actualAlignment} (требуется {gost.TocAlignment ?? DefaultTocAlignment})");
+                    hasError = true;
+                }
+
+                // 4. Проверка отступов
+                // Левый отступ
+                if (gost.TocIndentLeft.HasValue)
+                {
+                    double actualLeft = indent?.Left?.Value != null ? TwipsToCm(double.Parse(indent.Left.Value)) : DefaultTocLeftIndent;
+
+                    if (Math.Abs(actualLeft - gost.TocIndentLeft.Value) > 0.05)
+                    {
+                        errorDetails.Add($"левый отступ: {actualLeft:F2} см (требуется {gost.TocIndentLeft.Value:F2} см)");
+                        hasError = true;
+                    }
+                }
+
+                // Правый отступ
+                if (gost.TocIndentRight.HasValue)
+                {
+                    double actualRight = indent?.Right?.Value != null ? TwipsToCm(double.Parse(indent.Right.Value)) : DefaultTocRightIndent;
+
+                    if (Math.Abs(actualRight - gost.TocIndentRight.Value) > 0.05)
+                    {
+                        errorDetails.Add($"правый отступ: {actualRight:F2} см (требуется {gost.TocIndentRight.Value:F2} см)");
+                        hasError = true;
+                    }
+                }
+
+                // 5. Проверка отступа/выступа первой строки
+                if (gost.TocFirstLineIndent.HasValue && gost.TocIndentOrOutdent != "нет")
+                {
+                    string currentType = "не определен";
+                    double? currentValue = null;
+
+                    if (indent?.Hanging != null)
+                    {
+                        currentType = "выступ";
+                        currentValue = TwipsToCm(double.Parse(indent.Hanging.Value));
+                    }
+                    else if (indent?.FirstLine != null)
+                    {
+                        currentType = "отступ";
+                        currentValue = TwipsToCm(double.Parse(indent.FirstLine.Value));
+                    }
+
+                    // Проверка типа
+                    if (!string.IsNullOrEmpty(gost.TocIndentOrOutdent))
+                    {
+                        string requiredType = gost.TocIndentOrOutdent == "Выступ" ? "выступ" : "отступ";
+
+                        if (currentType != requiredType)
+                        {
+                            errorDetails.Add($"тип первой строки: {currentType} (требуется {requiredType})");
+                            hasError = true;
+                        }
+                    }
+
+                    // Проверка значения
+                    if (currentValue.HasValue)
+                    {
+                        if (Math.Abs(currentValue.Value - gost.TocFirstLineIndent.Value) > 0.05)
+                        {
+                            errorDetails.Add($"{currentType} первой строки: {currentValue.Value:F2} см (требуется {gost.TocFirstLineIndent.Value:F2} см)");
+                            hasError = true;
+                        }
+                    }
+                    else
+                    {
+                        errorDetails.Add($"отсутствует {gost.TocIndentOrOutdent} первой строки");
+                        hasError = true;
+                    }
+                }
+
+                // 6. Проверка межстрочного интервала
+                if (gost.TocLineSpacing.HasValue)
+                {
+                    double actualSpacing = DefaultTocLineSpacingValue;
+                    string actualSpacingType = DefaultTocLineSpacingType;
+                    LineSpacingRuleValues? actualRule = LineSpacingRuleValues.Auto;
+
+                    if (spacing?.Line != null)
+                    {
+                        if (spacing.LineRule?.Value == LineSpacingRuleValues.Exact)
+                        {
+                            actualSpacing = double.Parse(spacing.Line.Value) / 20.0;
+                            actualSpacingType = "Точно";
+                            actualRule = LineSpacingRuleValues.Exact;
+                        }
+                        else if (spacing.LineRule?.Value == LineSpacingRuleValues.AtLeast)
+                        {
+                            actualSpacing = double.Parse(spacing.Line.Value) / 20.0;
+                            actualSpacingType = "Минимум";
+                            actualRule = LineSpacingRuleValues.AtLeast;
+                        }
+                        else
+                        {
+                            actualSpacing = double.Parse(spacing.Line.Value) / 240.0;
+                            actualSpacingType = "Множитель";
+                            actualRule = LineSpacingRuleValues.Auto;
+                        }
+                    }
+
+                    // Проверка типа интервала
+                    LineSpacingRuleValues requiredRule = (gost.TocLineSpacingType ?? DefaultTocLineSpacingType) switch
+                    {
+                        "Минимум" => LineSpacingRuleValues.AtLeast,
+                        "Точно" => LineSpacingRuleValues.Exact,
+                        _ => LineSpacingRuleValues.Auto
+                    };
+
+                    if (actualRule != requiredRule)
+                    {
+                        errorDetails.Add($"тип интервала: '{actualSpacingType}' (требуется '{gost.TocLineSpacingType ?? DefaultTocLineSpacingType}')");
+                        hasError = true;
+                    }
+
+                    // Проверка значения интервала
+                    if (Math.Abs(actualSpacing - gost.TocLineSpacing.Value) > 0.01)
+                    {
+                        errorDetails.Add($"межстрочный интервал: {actualSpacing:F2} (требуется {gost.TocLineSpacing.Value:F2})");
+                        hasError = true;
+                    }
+                }
+
+                // 7. Проверка интервалов перед/после
+                if (gost.TocLineSpacingBefore.HasValue)
+                {
+                    double actualBefore = spacing?.Before?.Value != null ? ConvertTwipsToPoints(spacing.Before.Value) : DefaultTocSpacingBefore;
+
+                    if (Math.Abs(actualBefore - gost.TocLineSpacingBefore.Value) > 0.01)
+                    {
+                        errorDetails.Add($"интервал перед: {actualBefore:F1} pt (требуется {gost.TocLineSpacingBefore.Value:F1} pt)");
+                        hasError = true;
+                    }
+                }
+
+                if (gost.TocLineSpacingAfter.HasValue)
+                {
+                    double actualAfter = spacing?.After?.Value != null ? ConvertTwipsToPoints(spacing.After.Value) : DefaultTocSpacingAfter;
+
+                    if (Math.Abs(actualAfter - gost.TocLineSpacingAfter.Value) > 0.01)
+                    {
+                        errorDetails.Add($"интервал после: {actualAfter:F1} pt (требуется {gost.TocLineSpacingAfter.Value:F1} pt)");
+                        hasError = true;
+                    }
+                }
+
+                if (hasError)
+                {
+                    string shortText = GetShortTocText(paragraph);
+                    tocErrors.Add($"Оглавление '{shortText}': {string.Join(", ", errorDetails)}");
+                    HighlightTocItem(paragraph);
+                    hasErrors = true;
+                }
+            }
+
+            Dispatcher.UIThread.Post(() => {
+                if (hasErrors)
+                {
+                    string errorMessage = $"Ошибки в оглавлении:\n{string.Join("\n", tocErrors.Take(3))}";
+                    if (tocErrors.Count > 3) errorMessage += $"\n...и ещё {tocErrors.Count - 3} ошибок";
+
+                    Error_ControlToc_Spacing.Text = errorMessage;
+                    Error_ControlToc_Spacing.Foreground = Brushes.Red;
+                }
+                else
+                {
+                    Error_ControlToc_Spacing.Text = "Оглавление полностью соответствует ГОСТу";
+                    Error_ControlToc_Spacing.Foreground = Brushes.Green;
+                }
+            });
+
+            return !hasErrors;
+        }
+
+        /// <summary>
+        /// Выделяет ошибки в Оглавлении
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <param name="gost"></param>
+        private void HighlightTocErrors(WordprocessingDocument doc, Gost gost)
+        {
+            try
+            {
+                var body = doc.MainDocumentPart?.Document?.Body;
+                if (body == null) return;
+
+                var tocStyles = doc.MainDocumentPart?.StyleDefinitionsPart?.Styles.Elements<Style>().Where(s => s.StyleId?.Value?.StartsWith("TOC") == true).ToDictionary(s => s.StyleId.Value);
+                var tocField = body.Descendants<FieldCode>().FirstOrDefault(f => f.Text?.Contains(" TOC ") == true || f.Text?.Contains("TOC \\") == true);
+
+                if (tocField == null)
+                {
+                    Debug.WriteLine("Оглавление не найдено");
+                    return;
+                }
+
+                var tocContainer = tocField.Ancestors<Table>().FirstOrDefault() ?? tocField.Ancestors<Paragraph>().FirstOrDefault()?.Parent;
+
+                if (tocContainer == null)
+                {
+                    Debug.WriteLine("Контейнер оглавления не найден");
+                    return;
+                }
+
+                bool hasAnyErrors = false;
+
+                foreach (var paragraph in tocContainer.Descendants<Paragraph>())
+                {
+                    if (IsEmptyParagraph(paragraph)) continue;
+
+                    bool hasError = false;
+                    var indent = paragraph.ParagraphProperties?.Indentation;
+                    var spacing = paragraph.ParagraphProperties?.SpacingBetweenLines;
+                    var justification = paragraph.ParagraphProperties?.Justification;
+                    
+                    Style paragraphStyle = null;
+                    var styleId = paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value; // Получаем стиль параграфа
+                    if (styleId != null && tocStyles.TryGetValue(styleId, out var style))
+                    {
+                        paragraphStyle = style;
+                    }
+
+                    // 1. Проверка шрифта и размера
+                    foreach (var run in paragraph.Descendants<Run>())
+                    {
+                        if (string.IsNullOrWhiteSpace(run.InnerText) || run.InnerText.Contains("\t") || run.InnerText.Contains("..."))
+                            continue;
+
+                        // Проверка шрифта
+                        var font = run.RunProperties?.RunFonts?.Ascii?.Value ?? paragraphStyle?.StyleRunProperties?.RunFonts?.Ascii?.Value;
+                        if (font == null || !string.Equals(font, gost.TocFontName, StringComparison.OrdinalIgnoreCase))
+                        {
+                            hasError = true;
+                            break;
+                        }
+
+                        // Проверка размера шрифта
+                        double actualSize = -1;
+                        var fontSizeVal = run.RunProperties?.FontSize?.Val?.Value ?? paragraphStyle?.StyleRunProperties?.FontSize?.Val?.Value;
+
+                        if (fontSizeVal != null)
+                        {
+                            actualSize = double.Parse(fontSizeVal) / 2;
+                        }
+                        else
+                        {
+                            actualSize = DefaultTocSize;
+                        }
+
+                        if (Math.Abs(actualSize - gost.TocFontSize.Value) > 0.1)
+                        {
+                            hasError = true;
+                            break;
+                        }
+                    }
+
+                    // 2. Проверка выравнивания
+                    var actualAlignment = GetAlignmentString(justification);
+                    if (actualAlignment != (gost.TocAlignment ?? DefaultTocAlignment))
+                    {
+                        hasError = true;
+                    }
+
+                    // 3. Проверка отступов
+                    // Левый отступ
+                    if (gost.TocIndentLeft.HasValue)
+                    {
+                        double actualLeft = indent?.Left?.Value != null ? TwipsToCm(double.Parse(indent.Left.Value)) : DefaultTocLeftIndent;
+                        if (Math.Abs(actualLeft - gost.TocIndentLeft.Value) > 0.05)
+                        {
+                            hasError = true;
+                        }
+                    }
+
+                    // Правый отступ
+                    if (gost.TocIndentRight.HasValue)
+                    {
+                        double actualRight = indent?.Right?.Value != null ? TwipsToCm(double.Parse(indent.Right.Value)) : DefaultTocRightIndent;
+                        if (Math.Abs(actualRight - gost.TocIndentRight.Value) > 0.05)
+                        {
+                            hasError = true;
+                        }
+                    }
+
+                    // 4. Проверка отступа/выступа первой строки
+                    if (gost.TocFirstLineIndent.HasValue && !string.IsNullOrEmpty(gost.TocIndentOrOutdent))
+                    {
+                        if (gost.TocIndentOrOutdent != "нет")
+                        {
+                            string currentType = "не определен";
+                            double? currentValue = null;
+
+                            if (indent?.Hanging != null)
+                            {
+                                currentType = "выступ";
+                                currentValue = TwipsToCm(double.Parse(indent.Hanging.Value));
+                            }
+                            else if (indent?.FirstLine != null)
+                            {
+                                currentType = "отступ";
+                                currentValue = TwipsToCm(double.Parse(indent.FirstLine.Value));
+                            }
+
+                            string requiredType = gost.TocIndentOrOutdent.ToLower().Trim();
+                            currentType = currentType.ToLower().Trim();
+
+                            // Проверка типа
+                            if (currentType != requiredType)
+                            {
+                                hasError = true;
+                                Debug.WriteLine($"Ошибка типа первой строки: текущий '{currentType}', требуется '{requiredType}'");
+                            }
+
+                            if (currentValue.HasValue)
+                            {
+                                if (Math.Abs(currentValue.Value - gost.TocFirstLineIndent.Value) > 0.05)
+                                {
+                                    hasError = true;
+                                    Debug.WriteLine($"Ошибка значения первой строки: текущее '{currentValue:F2} см', требуется '{gost.TocFirstLineIndent.Value:F2} см'");
+                                }
+                            }
+                            else
+                            {
+                                hasError = true;
+                                Debug.WriteLine("Отсутствует отступ/выступ первой строки");
+                            }
+                        }
+                    }
+
+                    // 5. Проверка межстрочного интервала
+                    if (gost.TocLineSpacing.HasValue)
+                    {
+                        double actualSpacing = DefaultTocLineSpacingValue;
+                        LineSpacingRuleValues? actualRule = LineSpacingRuleValues.Auto;
+
+                        if (spacing?.Line != null)
+                        {
+                            if (spacing.LineRule?.Value == LineSpacingRuleValues.Exact)
+                            {
+                                actualSpacing = double.Parse(spacing.Line.Value) / 20.0;
+                                actualRule = LineSpacingRuleValues.Exact;
+                            }
+                            else if (spacing.LineRule?.Value == LineSpacingRuleValues.AtLeast)
+                            {
+                                actualSpacing = double.Parse(spacing.Line.Value) / 20.0;
+                                actualRule = LineSpacingRuleValues.AtLeast;
+                            }
+                            else
+                            {
+                                actualSpacing = double.Parse(spacing.Line.Value) / 240.0;
+                                actualRule = LineSpacingRuleValues.Auto;
+                            }
+                        }
+
+                        // Проверка типа интервала
+                        LineSpacingRuleValues requiredRule = (gost.TocLineSpacingType ?? DefaultTocLineSpacingType) switch
+                        {
+                            "Минимум" => LineSpacingRuleValues.AtLeast,
+                            "Точно" => LineSpacingRuleValues.Exact,
+                            _ => LineSpacingRuleValues.Auto
+                        };
+
+                        if (actualRule != requiredRule || Math.Abs(actualSpacing - gost.TocLineSpacing.Value) > 0.01)
+                        {
+                            hasError = true;
+                        }
+                    }
+
+                    // 6. Проверка интервалов перед/после
+                    if (gost.TocLineSpacingBefore.HasValue)
+                    {
+                        double actualBefore = spacing?.Before?.Value != null ? ConvertTwipsToPoints(spacing.Before.Value) : DefaultTocSpacingBefore;
+
+                        if (Math.Abs(actualBefore - gost.TocLineSpacingBefore.Value) > 0.01)
+                        {
+                            hasError = true;
+                        }
+                    }
+
+                    if (gost.TocLineSpacingAfter.HasValue)
+                    {
+                        double actualAfter = spacing?.After?.Value != null ? ConvertTwipsToPoints(spacing.After.Value) : DefaultTocSpacingAfter;
+
+                        if (Math.Abs(actualAfter - gost.TocLineSpacingAfter.Value) > 0.01)
+                        {
+                            hasError = true;
+                        }
+                    }
+
+                    if (hasError)
+                    {
+                        hasAnyErrors = true;
+                        HighlightParagraph(paragraph);
+                    }
+                }
+
+                if (!hasAnyErrors)
+                {
+                    Debug.WriteLine("Ошибок форматирования в оглавлении не найдено.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Ошибка при подсветке ошибок в оглавлении: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Выделение в Оглавлении
+        /// </summary>
+        /// <param name="paragraph"></param>
+        private void HighlightTocItem(Paragraph paragraph)
+        {
+            foreach (var run in paragraph.Elements<Run>())
+            {
+                if (string.IsNullOrWhiteSpace(run.InnerText)) continue;
+
+                run.RunProperties ??= new RunProperties();
+
+                // Удаление старого выделение
+                var existingHighlight = run.RunProperties.Elements<Highlight>().FirstOrDefault();
+                if (existingHighlight != null)
+                {
+                    run.RunProperties.RemoveChild(existingHighlight);
+                }
+                
+                run.RunProperties.Append(new Highlight { Val = HighlightColorValues.Red }); // Красное выделение фона
+
+            }
+        }
+
+        /// <summary>
+        /// Метод для выделения ошибок в тексте "включая межстрочный интервал, отступы и выравнивание"
         /// </summary>
         /// <param name="body"></param>
         /// <param name="gost"></param>
         /// <param name="errors"></param>
         private void HighlightFormattingErrors(Body body, Gost gost, List<string> errors)
         {
+            var headerTexts = GetHeaderTexts(body, gost);
+            string requiredAlignment = gost.TextAlignment; 
+
             foreach (var paragraph in body.Descendants<Paragraph>())
             {
                 if (IsEmptyParagraph(paragraph)) continue;
@@ -838,54 +2523,168 @@ namespace GOST_Control
                 if (IsTocParagraph(paragraph) || IsHeaderParagraph(paragraph, gost) || IsListItem(paragraph))
                     continue;
 
-                // Проверка только для обычного текста
                 bool hasError = false;
+                var errorDetails = new List<string>();
+                var indent = paragraph.ParagraphProperties?.Indentation;
+                var spacing = paragraph.ParagraphProperties?.SpacingBetweenLines;
 
                 // 1. Проверка межстрочного интервала
-                if (gost.LineSpacing.HasValue)
+                if (gost.LineSpacingValue.HasValue)
                 {
-                    var spacing = paragraph.ParagraphProperties?.SpacingBetweenLines;
                     if (spacing?.Line == null ||
-                        Math.Abs(double.Parse(spacing.Line.Value) / 240.0 - gost.LineSpacing.Value) > 0.01)
+                        Math.Abs(double.Parse(spacing.Line.Value) / 240.0 - gost.LineSpacingValue.Value) > 0.01)
                     {
                         hasError = true;
-                        errors.Add($"Неверный межстрочный интервал в тексте: '{paragraph.InnerText.Trim()}'");
+                        errorDetails.Add("Неверный межстрочный интервал");
                     }
                 }
 
-                // 2. Проверка отступа первой строки
-                if (gost.FirstLineIndent.HasValue)
+                // 2. Проверка отступов
+                if (gost.IndentLeftText.HasValue)
                 {
-                    var indent = paragraph.ParagraphProperties?.Indentation;
-                    if (indent?.FirstLine == null ||
-                        Math.Abs(double.Parse(indent.FirstLine.Value) / 567.0 - gost.FirstLineIndent.Value) > 0.05)
+                    double actualLeft = indent?.Left?.Value != null ? TwipsToCm(double.Parse(indent.Left.Value)) : 0;
+
+                    if (Math.Abs(actualLeft - gost.IndentLeftText.Value) > 0.05)
                     {
+                        errorDetails.Add($"левый отступ: {actualLeft:F2} см (требуется {gost.IndentLeftText.Value:F2} см)");
                         hasError = true;
-                        errors.Add($"Неверный отступ в тексте: '{paragraph.InnerText.Trim()}'");
                     }
                 }
 
-                // 3. Проверка выравнивания
-                if (!string.IsNullOrEmpty(gost.TextAlignment))
+                if (gost.IndentRightText.HasValue)
                 {
-                    var currentAlignment = GetAlignmentString(paragraph.ParagraphProperties?.Justification);
-                    if (currentAlignment != gost.TextAlignment)
+                    double actualRight = indent?.Right?.Value != null ? TwipsToCm(double.Parse(indent.Right.Value)) : 0;
+
+                    if (Math.Abs(actualRight - gost.IndentRightText.Value) > 0.05)
                     {
+                        errorDetails.Add($"правый отступ: {actualRight:F2} см (требуется {gost.IndentRightText.Value:F2} см)");
                         hasError = true;
-                        errors.Add($"Неверное выравнивание текста: '{paragraph.InnerText.Trim()}'");
                     }
                 }
 
-                // Выделяем весь параграф при наличии ошибок
+                // 3. Проверка выравнивания текста
+                var currentAlignment = GetAlignmentString(paragraph.ParagraphProperties?.Justification) ?? DefaultTextAlignment;
+
+                if (currentAlignment != requiredAlignment)
+                {
+                    hasError = true;
+                    errorDetails.Add($"Выравнивание: {currentAlignment} (требуется {requiredAlignment})");
+
+                    foreach (var run in paragraph.Descendants<Run>())
+                    {
+                        if (!string.IsNullOrWhiteSpace(run.InnerText))
+                        {
+                            run.RunProperties ??= new RunProperties();
+                            run.RunProperties.RemoveAllChildren<Highlight>();
+                            run.RunProperties.Append(new Highlight { Val = HighlightColorValues.Red });
+                        }
+                    }
+                }
+
                 if (hasError)
                 {
-                    HighlightWholeParagraph(paragraph);
+                    string shortText = GetShortText2(paragraph.InnerText?.Trim() ?? "");
+                    errors.Add($"Абзац '{shortText}': {string.Join(", ", errorDetails)}");
+
+                    foreach (var run in paragraph.Descendants<Run>())
+                    {
+                        if (!string.IsNullOrWhiteSpace(run.InnerText))
+                        {
+                            run.RunProperties ??= new RunProperties();
+                            run.RunProperties.RemoveAllChildren<Highlight>();
+                            run.RunProperties.Append(new Highlight { Val = HighlightColorValues.Red });
+                        }
+                    }
                 }
             }
         }
 
         /// <summary>
-        /// Метод для проверки, является ли параграф заголовком
+        /// Выделяет ошибки в обычном тексте
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <param name="gost"></param>
+        private void HighlightErrorText(WordprocessingDocument doc, Gost gost)
+        {
+            string requiredFont = gost.FontName ?? DefaultTextFont;
+            double requiredSize = gost.FontSize ?? DefaultTextSize;
+
+            var body = doc.MainDocumentPart.Document.Body;
+            var headerTexts = GetHeaderTexts(body, gost);
+            var defaultStyle = GetDefaultStyle(doc);
+
+            foreach (var para in body.Descendants<Paragraph>())
+            {
+                if (ShouldSkipHighlighting(para, headerTexts)) continue;
+
+                foreach (var run in para.Descendants<Run>())
+                {
+                    if (string.IsNullOrWhiteSpace(run.InnerText)) continue;
+                    
+                    var font = run.RunProperties?.RunFonts?.Ascii?.Value ?? defaultStyle?.StyleRunProperties?.RunFonts?.Ascii?.Value ?? DefaultTextFont;// Получение текущего значения
+                    var fontSizeVal = run.RunProperties?.FontSize?.Val?.Value ?? defaultStyle?.StyleRunProperties?.FontSize?.Val?.Value;
+                    double fontSize = fontSizeVal != null ? double.Parse(fontSizeVal) / 2 : DefaultTextSize;
+                    bool isWrongFont = font != requiredFont;
+                    bool isWrongSize = Math.Abs(fontSize - requiredSize) > 0.1;
+
+                    if (isWrongFont || isWrongSize)
+                    {
+                        run.RunProperties ??= new RunProperties();
+                        run.RunProperties.RemoveAllChildren<Highlight>();
+                        run.RunProperties.Append(new Highlight { Val = HighlightColorValues.Red });
+                    }
+                }
+            }
+
+            doc.MainDocumentPart.Document.Save();
+        }
+
+        /// <summary>
+        /// Метод выделяет в простом тексте абзацные отступы
+        /// </summary>
+        /// <param name="body"></param>
+        /// <param name="gost"></param>
+        private void CheckAndHighlightParagraphSpacing(Body body, Gost gost)
+        {
+            const double defaultWordSpacingAfter = 0.35; // 0.35 см после абзаца в Word
+            const double defaultWordSpacingBefore = 0.0; // 0 см перед абзацем в Word
+
+            var headerTexts = GetHeaderTexts(body, gost);
+
+            foreach (var paragraph in body.Descendants<Paragraph>())
+            {
+                if (ShouldSkipSpacingCheck(paragraph, headerTexts)) continue;
+
+                var spacing = paragraph.ParagraphProperties?.SpacingBetweenLines;
+                bool hasError = false;
+
+                // Перед
+                if (gost.LineSpacingBefore.HasValue)
+                {
+                    double actualBefore = spacing?.Before?.Value != null ? ConvertTwipsToPoints(spacing.Before.Value) : defaultWordSpacingBefore;
+
+                    if (Math.Abs(actualBefore - gost.LineSpacingBefore.Value) > 0.1)
+                        hasError = true;
+                }
+
+                // После
+                if (gost.LineSpacingAfter.HasValue)
+                {
+                    double actualAfter = spacing?.After?.Value != null ? ConvertTwipsToPoints(spacing.After.Value) : defaultWordSpacingAfter;
+
+                    if (Math.Abs(actualAfter - gost.LineSpacingAfter.Value) > 0.1)
+                        hasError = true;
+                }
+
+                if (hasError)
+                {
+                    HighlightParagraphSpacingErrors(paragraph); // Выделение ошибки
+                }
+            }
+        }
+
+        /// <summary>
+        /// Проверяет является ли параграф заголовком
         /// </summary>
         /// <param name="paragraph"></param>
         /// <param name="gost"></param>
@@ -894,190 +2693,199 @@ namespace GOST_Control
         {
             if (string.IsNullOrEmpty(gost.RequiredSections)) return false;
 
-            var requiredSections = gost.RequiredSections.Split(',')
-                .Select(s => s.Trim())
-                .Where(s => !string.IsNullOrEmpty(s));
-
+            var requiredSections = gost.RequiredSections.Split(',').Select(s => s.Trim()).Where(s => !string.IsNullOrEmpty(s));
             var paragraphText = paragraph.InnerText.Trim();
 
-            return requiredSections.Any(section =>
-                paragraphText.IndexOf(section, StringComparison.OrdinalIgnoreCase) >= 0);
+            return requiredSections.Any(section => paragraphText.IndexOf(section, StringComparison.OrdinalIgnoreCase) >= 0);
         }
+
+
+
+
+
+
+        private string GetShortTocText(Paragraph paragraph)
+        {
+            string text = paragraph.InnerText.Trim();
+            if (text.Length > 30)
+            {
+                return text.Substring(0, 27) + "...";
+            }
+            return text;
+        }
+
+        private double TwipsToCm(double twips) => twips / 567.0;
 
         /// <summary>
-        /// Улучшенный метод выделения текста с ошибками
+        /// Вспомогательный метод для получения сокращенного текста
         /// </summary>
-        /// <param name="body"></param>
-        /// <param name="errors"></param>
-        private void HighlightErrorText(Body body, List<string> errors)
+        /// <param name="text"></param>
+        /// <returns></returns>
+        private string GetShortText2(string text)
         {
-            foreach (var error in errors)
-            {
-                // Ищем текст после последнего '|' как текст для поиска
-                var errorParts = error.Split('|');
-                if (errorParts.Length == 0) continue;
+            if (string.IsNullOrEmpty(text))
+                return "[пустой элемент]";
 
-                var errorText = errorParts.Last().Trim();
-                if (string.IsNullOrEmpty(errorText)) continue;
-
-                // Ищем во всех параграфах
-                foreach (var paragraph in body.Descendants<Paragraph>())
-                {
-                    if (paragraph.InnerText.Contains(errorText))
-                    {
-                        // Выделяем весь параграф, если нашли совпадение
-                        HighlightParagraph(paragraph);
-                        break;
-                    }
-                }
-            }
+            return text.Length > 30 ? text.Substring(0, 27) + "..." : text;
         }
 
-        /// <summary>
-        /// Метод для выделения обязательных разделов и их ошибок форматирования
-        /// </summary>
-        private void HighlightRequiredSections(Body body, Gost gost, List<string> errors)
+        private string GetShortText(Paragraph paragraph)
         {
-            if (string.IsNullOrEmpty(gost.RequiredSections))
-                return;
-
-            var requiredSections = gost.RequiredSections.Split(',')
-                .Select(s => s.Trim())
-                .Where(s => !string.IsNullOrEmpty(s))
-                .ToList();
-
-            foreach (var section in requiredSections)
-            {
-                bool sectionFound = false;
-                bool hasFormattingErrors = false;
-
-                foreach (var paragraph in body.Descendants<Paragraph>())
-                {
-                    // Пропускаем специальные элементы
-                    if (ShouldSkipHeaderCheck(paragraph))
-                        continue;
-
-                    var paragraphText = paragraph.InnerText.Trim();
-
-                    // Точное сравнение с учетом возможных номеров (например "1 Введение")
-                    if (IsSectionMatch(paragraphText, section))
-                    {
-                        sectionFound = true;
-                        hasFormattingErrors = CheckHeaderFormatting(paragraph, section, gost, errors);
-
-                        if (hasFormattingErrors)
-                        {
-                            HighlightParagraph(paragraph);
-                        }
-                        break;
-                    }
-                }
-
-                if (!sectionFound)
-                {
-                    errors.Add($"Отсутствует обязательный раздел: '{section}'");
-                }
-            }
+            string text = paragraph.InnerText.Trim();
+            return text.Length > 50 ? text.Substring(0, 47) + "..." : text;
         }
 
-        private bool ShouldSkipHeaderCheck(Paragraph paragraph)
+        private double ConvertTwipsToPoints(string twipsValue)
         {
-            // 1. Пропускаем пустые параграфы
-            if (string.IsNullOrWhiteSpace(paragraph.InnerText))
+            if (string.IsNullOrEmpty(twipsValue))
+                return 0;
+
+            double value = double.Parse(twipsValue);
+            return value / 567.0; // Стандартное преобразование twips -> pt
+        }
+
+        private bool ShouldSkipSpacingCheck(Paragraph paragraph, HashSet<string> headerTexts)
+        {
+            // Пропуск заголовков
+            if (headerTexts.Contains(paragraph.InnerText.Trim()))
                 return true;
 
-            // 2. Пропускаем оглавление
-            if (IsTocParagraph(paragraph))
+            // Пропуск пустых параграфов
+            if (IsEmptyParagraph(paragraph))
                 return true;
 
-            // 3. Пропускаем элементы списков
+            // Пропуск элементов списков
             if (IsListItem(paragraph))
                 return true;
 
-            // 4. Пропускаем таблицы
+            // Пропуск таблиц
             if (paragraph.Ancestors<Table>().Any())
                 return true;
 
-            // 5. Пропускаем специальные стили
+            // Пропуск специальных стилей
             var style = paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value;
             if (!string.IsNullOrEmpty(style) && style.Contains("TOC"))
                 return true;
 
             return false;
         }
-
-        private bool IsTocParagraph(Paragraph paragraph)
+        
+        private void HighlightOnlyThisParagraph(Paragraph paragraph)
         {
-            // 1. Проверка полей оглавления
-            if (paragraph.Descendants<FieldCode>().Any(f =>
-                f.Text.Contains(" TOC ") || f.Text.Contains("TOC \\")))
+            foreach (var run in paragraph.Descendants<Run>())
+            {
+                if (string.IsNullOrWhiteSpace(run.InnerText)) continue;
+
+                run.RunProperties ??= new RunProperties();
+
+                var existingHighlight = run.RunProperties.Elements<Highlight>().FirstOrDefault();
+                if (existingHighlight != null) run.RunProperties.RemoveChild(existingHighlight);
+
+                run.RunProperties.Append(new Highlight { Val = HighlightColorValues.Red });
+            }
+        }
+
+        private void HighlightParagraphSpacingErrors(Paragraph paragraph)
+        {
+            foreach (var run in paragraph.Descendants<Run>())
+            {
+                if (!string.IsNullOrWhiteSpace(run.InnerText))
+                {
+                    run.RunProperties ??= new RunProperties();
+                    run.RunProperties.RemoveAllChildren<Highlight>();
+                    run.RunProperties.Append(new Highlight { Val = HighlightColorValues.Red });
+                }
+            }
+        }
+
+        private int GetListLevel(Paragraph paragraph, Gost gost)
+        {
+            var numberingProps = paragraph.ParagraphProperties?.NumberingProperties;
+
+            if (numberingProps?.NumberingLevelReference?.Val?.Value != null)
+            {
+                return numberingProps.NumberingLevelReference.Val.Value + 1;
+            }
+
+            var indent = paragraph.ParagraphProperties?.Indentation;
+            if (indent?.Left != null)
+            {
+                double leftIndent = double.Parse(indent.Left.Value) / 567.0; // в см
+
+                if (gost.ListLevel3Indent.HasValue && leftIndent >= gost.ListLevel3Indent.Value - 0.5)
+                    return 3;
+                if (gost.ListLevel2Indent.HasValue && leftIndent >= gost.ListLevel2Indent.Value - 0.5)
+                    return 2;
+            }
+
+            return 1; // По умолчанию 
+        }
+
+        private bool IsNumberedList(Paragraph paragraph)
+        {
+            var firstRun = paragraph.Elements<Run>().FirstOrDefault();
+            if (firstRun == null) return false;
+
+            var text = firstRun.InnerText.Trim();
+
+            return Regex.IsMatch(text, @"^(\d+[\.\)]|[a-z]\)|[A-Z]\.|I+\.|V+\.|X+\.)");// Форматы нумерации: 1., 1), a., a), I., и т.д.
+        }
+
+        private bool CheckNumberFormat(string text, string requiredFormat)
+        {
+            if (requiredFormat.EndsWith(".") && text.EndsWith("."))
                 return true;
-
-            // 2. Проверка по характерным признакам
-            string text = paragraph.InnerText;
-            return text.Contains(".........") ||          // Точечные заполнители
-                   text.Contains("\t") ||                 // Табуляция
-                   Regex.IsMatch(text, @"\.{3,}\s*\d+$"); // Многоточие с номером страницы
+            if (requiredFormat.EndsWith(")") && text.EndsWith(")"))
+                return true;
+            return false;
         }
 
-        private bool IsSectionMatch(string paragraphText, string section)
+        private void HighlightRun(Run run)
         {
-            // Удаляем возможные номера (например "1 Введение" -> "Введение")
-            string cleanText = Regex.Replace(paragraphText, @"^\d+\s*", "").Trim();
-            return cleanText.Equals(section, StringComparison.OrdinalIgnoreCase);
+            run.RunProperties ??= new RunProperties();
+            run.RunProperties.RemoveAllChildren<Highlight>();
+            run.RunProperties.Append(new Highlight { Val = HighlightColorValues.Red });
         }
 
-        private bool CheckHeaderFormatting(Paragraph paragraph, string section, Gost gost, List<string> errors)
+        private void HighlightParagraph(Paragraph paragraph)
         {
-            bool hasErrors = false;
-            var runs = paragraph.Descendants<Run>().Where(r => !string.IsNullOrWhiteSpace(r.InnerText)).ToList();
-
-            // Проверка шрифта
-            if (!string.IsNullOrEmpty(gost.HeaderFontName))
+            foreach (var run in paragraph.Descendants<Run>())
             {
-                foreach (var run in runs)
+                if (!string.IsNullOrWhiteSpace(run.InnerText))
                 {
-                    var font = run.RunProperties?.RunFonts?.Ascii?.Value;
-                    if (font != null && font != gost.HeaderFontName)
-                    {
-                        errors.Add($"Раздел '{section}': неверный шрифт ({font} вместо {gost.HeaderFontName})");
-                        HighlightRun(run);
-                        hasErrors = true;
-                    }
+                    HighlightRun(run);
                 }
             }
+        }
 
-            // Проверка размера шрифта
-            if (gost.HeaderFontSize.HasValue)
-            {
-                foreach (var run in runs)
-                {
-                    var size = run.RunProperties?.FontSize?.Val?.Value;
-                    if (size != null)
-                    {
-                        double actualSize = double.Parse(size) / 2;
-                        if (Math.Abs(actualSize - gost.HeaderFontSize.Value) > 0.1)
-                        {
-                            errors.Add($"Раздел '{section}': неверный размер шрифта ({actualSize}pt вместо {gost.HeaderFontSize.Value}pt)");
-                            HighlightRun(run);
-                            hasErrors = true;
-                        }
-                    }
-                }
-            }
+        private bool IsEmptyParagraph(Paragraph p)
+        {
+            return !p.Descendants<Run>().Any(r => !string.IsNullOrWhiteSpace(r.InnerText));
+        }
 
-            // Проверка выравнивания
-            if (!string.IsNullOrEmpty(gost.HeaderAlignment))
-            {
-                var currentAlignment = GetAlignmentString(paragraph.ParagraphProperties?.Justification);
-                if (currentAlignment != gost.HeaderAlignment)
-                {
-                    errors.Add($"Раздел '{section}': неверное выравнивание ({currentAlignment} вместо {gost.HeaderAlignment})");
-                    hasErrors = true;
-                }
-            }
+        private bool ShouldSkipHighlighting(Paragraph paragraph, HashSet<string> headerTexts)
+        {
+            return IsListItem(paragraph) || IsEmptyParagraph(paragraph) || headerTexts.Contains(paragraph.InnerText.Trim()) ||IsTocParagraph(paragraph);
+        }
 
-            return hasErrors;
+        private void ShowHeaderError(string message)
+        {
+            Dispatcher.UIThread.Post(() => {
+
+                ErrorControlHeaderSpacing.Text = message;
+                ErrorControlHeaderSpacing.Foreground = Brushes.Red;
+
+            });
+        }
+
+        private void ShowHeaderSuccess(string message)
+        {
+            Dispatcher.UIThread.Post(() => {
+
+                ErrorControlHeaderSpacing.Text = message;
+                ErrorControlHeaderSpacing.Foreground = Brushes.Green;
+
+            });
         }
 
         private void UpdateBulletedListsUI(List<string> errors, bool listsValid, bool hasLists)
@@ -1089,44 +2897,51 @@ namespace GOST_Control
                     ErrorControlBulletedLists.Text = "Проблемы в списках:\n" + string.Join("\n", errors.Distinct());
                     ErrorControlBulletedLists.Foreground = Brushes.Red;
                 }
-                else if (!hasLists)
-                {
-                    ErrorControlBulletedLists.Text = "В документе отсутствуют обязательные списки";
-                    ErrorControlBulletedLists.Foreground = Brushes.Red;
-                }
-                else
+                else if (hasLists)
                 {
                     ErrorControlBulletedLists.Text = "Списки соответствуют ГОСТу";
                     ErrorControlBulletedLists.Foreground = Brushes.Green;
                 }
+                else
+                {
+                    ErrorControlBulletedLists.Text = "Списки не обнаружены - проверка не требуется";
+                    ErrorControlBulletedLists.Foreground = Brushes.Gray;
+                }
             });
         }
 
-        private void HighlightWholeParagraph(Paragraph paragraph)
-        {
-            foreach (var run in paragraph.Elements<Run>())
-            {
-                if (run.RunProperties == null)
-                {
-                    run.RunProperties = new RunProperties();
-                }
-                run.RunProperties.Append(new Highlight() { Val = HighlightColorValues.Red });
-            }
-        }
+
+
+
+
 
         /// <summary>
-        /// Проверка обязательных разделов (Введение, Заключение и т.д.)
+        /// Проверка обязательных разделов у ЗАГОЛОВКОВ
         /// </summary>
-        private bool CheckRequiredSections(Gost gost, Body body)
+        /// <param name="gost"></param>
+        /// <param name="body"></param>
+        /// <param name="doc"></param>
+        /// <returns></returns>
+        private bool CheckRequiredSections(Gost gost, Body body, WordprocessingDocument doc)
         {
             if (string.IsNullOrEmpty(gost.RequiredSections))
                 return true;
+
+            string requiredFont = gost.HeaderFontName;
+            double? requiredSize = gost.HeaderFontSize;
+
+            bool checkFont = !string.IsNullOrEmpty(requiredFont);
+            bool checkSize = requiredSize.HasValue;
 
             var requiredSections = GetRequiredSectionsList(gost);
             bool allSectionsFound = true;
             bool allSectionsValid = true;
             var missingSections = new List<string>();
             var invalidSections = new List<string>();
+
+            // Получение стилей заголовков
+            var headerStyles = doc.MainDocumentPart?.StyleDefinitionsPart?.Styles.Elements<Style>().Where(s => s.StyleName?.Val?.Value?.StartsWith("Heading") == true ||
+                                                                           s.StyleName?.Val?.Value?.StartsWith("Заголовок") == true).ToDictionary(s => s.StyleId.Value);
 
             foreach (var section in requiredSections)
             {
@@ -1140,41 +2955,49 @@ namespace GOST_Control
                     {
                         sectionFound = true;
 
-                        // НОВАЯ ПРОВЕРКА: Шрифт заголовка
-                        if (!string.IsNullOrEmpty(gost.HeaderFontName))
+                        // Стиль параграфа
+                        Style paragraphStyle = null;
+                        var styleId = paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value;
+
+                        if (styleId != null && headerStyles.TryGetValue(styleId, out var style))
                         {
-                            foreach (var run in paragraph.Elements<Run>())
+                            paragraphStyle = style;
+                        }
+
+                        foreach (var run in paragraph.Elements<Run>())
+                        {
+                            if (string.IsNullOrWhiteSpace(run.InnerText)) continue;
+
+                            // Проверка типа шрифта 
+                            if (checkFont)
                             {
-                                var font = run.RunProperties?.RunFonts?.Ascii?.Value;
-                                if (font != null && font != gost.HeaderFontName)
+                                var font = run.RunProperties?.RunFonts?.Ascii?.Value ?? paragraphStyle?.StyleRunProperties?.RunFonts?.Ascii?.Value;
+
+                                if (font != null && !string.Equals(font, requiredFont, StringComparison.OrdinalIgnoreCase))
                                 {
-                                    invalidSections.Add($"{section} (неверный шрифт: {font})");
+                                    invalidSections.Add($"{section} (неверный шрифт: '{font}')");
+                                    HighlightRun(run);
                                     sectionValid = false;
-                                    break;
                                 }
                             }
-                        }
 
-                        // Проверка размера шрифта заголовка
-                        if (gost.HeaderFontSize.HasValue &&
-                            !CheckHeaderFontSize(paragraph, gost.HeaderFontSize.Value))
-                        {
-                            invalidSections.Add($"{section} (неверный размер шрифта)");
-                            sectionValid = false;
-                            break;
-                        }
-
-                        // Проверка выравнивания заголовка
-                        if (!string.IsNullOrEmpty(gost.HeaderAlignment))
-                        {
-                            var justification = paragraph.ParagraphProperties?.Justification;
-                            var currentAlignment = GetAlignmentString(justification);
-
-                            if (currentAlignment != gost.HeaderAlignment)
+                            // Проверка размера шрифта
+                            if (checkSize)
                             {
-                                invalidSections.Add($"{section} (неверное выравнивание: {currentAlignment})");
-                                sectionValid = false;
-                                break;
+                                double? size = null;
+                                var fontSize = run.RunProperties?.FontSize?.Val?.Value ?? paragraphStyle?.StyleRunProperties?.FontSize?.Val?.Value;
+
+                                if (fontSize != null)
+                                {
+                                    size = double.Parse(fontSize) / 2;
+                                }
+
+                                if (size.HasValue && Math.Abs(size.Value - requiredSize.Value) > 0.1)
+                                {
+                                    invalidSections.Add($"{section} (неверный размер: {size:F1} pt)");
+                                    HighlightRun(run);
+                                    sectionValid = false;
+                                }
                             }
                         }
                     }
@@ -1200,12 +3023,14 @@ namespace GOST_Control
                 }
                 else if (!allSectionsValid)
                 {
-                    ErrorControlSections.Text = $"Найдены, но не соответствуют: {string.Join(", ", invalidSections)}";
+                    ErrorControlSections.Text = $"Ошибки в разделах:\n{string.Join("\n", invalidSections.Take(3))}";
+                    if (invalidSections.Count > 3)
+                        ErrorControlSections.Text += $"\n...и ещё {invalidSections.Count - 3} ошибок";
                     ErrorControlSections.Foreground = Brushes.Red;
                 }
                 else
                 {
-                    ErrorControlSections.Text = "Все обязательные разделы найдены и соответствуют требованиям";
+                    ErrorControlSections.Text = "Все обязательные разделы соответствуют требованиям ГОСТ";
                     ErrorControlSections.Foreground = Brushes.Green;
                 }
             });
@@ -1214,47 +3039,21 @@ namespace GOST_Control
         }
 
         /// <summary>
-        /// Проверяет, что основной текст заголовка имеет правильный размер шрифта
-        /// (разрешает небольшие форматирования перед основным текстом)
+        /// Проверяет тип шрифта у ПРОСТОГО ТЕКСТА 
         /// </summary>
-        private bool CheckHeaderFontSize(Paragraph paragraph, double requiredSize)
+        /// <param name="requiredFontName"></param>
+        /// <param name="body"></param>
+        /// <param name="gost"></param>
+        /// <param name="doc"></param>
+        /// <returns></returns>
+        private bool CheckFontName(string requiredFontName, Body body, Gost gost, WordprocessingDocument doc)
         {
-            if (paragraph == null) return false;
+            var defaultStyle = GetDefaultStyle(doc);
+            string defaultFont = defaultStyle?.StyleRunProperties?.RunFonts?.Ascii?.Value;
 
-            var runs = paragraph.Elements<Run>().Where(r => !string.IsNullOrWhiteSpace(r.InnerText)).ToList();
-
-            if (!runs.Any()) return false;
-
-            int totalLength = 0;
-            int correctLength = 0;
-
-            foreach (var run in runs)
-            {
-                var textLength = run.InnerText.Trim().Length;
-                totalLength += textLength;
-
-                var fontSize = run.RunProperties?.FontSize;
-                if (fontSize != null)
-                {
-                    double fontSizeValue = double.Parse(fontSize.Val.Value) / 2;
-                    if (Math.Abs(fontSizeValue - requiredSize) <= 0.1)
-                    {
-                        correctLength += textLength;
-                    }
-                }
-            }
-
-            return (double)correctLength / totalLength >= 0.8;
-        }
-
-        /// <summary>
-        /// Проверка типа шрифта (только для обычных абзацев)
-        /// </summary>
-        private bool CheckFontName(string requiredFontName, Body body, Gost gost)
-        {
-            var headerTexts = GetHeaderTexts(body, gost);
             bool isValid = true;
             var errors = new List<string>();
+            var headerTexts = GetHeaderTexts(body, gost);
 
             foreach (var paragraph in body.Elements<Paragraph>())
             {
@@ -1266,41 +3065,54 @@ namespace GOST_Control
                     if (ShouldSkipRun(run)) continue;
 
                     var fontName = run.RunProperties?.RunFonts?.Ascii?.Value;
-                    if (fontName != null && fontName != requiredFontName)
+
+                    if (string.IsNullOrEmpty(fontName))
+                        fontName = defaultFont;
+
+                    if (string.IsNullOrEmpty(fontName))
+                        fontName = DefaultTextFont;
+
+                    if (fontName != requiredFontName)
                     {
-                        errors.Add($"Найден неверный шрифт: '{fontName}' (ожидался '{requiredFontName}') в тексте: '{run.InnerText.Trim()}'");
+                        errors.Add($"{run.InnerText.Trim()} (шрифт: '{fontName}') - требуется ('{requiredFontName}')");
                         isValid = false;
                     }
                 }
             }
 
-            if (!isValid)
-            {
-                Dispatcher.UIThread.Post(() => {
-                    ErrorControlFont.Text = "Ошибки в шрифте основного текста:\n" + string.Join("\n", errors.Take(3));
+            Dispatcher.UIThread.Post(() => {
+                if (!isValid)
+                {
+                    ErrorControlFont.Text = "Ошибки в шрифте:\n" + string.Join("\n", errors.Take(3));
                     if (errors.Count > 3) ErrorControlFont.Text += $"\n...и ещё {errors.Count - 3} ошибок";
                     ErrorControlFont.Foreground = Brushes.Red;
-                });
-            }
-            else
-            {
-                Dispatcher.UIThread.Post(() => {
-                    ErrorControlFont.Text = "Шрифт основного текста соответствует ГОСТу";
+                }
+                else
+                {
+                    ErrorControlFont.Text = "Шрифт соответствует ГОСТу";
                     ErrorControlFont.Foreground = Brushes.Green;
-                });
-            }
+                }
+            });
 
             return isValid;
         }
 
         /// <summary>
-        /// Проверка размера шрифта (только для обычных абзацев)
+        /// Проверяет размер шрифта у ПРОСТОГО ТЕКСТА 
         /// </summary>
-        private bool CheckFontSize(double requiredFontSize, Body body, Gost gost)
+        /// <param name="requiredFontSize"></param>
+        /// <param name="body"></param>
+        /// <param name="gost"></param>
+        /// <param name="doc"></param>
+        /// <returns></returns>
+        private bool CheckFontSize(double requiredFontSize, Body body, Gost gost, WordprocessingDocument doc)
         {
-            var headerTexts = GetHeaderTexts(body, gost);
+            var defaultStyle = GetDefaultStyle(doc);
+            var defaultSize = defaultStyle?.StyleRunProperties?.FontSize?.Val?.Value;
+
             bool isValid = true;
             var errors = new List<string>();
+            var headerTexts = GetHeaderTexts(body, gost);
 
             foreach (var paragraph in body.Elements<Paragraph>())
             {
@@ -1311,32 +3123,82 @@ namespace GOST_Control
                 {
                     if (ShouldSkipRun(run)) continue;
 
-                    var fontSize = run.RunProperties?.FontSize;
-                    if (fontSize != null)
+                    var fontSize = run.RunProperties?.FontSize?.Val?.Value;
+
+                    double actualSize;
+                    if (fontSize == null)
+                        fontSize = defaultSize;
+
+                    if (fontSize == null)
                     {
-                        double actualSize = double.Parse(fontSize.Val.Value) / 2;
-                        if (Math.Abs(actualSize - requiredFontSize) > 0.1)
-                        {
-                            errors.Add($"Неверный размер: {actualSize}pt (ожидался {requiredFontSize}pt) в тексте: '{run.InnerText.Trim()}'");
-                            isValid = false;
-                        }
+                        actualSize = DefaultTextSize;
+                    }
+                    else
+                    {
+                        actualSize = double.Parse(fontSize) / 2;
+                    }
+
+                    if (Math.Abs(actualSize - requiredFontSize) > 0.1)
+                    {
+                        errors.Add($"{run.InnerText.Trim()} (размер: {actualSize:F1} pt) - требуется ({requiredFontSize:F1} pt)");
+                        isValid = false;
                     }
                 }
             }
 
-            if (!isValid)
-            {
-                Dispatcher.UIThread.Post(() => {
+            Dispatcher.UIThread.Post(() => {
+                if (!isValid)
+                {
                     ErrorControlFontSize.Text = "Ошибки в размере шрифта:\n" + string.Join("\n", errors.Take(3));
                     if (errors.Count > 3) ErrorControlFontSize.Text += $"\n...и ещё {errors.Count - 3} ошибок";
                     ErrorControlFontSize.Foreground = Brushes.Red;
-                });
-            }
-            else
-            {
-                Dispatcher.UIThread.Post(() => {
+                }
+                else
+                {
                     ErrorControlFontSize.Text = "Размер шрифта соответствует ГОСТу";
                     ErrorControlFontSize.Foreground = Brushes.Green;
+                }
+            });
+
+            return isValid;
+        }
+
+        /// <summary>
+        /// Проверяет выравнивания ПРОСТОГО ТЕКСТА 
+        /// </summary>
+        /// <param name="requiredAlignment"></param>
+        /// <param name="body"></param>
+        /// <param name="gost"></param>
+        /// <returns></returns>
+        private bool CheckTextAlignment(string requiredAlignment, Body body, Gost gost)
+        {
+            bool isValid = true;
+            var headerTexts = GetHeaderTexts(body, gost);
+
+            foreach (var paragraph in body.Elements<Paragraph>())
+            {
+                if (ShouldSkipParagraph(paragraph, headerTexts, gost))
+                    continue;
+
+                var currentAlignment = GetAlignmentString(paragraph.ParagraphProperties?.Justification);
+                if (currentAlignment != requiredAlignment)
+                {
+                    Dispatcher.UIThread.Post(() => {
+
+                        ErrorControlViravnivanie.Text = $"{paragraph.InnerText.Trim()} (выравнивание: {currentAlignment}) - требуется ({requiredAlignment})";
+                        ErrorControlViravnivanie.Foreground = Brushes.Red;
+
+                    });
+                    isValid = false;
+                    break;
+                }
+            }
+
+            if (isValid)
+            {
+                Dispatcher.UIThread.Post(() => {
+                    ErrorControlViravnivanie.Text = "Выравнивание соответствует ГОСТу";
+                    ErrorControlViravnivanie.Foreground = Brushes.Green;
                 });
             }
 
@@ -1344,44 +3206,418 @@ namespace GOST_Control
         }
 
         /// <summary>
-        /// Определяет, нужно ли пропускать параграф при проверке основного текста
+        /// Проверяет междустрочный интервал ПРОСТОГО ТЕКСТА
         /// </summary>
+        /// <param name="requiredLineSpacing"></param>
+        /// <param name="body"></param>
+        /// <param name="gost"></param>
+        /// <param name="doc"></param>
+        /// <returns></returns>
+        private bool CheckLineSpacing(double requiredLineSpacing, Body body, Gost gost, WordprocessingDocument doc)
+        {
+            bool isValid = true;
+            var errors = new List<string>();
+            var headerTexts = GetHeaderTexts(body, gost);
+
+            foreach (var paragraph in body.Elements<Paragraph>())
+            {
+                if (ShouldSkipParagraph(paragraph, headerTexts, gost))
+                    continue;
+
+                // Текст параграфа вывода в ошибке
+                string paragraphText = GetShortText(paragraph);
+
+                // Текущие значения 
+                var spacing = paragraph.ParagraphProperties?.SpacingBetweenLines;
+                double actualSpacing;
+                string actualSpacingType;
+
+                if (spacing != null && spacing.Line != null)
+                {
+                    actualSpacing = CalculateActualSpacing(spacing);
+                    actualSpacingType = ConvertSpacingRuleToName(spacing.LineRule?.Value);
+                }
+                else
+                {
+                    actualSpacing = DefaultTextLineSpacingValue;
+                    actualSpacingType = DefaultTextLineSpacingType;
+                }
+
+                // Проверка типа интервала
+                string requiredSpacingType = gost.LineSpacingType ?? DefaultTextLineSpacingType;
+                if (actualSpacingType != requiredSpacingType)
+                {
+                    errors.Add($"{paragraphText} (тип интервала: '{actualSpacingType}') - требуется ('{requiredSpacingType}')");
+                    isValid = false;
+                }
+
+                // Проверка значений интервала
+                if (Math.Abs(actualSpacing - requiredLineSpacing) > 0.01)
+                {
+                    errors.Add($"{paragraphText} (интервал: {actualSpacing:F2}) - требуется ({requiredLineSpacing:F2})");
+                    isValid = false;
+                }
+            }
+
+            Dispatcher.UIThread.Post(() => {
+                if (!isValid)
+                {
+                    ErrorControlMnochitel.Text = "Ошибки в межстрочном интервале:\n" + string.Join("\n", errors.Take(3));
+                    if (errors.Count > 3)
+                        ErrorControlMnochitel.Text += $"\n...и ещё {errors.Count - 3} ошибок";
+                    ErrorControlMnochitel.Foreground = Brushes.Red;
+                }
+                else
+                {
+                    ErrorControlMnochitel.Text = "Межстрочный интервал соответствует ГОСТу";
+                    ErrorControlMnochitel.Foreground = Brushes.Green;
+                }
+            });
+
+            return isValid;
+        }
+
+        /// <summary>
+        /// Определяет типп межстрочного интервала
+        /// </summary>
+        /// <param name="rule"></param>
+        /// <returns></returns>
+        private string ConvertSpacingRuleToName(LineSpacingRuleValues? rule)
+        {
+            if (rule == null) return "Не задан";
+
+            if (rule.Value == LineSpacingRuleValues.AtLeast)
+            {
+                return "Минимум";
+            }
+            else if (rule.Value == LineSpacingRuleValues.Exact)
+            {
+                return "Точно";
+            }
+            else if (rule.Value == LineSpacingRuleValues.Auto)
+            {
+                return "Множитель";
+            }
+            else
+            {
+                return "Неизвестный";
+            }
+        }
+
+        /// <summary>
+        /// Определяет тип межстрочного интервала
+        /// </summary>
+        /// <param name="spacing"></param>
+        /// <returns></returns>
+        private double CalculateActualSpacing(SpacingBetweenLines spacing)
+        {
+            if (spacing.Line == null) return 0;
+
+            if (spacing.LineRule == LineSpacingRuleValues.Exact)
+            {
+                // Точно
+                return double.Parse(spacing.Line.Value) / 20.0;
+            }
+            else if (spacing.LineRule == LineSpacingRuleValues.AtLeast)
+            {
+                // Минимум
+                return double.Parse(spacing.Line.Value) / 20.0;
+            }
+            else if (spacing.LineRule == LineSpacingRuleValues.Auto)
+            {
+                // Множитель
+                return double.Parse(spacing.Line.Value) / 240.0;
+            }
+            else
+            {
+                // По умолчанию множитель
+                return double.Parse(spacing.Line.Value) / 240.0;
+            }
+        }
+
+        /// <summary>
+        /// Проверка интервалов между абзацами (перед и после) для простого текста
+        /// </summary>
+        /// <param name="body"></param>
+        /// <param name="gost"></param>
+        /// <param name="doc"></param>
+        /// <returns></returns>
+        private bool CheckParagraphSpacing(Body body, Gost gost, WordprocessingDocument doc)
+        {
+            const double defaultWordSpacingAfter = 0.35; // 0.35 см после абзаца в Word
+            const double defaultWordSpacingBefore = 0.0; // 0 см перед абзацем в Word
+
+            if (!gost.LineSpacingBefore.HasValue && !gost.LineSpacingAfter.HasValue)
+            {
+                Dispatcher.UIThread.Post(() => {
+
+                    ErrorControlParagraphSpacing_Unique.Text = "Интервалы между абзацами не требуются";
+                    ErrorControlParagraphSpacing_Unique.Foreground = Brushes.Gray;
+
+                });
+                return true;
+            }
+
+            bool isValid = true;
+            var headerTexts = GetHeaderTexts(body, gost);
+            var paragraphErrors = new List<string>();
+
+            foreach (var paragraph in body.Descendants<Paragraph>())
+            {
+                if (ShouldSkipParagraph(paragraph, headerTexts, gost)) continue;
+
+                var spacing = paragraph.ParagraphProperties?.SpacingBetweenLines;
+                bool hasError = false;
+                string errorDetails = "";
+
+                // Проверка интервала "Перед"
+                if (gost.LineSpacingBefore.HasValue)
+                {
+                    double actualBefore = spacing?.Before?.Value != null ? ConvertTwipsToPoints(spacing.Before.Value) : defaultWordSpacingBefore;
+
+                    if (Math.Abs(actualBefore - gost.LineSpacingBefore.Value) > 0.01)
+                    {
+                        errorDetails += $"Интервал перед: {actualBefore:F1} pt (требуется {gost.LineSpacingBefore.Value:F1} pt)";
+                        hasError = true;
+                    }
+                }
+
+                // Проверка интервала "После"
+                if (gost.LineSpacingAfter.HasValue)
+                {
+                    double actualAfter = spacing?.After?.Value != null ? ConvertTwipsToPoints(spacing.After.Value) : defaultWordSpacingAfter;
+
+                    if (Math.Abs(actualAfter - gost.LineSpacingAfter.Value) > 0.01)
+                    {
+                        if (!string.IsNullOrEmpty(errorDetails)) errorDetails += ", ";
+                        errorDetails += $"Интервал после: {actualAfter:F1} pt (требуется {gost.LineSpacingAfter.Value:F1} pt)";
+                        hasError = true;
+                    }
+                }
+
+                if (hasError)
+                {
+                    string shortText = GetShortText(paragraph);
+                    paragraphErrors.Add($"Текст: '{shortText}' - {errorDetails}");
+                    HighlightOnlyThisParagraph(paragraph);
+                    isValid = false;
+                }
+            }
+
+            Dispatcher.UIThread.Post(() => {
+                if (paragraphErrors.Any())
+                {
+                    string error_Message = "Ошибки в интервалах между абзацами:\n" + string.Join("\n", paragraphErrors.Take(3));
+                    if (paragraphErrors.Count > 3) error_Message += $"\n...и ещё {paragraphErrors.Count - 3} ошибок";
+
+                    ErrorControlParagraphSpacing_Unique.Text = error_Message;
+                    ErrorControlParagraphSpacing_Unique.Foreground = Brushes.Red;
+                }
+                else
+                {
+                    ErrorControlParagraphSpacing_Unique.Text = "Интервалы между абзацами соответствуют ГОСТу";
+                    ErrorControlParagraphSpacing_Unique.Foreground = Brushes.Green;
+                }
+            });
+
+            return isValid;
+        }
+
+        /// <summary>
+        /// Проверка отступов (левого/правого) и первой строки ДЛЯ ПРОСТОГО ТЕКСТА
+        /// </summary>
+        /// <param name="requiredFirstLineIndent"></param>
+        /// <param name="body"></param>
+        /// <param name="gost"></param>
+        /// <param name="doc"></param>
+        /// <returns></returns>
+        private bool CheckFirstLineIndent(double requiredFirstLineIndent, Body body, Gost gost, WordprocessingDocument doc)
+        {
+            if (gost.TextIndentOrOutdent == "нет")
+            {
+                Dispatcher.UIThread.Post(() => {
+
+                    ErrorControlFirstLineIndent.Text = "Отступ первой строки не требуется";
+                    ErrorControlFirstLineIndent.Foreground = Brushes.Gray;
+
+                });
+                return true;
+            }
+
+            bool isValid = true;
+            var errors = new List<string>();
+            var headerTexts = GetHeaderTexts(body, gost);
+
+            foreach (var paragraph in body.Elements<Paragraph>())
+            {
+                if (ShouldSkipParagraph(paragraph, headerTexts, gost))
+                    continue;
+
+                var indent = paragraph.ParagraphProperties?.Indentation;
+                bool hasError = false;
+                var errorDetails = new List<string>();
+
+                // 1. Проверка левого отступа
+                if (gost.IndentLeftText.HasValue)
+                {
+                    double actualLeft = indent?.Left?.Value != null ? TwipsToCm(double.Parse(indent.Left.Value)) : DefaultTextLeftIndent;
+
+                    if (Math.Abs(actualLeft - gost.IndentLeftText.Value) > 0.05)
+                    {
+                        errorDetails.Add($"левый отступ: {actualLeft:F2} см (требуется {gost.IndentLeftText.Value:F2} см)");
+                        hasError = true;
+                    }
+                }
+
+                // 2. Проверка правого отступа
+                if (gost.IndentRightText.HasValue)
+                {
+                    double actualRight = indent?.Right?.Value != null ? TwipsToCm(double.Parse(indent.Right.Value)) : DefaultTextRightIndent;
+
+                    if (Math.Abs(actualRight - gost.IndentRightText.Value) > 0.05)
+                    {
+                        errorDetails.Add($"правый отступ: {actualRight:F2} см (требуется {gost.IndentRightText.Value:F2} см)");
+                        hasError = true;
+                    }
+                }
+
+                // 3. Проверка отступа/выступа первой строки
+                if (gost.TextIndentOrOutdent != "нет")
+                {
+                    string currentType = "не определен";
+                    double? currentValue = null;
+
+                    if (indent?.Hanging != null)
+                    {
+                        currentType = "выступ";
+                        currentValue = TwipsToCm(double.Parse(indent.Hanging.Value));
+                    }
+                    else if (indent?.FirstLine != null)
+                    {
+                        currentType = "отступ";
+                        currentValue = TwipsToCm(double.Parse(indent.FirstLine.Value));
+                    }
+
+                    if (!string.IsNullOrEmpty(gost.TextIndentOrOutdent))
+                    {
+                        string requiredType = gost.TextIndentOrOutdent == "Выступ" ? "выступ" : "отступ";
+
+                        if (currentType != requiredType)
+                        {
+                            errorDetails.Add($"тип первой строки: {currentType} (требуется {requiredType})");
+                            hasError = true;
+                        }
+                    }
+
+                    if (currentValue.HasValue)
+                    {
+                        if (Math.Abs(currentValue.Value - requiredFirstLineIndent) > 0.05)
+                        {
+                            errorDetails.Add($"{currentType} первой строки: {currentValue.Value:F2} см (требуется {requiredFirstLineIndent:F2} см)");
+                            hasError = true;
+                        }
+                    }
+                    else if (!string.IsNullOrEmpty(gost.TextIndentOrOutdent))
+                    {
+                        errorDetails.Add($"отсутствует {gost.TextIndentOrOutdent} первой строки");
+                        hasError = true;
+                    }
+                }
+
+                if (hasError)
+                {
+                    string shortText = GetShortText2(paragraph.InnerText?.Trim() ?? "");
+                    errors.Add($"Абзац '{shortText}': {string.Join(", ", errorDetails)}");
+                    isValid = false;
+
+                    // Выделение ошибки
+                    foreach (var run in paragraph.Descendants<Run>())
+                    {
+                        if (!string.IsNullOrWhiteSpace(run.InnerText))
+                        {
+                            run.RunProperties ??= new RunProperties();
+                            run.RunProperties.RemoveAllChildren<Highlight>();
+                            run.RunProperties.Append(new Highlight { Val = HighlightColorValues.Red });
+                        }
+                    }
+                }
+            }
+
+            Dispatcher.UIThread.Post(() => {
+                if (errors.Any())
+                {
+                    string errorMessage = $"Ошибки в отступах:\n{string.Join("\n", errors.Take(3))}";
+                    if (errors.Count > 3) errorMessage += $"\n...и ещё {errors.Count - 3} ошибок";
+
+                    ErrorControlFirstLineIndent.Text = errorMessage;
+                    ErrorControlFirstLineIndent.Foreground = Brushes.Red;
+                }
+                else
+                {
+                    ErrorControlFirstLineIndent.Text = "Отступы соответствуют ГОСТу";
+                    ErrorControlFirstLineIndent.Foreground = Brushes.Green;
+                }
+            });
+
+            return isValid;
+        }
+
+        /// <summary>
+        /// Определяет нужно ли пропускать параграф при проверке основного текста
+        /// </summary>
+        /// <param name="paragraph"></param>
+        /// <param name="headerTexts"></param>
+        /// <param name="gost"></param>
+        /// <returns></returns>
         private bool ShouldSkipParagraph(Paragraph paragraph, HashSet<string> headerTexts, Gost gost)
         {
-            // Пропускаем заголовки
+            // 1. Пропуск заголовков
             if (headerTexts.Contains(paragraph.InnerText.Trim()))
                 return true;
 
-            // Пропускаем пустые параграфы
+            // 2. Пропуск пустых параграфов
             if (IsEmptyParagraph(paragraph))
                 return true;
 
-            // Пропускаем элементы списков
+            // 3. Пропуск элементов списков
             if (IsListItem(paragraph))
                 return true;
 
-            // Пропускаем таблицы
+            // 4. Пропуск таблиц
             if (paragraph.Ancestors<Table>().Any())
                 return true;
 
-            // Пропускаем специальные стили (если есть)
+            // 5. Пропуск оглавлений
+            if (IsTocParagraph(paragraph))
+                return true;
+
+            // 6. Пропуск специальных стилей
             var style = paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value;
-            if (!string.IsNullOrEmpty(style) && style.Contains("Special"))
+            if (!string.IsNullOrEmpty(style) && (style.Contains("Caption") || style.Contains("Footer") || style.Contains("Header") || style.Contains("TOC") || style.Contains("Title")))
+                return true;
+
+            // 7. Пропуск номеров страниц
+            if (paragraph.Descendants<SimpleField>().Any(f => f.Instruction?.Value?.Contains("PAGE") == true))
+                return true;
+
+            // 8. Пропуск подписи к рисункам и таблицам
+            string text = paragraph.InnerText.Trim();
+            if (text.StartsWith("Рисунок") || text.StartsWith("Таблица") || text.StartsWith("Рис.") || text.StartsWith("Табл."))
                 return true;
 
             return false;
         }
 
         /// <summary>
-        /// Определяет, нужно ли пропускать Run элемент при проверке
+        /// Определяет нужно ли пропускать Run при проверке
         /// </summary>
         private bool ShouldSkipRun(Run run)
         {
-            // Пропускаем пустые Run элементы
+            // Пропуск пустых Run элементов
             if (string.IsNullOrWhiteSpace(run.InnerText))
                 return true;
 
-            // Пропускаем специальные символы
+            // Пропуск специальных символов
             if (run.Elements<Break>().Any() || run.Elements<TabChar>().Any())
                 return true;
 
@@ -1389,42 +3625,7 @@ namespace GOST_Control
         }
 
         /// <summary>
-        /// Проверка выравнивания текста (исключая заголовки, пустые параграфы и списки)
-        /// </summary>
-        private bool CheckTextAlignment(string requiredAlignment, Body body, Gost gost)
-        {
-            var headerTexts = GetHeaderTexts(body, gost);
-            bool isValid = true;
-
-            foreach (var paragraph in body.Elements<Paragraph>())
-            {
-                // Пропускаем: 1) заголовки, 2) пустые параграфы, 3) элементы списков
-                if (headerTexts.Contains(paragraph.InnerText.Trim()) ||
-                    IsEmptyParagraph(paragraph) ||
-                    IsListItem(paragraph))
-                    continue;
-
-                // Проверяем только параграфы с текстом
-                bool hasText = paragraph.Elements<Run>().Any(r => !string.IsNullOrWhiteSpace(r.InnerText));
-                if (!hasText) continue;
-
-                var currentAlignment = GetAlignmentString(paragraph.ParagraphProperties?.Justification);
-
-                if (currentAlignment != requiredAlignment)
-                {
-                    Dispatcher.UIThread.Post(() => {
-                        ErrorControlViravnivanie.Text = $"Ошибка: выравнивание {currentAlignment} (требуется {requiredAlignment})";
-                        ErrorControlViravnivanie.Foreground = Brushes.Red;
-                    });
-                    isValid = false;
-                    break;
-                }
-            }
-            return isValid;
-        }
-
-        /// <summary>
-        /// Формат листа "к примеру А4"
+        /// Проверяет формат листа "к примеру А4"
         /// </summary>
         /// <param name="doc"></param>
         /// <param name="gost"></param>
@@ -1437,18 +3638,17 @@ namespace GOST_Control
             var pgSz = sectPr.Elements<PageSize>().FirstOrDefault();
             if (pgSz == null) return false;
 
-            // Конвертация в миллиметры
+            // Конвертация значений в миллиметры
             double widthMm = (pgSz.Width.Value / 1440.0) * 25.4;
             double heightMm = (pgSz.Height.Value / 1440.0) * 25.4;
 
-            // Допустимое отклонение 1 мм
-            bool isCorrectSize = Math.Abs(widthMm - gost.PaperWidthMm.Value) <= 1 &&
-                                 Math.Abs(heightMm - gost.PaperHeightMm.Value) <= 1;
+            // Допустимое отклонение в 1 мм
+            bool isCorrectSize = Math.Abs(widthMm - gost.PaperWidthMm.Value) <= 1 && Math.Abs(heightMm - gost.PaperHeightMm.Value) <= 1;
 
             Dispatcher.UIThread.Post(() => {
+
                 ErrorControlPaperSize.Text = isCorrectSize ? $"Формат бумаги: {gost.PaperSize} ({widthMm:F1}×{heightMm:F1} мм)" :
-                                                                                          $"Требуется {gost.PaperSize} ({gost.PaperWidthMm}×{gost.PaperHeightMm} мм), " +
-                                                                                          $"текущий: {widthMm:F1}×{heightMm:F1} мм";
+                $"Требуется {gost.PaperSize} ({gost.PaperWidthMm}×{gost.PaperHeightMm} мм), " + $"текущий: {widthMm:F1}×{heightMm:F1} мм";
 
                 ErrorControlPaperSize.Foreground = isCorrectSize ? Brushes.Green : Brushes.Red;
             });
@@ -1457,7 +3657,7 @@ namespace GOST_Control
         }
 
         /// <summary>
-        /// Ориентация листа "Альбомная или Книжная"
+        /// Проверяет ориентацию листа "Альбомная или Книжная"
         /// </summary>
         /// <param name="doc"></param>
         /// <param name="gost"></param>
@@ -1474,11 +3674,12 @@ namespace GOST_Control
             bool shouldBePortrait = gost.PageOrientation == "Portrait";
 
             Dispatcher.UIThread.Post(() => {
+
                 ErrorControlOrientation.Text = (isPortrait == shouldBePortrait) ? $"Ориентация: {(shouldBePortrait ? "Книжная" : "Альбомная")} (соответствует)" :
-                                                                                                               $"Ориентация: {(isPortrait ? "Книжная" : "Альбомная")} " +
-                                                                                                               $"( Должна быть {(shouldBePortrait ? "Книжная" : "Альбомная")} )";
+                                    $"Ориентация: {(isPortrait ? "Книжная" : "Альбомная")} " + $"( Должна быть {(shouldBePortrait ? "Книжная" : "Альбомная")} )";
 
                 ErrorControlOrientation.Foreground = (isPortrait == shouldBePortrait) ? Brushes.Green : Brushes.Red;
+
             });
 
             return isPortrait == shouldBePortrait;
@@ -1498,9 +3699,13 @@ namespace GOST_Control
             foreach (var paragraph in body.Elements<Paragraph>())
             {
                 var text = paragraph.InnerText.Trim();
+
+                // Удаление номеров (например из "1 Введение" получаем "Введение")
+                string cleanText = Regex.Replace(text, @"^\d+[\s\.]*", "").Trim();
+
                 foreach (var section in requiredSections)
                 {
-                    if (text.IndexOf(section, StringComparison.OrdinalIgnoreCase) >= 0)
+                    if (cleanText.Equals(section, StringComparison.OrdinalIgnoreCase))
                     {
                         headerTexts.Add(text);
                         break;
@@ -1511,7 +3716,7 @@ namespace GOST_Control
         }
 
         /// <summary>
-        /// Проверяет соответствие шрифтов в стилях документа требованиям ГОСТа
+        /// Проверяет соответствие шрифтов в стилях документа
         /// </summary>
         /// <param name="doc"></param>
         /// <param name="gost"></param>
@@ -1539,7 +3744,7 @@ namespace GOST_Control
         }
 
         /// <summary>
-        /// Преобразует объект выравнивания в строковое представление
+        /// Вспомогательный метод который преобразует объект выравнивания в строковое представление
         /// </summary>
         /// <param name="justification"></param>
         /// <returns></returns>
@@ -1574,10 +3779,11 @@ namespace GOST_Control
         }
 
         /// <summary>
-        /// Получает список обязательных разделов из строки
+        /// Вспомогательный метод который получает список обязательных разделов из строки
         /// </summary>
         private List<string> GetRequiredSectionsList(Gost gost)
         {
+
             if (string.IsNullOrEmpty(gost.RequiredSections))
                 return new List<string>();
 
@@ -1597,8 +3803,10 @@ namespace GOST_Control
             if (!requiredNumbering)
             {
                 Dispatcher.UIThread.Post(() => {
+
                     ErrorControlNumberPage.Text = "Нумерация страниц не требуется";
                     ErrorControlNumberPage.Foreground = Brushes.Gray;
+
                 });
                 return true;
             }
@@ -1614,15 +3822,13 @@ namespace GOST_Control
             {
                 // Находим все Run элементы, содержащие номер страницы
                 var runs = new List<Run>();
-
-                // 1. Сам элемент SimpleField (поле PAGE)
+              
                 if (element is SimpleField field)
                 {
                     var parentRun = field.Parent as Run;
                     if (parentRun != null) runs.Add(parentRun);
                 }
 
-                // 2. Соседние Run элементы (могут содержать отображаемый номер)
                 var sibling = element.NextSibling();
                 while (sibling != null)
                 {
@@ -1634,12 +3840,11 @@ namespace GOST_Control
                     sibling = sibling.NextSibling();
                 }
 
-                // 3. Выделяем все найденные Run элементы
                 foreach (var run in runs)
                 {
                     run.RunProperties ??= new RunProperties();
 
-                    // Удаляем старое выделение, если есть
+                    // Удаляем старое выделение
                     var existingHighlight = run.RunProperties.Elements<Highlight>().FirstOrDefault();
                     if (existingHighlight != null)
                     {
@@ -1648,29 +3853,17 @@ namespace GOST_Control
 
                     // Добавляем красное выделение
                     run.RunProperties.Append(new Highlight { Val = HighlightColorValues.Red });
-
-                    // Также добавляем красный цвет текста для лучшей видимости
-                    var color = run.RunProperties.Elements<DocumentFormat.OpenXml.Wordprocessing.Color>().FirstOrDefault();
-                    if (color == null)
-                    {
-                        run.RunProperties.Append(new DocumentFormat.OpenXml.Wordprocessing.Color { Val = "FF0000" });
-                    }
-                    else
-                    {
-                        color.Val = "FF0000";
-                    }
                 }
             }
 
-            // Проверяем верхние колонтитулы (headers)
+            // Проверка верхних кононтитулов
             if (wordDoc.MainDocumentPart.HeaderParts != null)
             {
                 foreach (var headerPart in wordDoc.MainDocumentPart.HeaderParts)
                 {
                     foreach (var paragraph in headerPart.Header.Elements<Paragraph>())
                     {
-                        var pageField = paragraph.Descendants<SimpleField>()
-                            .FirstOrDefault(f => f.Instruction?.Value?.Contains("PAGE") == true);
+                        var pageField = paragraph.Descendants<SimpleField>().FirstOrDefault(f => f.Instruction?.Value?.Contains("PAGE") == true);
 
                         if (pageField != null)
                         {
@@ -1678,11 +3871,9 @@ namespace GOST_Control
                             string alignment = GetAlignmentString(justification);
                             string position = "Top";
 
-                            // Проверяем соответствие требованиям
-                            bool positionMatch = string.IsNullOrEmpty(requiredPosition) ||
-                                               position.Equals(requiredPosition, StringComparison.OrdinalIgnoreCase);
-                            bool alignmentMatch = string.IsNullOrEmpty(requiredAlignment) ||
-                                                alignment.Equals(requiredAlignment, StringComparison.OrdinalIgnoreCase);
+                            // Проверка на  соответствие требованиям
+                            bool positionMatch = string.IsNullOrEmpty(requiredPosition) || position.Equals(requiredPosition, StringComparison.OrdinalIgnoreCase);
+                            bool alignmentMatch = string.IsNullOrEmpty(requiredAlignment) || alignment.Equals(requiredAlignment, StringComparison.OrdinalIgnoreCase);
 
                             if (positionMatch && alignmentMatch)
                             {
@@ -1701,15 +3892,14 @@ namespace GOST_Control
                 }
             }
 
-            // Проверяем нижние колонтитулы (footers)
+            // Проверка нижних колонтитулов
             if (wordDoc.MainDocumentPart.FooterParts != null)
             {
                 foreach (var footerPart in wordDoc.MainDocumentPart.FooterParts)
                 {
                     foreach (var paragraph in footerPart.Footer.Elements<Paragraph>())
                     {
-                        var pageField = paragraph.Descendants<SimpleField>()
-                            .FirstOrDefault(f => f.Instruction?.Value?.Contains("PAGE") == true);
+                        var pageField = paragraph.Descendants<SimpleField>().FirstOrDefault(f => f.Instruction?.Value?.Contains("PAGE") == true);
 
                         if (pageField != null)
                         {
@@ -1717,11 +3907,9 @@ namespace GOST_Control
                             string alignment = GetAlignmentString(justification);
                             string position = "Bottom";
 
-                            // Проверяем соответствие требованиям
-                            bool positionMatch = string.IsNullOrEmpty(requiredPosition) ||
-                                               position.Equals(requiredPosition, StringComparison.OrdinalIgnoreCase);
-                            bool alignmentMatch = string.IsNullOrEmpty(requiredAlignment) ||
-                                                alignment.Equals(requiredAlignment, StringComparison.OrdinalIgnoreCase);
+                            // Проверка на соответствие требованиям
+                            bool positionMatch = string.IsNullOrEmpty(requiredPosition) || position.Equals(requiredPosition, StringComparison.OrdinalIgnoreCase);
+                            bool alignmentMatch = string.IsNullOrEmpty(requiredAlignment) || alignment.Equals(requiredAlignment, StringComparison.OrdinalIgnoreCase);
 
                             if (positionMatch && alignmentMatch)
                             {
@@ -1740,7 +3928,6 @@ namespace GOST_Control
                 }
             }
 
-            // Формируем сообщение для пользователя
             if (!hasCorrectNumbering && !hasExtraNumbering)
             {
                 Dispatcher.UIThread.Post(() => {
@@ -1753,9 +3940,8 @@ namespace GOST_Control
             if (hasCorrectNumbering && !hasExtraNumbering)
             {
                 Dispatcher.UIThread.Post(() => {
-                    string message = string.IsNullOrEmpty(requiredAlignment) && string.IsNullOrEmpty(requiredPosition)
-                        ? "Нумерация страниц присутствует"
-                        : $"Нумерация соответствует ({actualCorrectPosition}, {actualCorrectAlignment})";
+                    string message = string.IsNullOrEmpty(requiredAlignment) && string.IsNullOrEmpty(requiredPosition) ? "Нумерация страниц присутствует" : 
+                                                                            $"Нумерация соответствует ({actualCorrectPosition}, {actualCorrectAlignment})";
 
                     ErrorControlNumberPage.Text = message;
                     ErrorControlNumberPage.Foreground = Brushes.Green;
@@ -1766,8 +3952,9 @@ namespace GOST_Control
             if (hasCorrectNumbering && hasExtraNumbering)
             {
                 Dispatcher.UIThread.Post(() => {
-                    ErrorControlNumberPage.Text = $"Нумерация соответствует ({actualCorrectPosition}, {actualCorrectAlignment}), " +
-                                                 $"но есть лишняя нумерация в: {string.Join("; ", extraNumberings)}";
+                    ErrorControlNumberPage.Text = $"Нумерация соответствует ({actualCorrectPosition}, {actualCorrectAlignment}), " + 
+                                                  $"но есть лишняя нумерация в: {string.Join("; ", extraNumberings)}";
+
                     ErrorControlNumberPage.Foreground = Brushes.Red;
                 });
                 return false;
@@ -1786,130 +3973,35 @@ namespace GOST_Control
         }
 
         /// <summary>
-        /// Проверка отступа первой строки 
-        /// </summary>
-        private bool CheckFirstLineIndent(double requiredFirstLineIndent, Body body, Gost gost)
-        {
-            var headerTexts = GetHeaderTexts(body, gost);
-            bool isValid = true;
-
-            foreach (var paragraph in body.Elements<Paragraph>())
-            {
-                // Пропускаем: 1) заголовки, 2) пустые параграфы, 3) элементы списков
-                if (headerTexts.Contains(paragraph.InnerText.Trim()) ||
-                    IsEmptyParagraph(paragraph) ||
-                    IsListItem(paragraph))
-                    continue;
-
-                // Проверяем только параграфы с текстом
-                bool hasText = paragraph.Elements<Run>().Any(r => !string.IsNullOrWhiteSpace(r.InnerText));
-                if (!hasText) continue;
-
-                var indent = paragraph.ParagraphProperties?.Indentation;
-
-                // Если отступ явно не задан, считаем его нулевым (что может быть ошибкой)
-                if (indent?.FirstLine == null)
-                {
-                    // Для ГОСТа обычно требуется отступ, поэтому отсутствие отступа - ошибка
-                    Dispatcher.UIThread.Post(() => {
-                        ErrorControlFirstLineIndent.Text = "Ошибка: отсутствует отступ первой строки";
-                        ErrorControlFirstLineIndent.Foreground = Brushes.Red;
-                    });
-                    isValid = false;
-                    break;
-                }
-
-                // Преобразуем значение отступа в сантиметры (1 см = 567 twips)
-                double firstLineIndentInCm = double.Parse(indent.FirstLine.Value) / 567.0;
-
-                // Проверяем с допуском 0.1 см
-                if (Math.Abs(firstLineIndentInCm - requiredFirstLineIndent) > 0.1)
-                {
-                    Dispatcher.UIThread.Post(() => {
-                        ErrorControlFirstLineIndent.Text = $"Ошибка: отступ {firstLineIndentInCm:F2} см (требуется {requiredFirstLineIndent:F2} см)";
-                        ErrorControlFirstLineIndent.Foreground = Brushes.Red;
-                    });
-                    isValid = false;
-                    break;
-                }
-            }
-
-            if (isValid)
-            {
-                Dispatcher.UIThread.Post(() => {
-                    ErrorControlFirstLineIndent.Text = $"Отступ соответствует ГОСТу: {requiredFirstLineIndent:F2} см";
-                    ErrorControlFirstLineIndent.Foreground = Brushes.Green;
-                });
-            }
-
-            return isValid;
-        }
-
-        /// <summary>
         /// Проверяет, является ли параграф элементом списка
         /// </summary>
         private bool IsListItem(Paragraph paragraph)
         {
-            // Проверяем явные признаки элемента списка
+            // 1. Проверка нумерации
             if (paragraph.ParagraphProperties?.NumberingProperties != null)
                 return true;
 
-            // Проверяем стили, связанные со списками
+            // 2. Проверка стиля списка
             var styleId = paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value;
-            if (!string.IsNullOrEmpty(styleId) &&
-                (styleId.Contains("List") || styleId.Contains("Bullet") || styleId.Contains("Numbering")))
+            if (!string.IsNullOrEmpty(styleId) && (styleId.Contains("List") || styleId.Contains("Bullet") || styleId.Contains("Numbering")))
                 return true;
 
-            // Проверяем наличие маркеров или номеров в тексте
+            // 3. Проверка по форматированию
             var firstRun = paragraph.Elements<Run>().FirstOrDefault();
             if (firstRun != null)
             {
                 var text = firstRun.InnerText.Trim();
-                if (text.StartsWith("•") || text.StartsWith("-") || text.StartsWith("—") ||
-                    Regex.IsMatch(text, @"^\d+[\.\)]"))
+
+                // Маркированные списки
+                if (text.StartsWith("•") || text.StartsWith("-") || text.StartsWith("—"))
+                    return true;
+
+                // Нумерованные списки
+                if (Regex.IsMatch(text, @"^\d+[\.\)]") || Regex.IsMatch(text, @"^[a-z]\)"))
                     return true;
             }
 
             return false;
-        }
-
-        /// <summary>
-        /// Проверка межстрочного интервала
-        /// </summary>
-        private bool CheckLineSpacing(double requiredLineSpacing, Body body, Gost gost)
-        {
-            bool isValid = true;
-            var headerTexts = GetHeaderTexts(body, gost);
-
-            foreach (var paragraph in body.Elements<Paragraph>())
-            {
-                // Пропускаем: 1) заголовки, 2) пустые параграфы, 3) элементы списков
-                if (headerTexts.Contains(paragraph.InnerText.Trim()) ||
-                    IsEmptyParagraph(paragraph) ||
-                    IsListItem(paragraph))
-                    continue;
-
-                var spacing = paragraph.ParagraphProperties?.SpacingBetweenLines;
-                if (spacing?.Line == null || spacing.LineRule != LineSpacingRuleValues.Auto)
-                    continue;
-
-                double lineSpacing = double.Parse(spacing.Line.Value) / 240.0;
-                if (Math.Abs(lineSpacing - requiredLineSpacing) > 0.01)
-                {
-                    isValid = false;
-                    HighlightWholeParagraph(paragraph);
-                    break;
-                }
-            }
-
-            Dispatcher.UIThread.Post(() => {
-                ErrorControlMnochitel.Text = isValid
-                    ? $"Межстрочный интервал соответствует ГОСТу: {requiredLineSpacing}"
-                    : "Ошибка в межстрочном интервале основного текста";
-                ErrorControlMnochitel.Foreground = isValid ? Brushes.Green : Brushes.Red;
-            });
-
-            return isValid;
         }
 
         /// <summary>
@@ -1942,7 +4034,18 @@ namespace GOST_Control
 
             return true;
         }
-        
+
+        /// <summary>
+        /// Получает стиль из документа
+        /// </summary>
+        private Style GetDefaultStyle(WordprocessingDocument doc)
+        {
+            var stylesPart = doc.MainDocumentPart?.StyleDefinitionsPart;
+            if (stylesPart == null) return null;
+
+            return stylesPart.Styles.Elements<Style>().FirstOrDefault(s => s.Type == StyleValues.Paragraph && (s.Default?.Value ?? false));
+        }
+
         /// <summary>
         /// Кнопка проверки на соответствие ГОСТу
         /// </summary>
@@ -1976,7 +4079,7 @@ namespace GOST_Control
         {
             var result = false;
 
-            // Создаем основное окно
+            // Основное окно
             var dialog = new Window
             {
                 Title = title,
@@ -1993,7 +4096,7 @@ namespace GOST_Control
                 Topmost = true
             };
 
-            // Создаем кнопки
+            // Кнопки
             var yesButton = new Button
             {
                 Content = "Да",
@@ -2009,7 +4112,7 @@ namespace GOST_Control
                 HorizontalAlignment = HorizontalAlignment.Center
             };
 
-            // Настраиваем содержимое окна
+            // Содержимое окна
             dialog.Content = new Avalonia.Controls.Border
             {
                 BorderBrush = Brushes.Red,
@@ -2041,7 +4144,7 @@ namespace GOST_Control
                 }
             };
 
-            // Назначаем обработчики кнопок
+            // Обработчики кнопок
             yesButton.Click += (s, e) => { result = true; dialog.Close(); };
             noButton.Click += (s, e) => { result = false; dialog.Close(); };
 
