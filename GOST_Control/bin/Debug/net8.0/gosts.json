@@ -25,7 +25,7 @@
         "PageNumberingAlignment": "Center",
         "PageNumberingPosition": "Bottom",
 
-        "RequiredSections": "Оглавление, Введение, Заключение, Список литературы",
+        "RequiredSections": "СОДЕРЖАНИЕ, ВВЕДЕНИЕ, ЗАКЛЮЧЕНИЕ, СПИСОК ИСПОЛЬЗОВАННОЙ ЛИТЕРАТУРЫ",
         "HeaderFontName": "Times New Roman",
         "HeaderFontSize": 16.0,
         "HeaderAlignment": "Center",

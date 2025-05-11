@@ -13,7 +13,7 @@
 		<Grid Name="GostControl_Сheck_Okko"
 			  ColumnDefinitions="*,*,*"
 			  RowDefinitions="*,*,*"
-			  ShowGridLines="True">
+			  ShowGridLines="False">
 
 			<ScrollViewer Grid.ColumnSpan="3"
 						  Grid.RowSpan="3"
@@ -33,6 +33,11 @@
 							   Text="ГОСТ"
 							   FontWeight="Bold"
 							   FontSize="30"/>
+					
+					<TextBlock Margin="0 5 0 0"
+							   Text="---"
+							   FontWeight="Bold"
+							   FontSize="15"/>
 
 					<!-- Проверка есть ли ГОСТ в базе данных -->
 					<TextBlock Name="ErrorControlGost"
@@ -234,6 +239,17 @@
 					<TextBlock Margin="0 5 0 0"
 							   Name="ErrorControlListIndents"
 							   Text="--- Отступы левой и правой строки с 1 стр Списков---"
+							   FontWeight="Bold"
+							   FontSize="15"/>
+
+					<TextBlock Margin="0 5 0 0"
+							   Text="---"
+							   FontWeight="Bold"
+							   FontSize="15"/>
+					
+					<TextBlock Margin="0 5 0 0"
+							   Name="ErrorControlLinks"
+							   Text="-Гиперссылки-"
 							   FontWeight="Bold"
 							   FontSize="15"/>
 
