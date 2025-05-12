@@ -39,6 +39,21 @@
         "HeaderLineSpacingBefore": 0.85,
         "HeaderLineSpacingAfter": 0.35,
 
+
+        "AdditionalHeaderFontName": "Times New Roman",
+        "AdditionalHeaderFontSize": 16.0,
+        "AdditionalHeaderAlignment": "Both",
+        "AdditionalHeaderLineSpacing": 1.5,
+        "AdditionalHeaderIndentOrOutdent": "Отступ",
+        "AdditionalHeaderFirstLineIndent": 1.25,
+        "AdditionalHeaderIndentLeft": 0,
+        "AdditionalHeaderIndentRight": 0,
+        "AdditionalHeaderLineSpacingType": "Множитель",
+        "AdditionalHeaderLineSpacingValue": 1.5,
+        "AdditionalHeaderLineSpacingBefore": 0.85,
+        "AdditionalHeaderLineSpacingAfter": 0.35,
+
+
         "ImageCaptionFontName": "Times New Roman",
         "ImageCaptionFontSize": 14.0,
         "ImageCaptionIndentOrOutdent": "нет",

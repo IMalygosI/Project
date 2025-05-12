@@ -143,6 +143,12 @@
 							   FontSize="15"/>
 
 					<TextBlock Margin="0 5 0 0"
+							   Text="Дополнительные Заголовки"
+							   Name="ErrorControlAdditionalHeaders"
+							   FontWeight="Bold"
+							   FontSize="15"/>
+
+					<TextBlock Margin="0 5 0 0"
 							   Text="10---Заголовки"
 							   FontWeight="Bold"
 							   FontSize="15"/>

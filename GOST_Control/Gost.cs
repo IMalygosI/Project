@@ -56,6 +56,21 @@ namespace GOST_Control
         public double? HeaderLineSpacingAfter { get; set; } // Интервал после 
 
 
+        // ======================= ДОП.ЗАГОЛОВКИ =======================
+        public string? AdditionalHeaderFontName { get; set; } // Шрифт дополнительных заголовков
+        public double? AdditionalHeaderFontSize { get; set; } // Размер шрифта дополнительных заголовков
+        public string? AdditionalHeaderAlignment { get; set; } // Выравнивание дополнительных заголовков (Center/Left/Right)
+        public double? AdditionalHeaderLineSpacing { get; set; } // Межстрочный интервал дополнительных заголовков 
+        public string? AdditionalHeaderIndentOrOutdent { get; set; } // Отступ или Выступ для дополнительных заголовков
+        public double? AdditionalHeaderFirstLineIndent { get; set; } // Отступ первой строки дополнительных заголовков 
+        public double? AdditionalHeaderIndentLeft { get; set; } // Отступ слева для дополнительных заголовков
+        public double? AdditionalHeaderIndentRight { get; set; } // Отступ справа для дополнительных заголовков
+        public string? AdditionalHeaderLineSpacingType { get; set; } // "Множитель"/"Минимум"/"Точно" для дополнительных заголовков
+        public double? AdditionalHeaderLineSpacingValue { get; set; } // Значение интервала для дополнительных заголовков
+        public double? AdditionalHeaderLineSpacingBefore { get; set; } // Интервал перед для дополнительных заголовков
+        public double? AdditionalHeaderLineSpacingAfter { get; set; } // Интервал после для дополнительных заголовков
+
+
         // ======================= ФОРМАТ И ОРИЕНТАЦИЯ СТРАНИЦЫ =======================
         public string? PaperSize { get; set; } // Формат бумаги (A4, A5 и т.д.)
         public string? PageOrientation { get; set; } // Ориентация (Portrait/Book - книжная, Landscape - альбомная)
