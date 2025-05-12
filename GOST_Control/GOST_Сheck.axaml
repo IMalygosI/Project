@@ -33,7 +33,35 @@
 							   Text="ГОСТ"
 							   FontWeight="Bold"
 							   FontSize="30"/>
+
+					<TextBlock Margin="0 5 0 0"
+							   Text="---"
+							   FontWeight="Bold"
+							   FontSize="15"/>
 					
+					<TextBlock Margin="0 5 0 0"
+							   Text="---"
+							   Name="ErrorControlImages"
+							   FontWeight="Bold"
+							   FontSize="15"/>
+
+					<TextBlock Margin="0 5 0 0"
+							   Name="TextImage"
+							   Text="Изображения"
+							   FontWeight="Bold"
+							   FontSize="15"/>
+
+					<TextBlock Margin="0 5 0 0"
+							   Text="---"
+							   FontWeight="Bold"
+							   FontSize="15"/>
+
+					<TextBlock Margin="0 5 0 0"
+							   Name="TextTables"
+							   Text="Таблицы"
+							   FontWeight="Bold"
+							   FontSize="15"/>
+
 					<TextBlock Margin="0 5 0 0"
 							   Text="---"
 							   FontWeight="Bold"

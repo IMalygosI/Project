@@ -27,7 +27,6 @@ namespace GOST_Control
         public double? LineSpacingBefore { get; set; } // Интервал перед
         public double? LineSpacingAfter { get; set; } // Интервал после
 
-
         // ======================= ОТСТУПЫ В ДОКУМЕНТЕ =======================
         public double? MarginTop { get; set; } // Отступ верхний в документе
         public double? MarginBottom { get; set; } // Отступ нижний в документе
@@ -151,8 +150,43 @@ namespace GOST_Control
         public string? ListLevel9IndentOrOutdent { get; set; }
 
 
-        // ===== ДЛЯ ССЫЛОК =====
+        // ======================= КАРТИНКИ И ПОДПИСИ =======================
+        public string? ImageCaptionFontName { get; set; } // Шрифт подписей под изображениями
+        public double? ImageCaptionFontSize { get; set; } // Размер шрифта подписей
+        public string? ImageCaptionIndentOrOutdent { get; set; } // Отступ или Выступ
+        public double? ImageCaptionFirstLineIndent { get; set; } // Отступ первой строки подписи
+        public double? ImageCaptionIndentLeft { get; set; } // Отступ слева у подписи
+        public double? ImageCaptionIndentRight { get; set; } // Отступ справа у подписи
+        public string? ImageCaptionAlignment { get; set; } // Выравнивание подписи (Left/Center/Right)
+        public string? ImageCaptionLineSpacingType { get; set; } // "Множитель"/"Минимум"/"Точно"
+        public double? ImageCaptionLineSpacingValue { get; set; } // Значение интервала
+        public double? ImageCaptionLineSpacingBefore { get; set; } // Интервал перед подписью
+        public double? ImageCaptionLineSpacingAfter { get; set; } // Интервал после подписи
 
 
+        // ======================= ТАБЛИЦЫ И ПОДПИСИ =======================
+        public string? TableCaptionFontName { get; set; } // Шрифт подписей над таблицами
+        public double? TableCaptionFontSize { get; set; } // Размер шрифта подписей
+        public string? TableCaptionIndentOrOutdent { get; set; } // Отступ или Выступ
+        public double? TableCaptionFirstLineIndent { get; set; } // Отступ первой строки подписи
+        public double? TableCaptionIndentLeft { get; set; } // Отступ слева у подписи
+        public double? TableCaptionIndentRight { get; set; } // Отступ справа у подписи
+        public string? TableCaptionAlignment { get; set; } // Выравнивание подписи (Left/Center/Right)
+        public string? TableCaptionLineSpacingType { get; set; } // "Множитель"/"Минимум"/"Точно"
+        public double? TableCaptionLineSpacingValue { get; set; } // Значение интервала
+        public double? TableCaptionLineSpacingBefore { get; set; } // Интервал перед подписью
+        public double? TableCaptionLineSpacingAfter { get; set; } // Интервал после подписи
+
+        // ======================= ТЕКСТ В ТАБЛИЦЕ =======================
+        public double? TableFontSize { get; set; } // Шрифт подписей над таблицами
+        public string? TableAlignment { get; set; } // Выравнивание текста в таблицах (Left/Center/Right)
+        public string? TableIndentOrOutdent { get; set; } // Отступ или Выступ
+        public double? TableFirstLineIndent { get; set; } // Отступ первой строки подписи
+        public double? TableIndentLeft { get; set; } // Отступ слева у подписи
+        public double? TableIndentRight { get; set; } // Отступ справа у подписи
+        public string? TableSpacingType { get; set; } // "Множитель"/"Минимум"/"Точно"
+        public double? TableLineSpacingValue { get; set; } // Значение интервала
+        public double? TableLineSpacingBefore { get; set; } // Интервал перед подписью
+        public double? TableLineSpacingAfter { get; set; } // Интервал после подписи
     }
 }

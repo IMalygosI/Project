@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("GOST_Control")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+33080bd9b9e8f8d4fc8b1bfbbd404ab29f440c75")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2496e951951542ddc0711449322ca51acd389409")]
 [assembly: System.Reflection.AssemblyProductAttribute("GOST_Control")]
 [assembly: System.Reflection.AssemblyTitleAttribute("GOST_Control")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

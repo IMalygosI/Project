@@ -22,7 +22,6 @@ using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.ExtendedProperties;
 
 
-
 namespace GOST_Control
 {
     /// <summary>
@@ -46,6 +45,44 @@ namespace GOST_Control
         private const double DefaultTextFirstLineIndent = 1.25;
         private const double DefaultTextLeftIndent = 0.0;
         private const double DefaultTextRightIndent = 0.0;
+
+        // ======================= СТАНДАРТНЫЕ ЗНАЧЕНИЯ ДЛЯ ПОДПИСЕЙ К КАРТИНКАМ =======================
+        private const string DefaultImageCaptionFont = "Arial"; 
+        private const double DefaultImageCaptionFontSize = 11.0;           
+        private const string DefaultImageCaptionIndentOrOutdent = "Нет";
+        private const double DefaultImageCaptionFirstLineIndent = 1.25;    
+        private const double DefaultImageCaptionIndentLeft = 0.0;       
+        private const double DefaultImageCaptionIndentRight = 0.0;       
+        private const string DefaultImageCaptionAlignment = "Left";       
+        private const string DefaultImageCaptionLineSpacingType = "Множитель"; 
+        private const double DefaultImageCaptionLineSpacingValue = 1.15;        
+        private const double DefaultImageCaptionLineSpacingBefore = 0.0;     
+        private const double DefaultImageCaptionLineSpacingAfter = 0.35;
+
+        // ======================= СТАНДАРТНЫЕ ЗНАЧЕНИЯ ДЛЯ ПОДПИСЕЙ К ТАБЛИЦАМ =======================
+        private const string DefaultTableCaptionFont = "Arial";  // Стандартный шрифт подписей к таблицам
+        private const double DefaultTableCaptionFontSize = 11.0; // Стандартный размер шрифта
+        private const string DefaultTableCaptionIndentOrOutdent = "Нет"; // Тип первой строки — "Отступ" или "Выступ"
+        private const double DefaultTableCaptionFirstLineIndent = 1.25; // Отступ первой строки подписи (в см)
+        private const double DefaultTableCaptionIndentLeft = 0.0; // Левый отступ подписи
+        private const double DefaultTableCaptionIndentRight = 0.0; // Правый отступ подписи
+        private const string DefaultTableCaptionAlignment = "Left"; // Выравнивание подписи
+        private const string DefaultTableCaptionLineSpacingType = "Множитель"; // Тип межстрочного интервала (например, "Множитель")
+        private const double DefaultTableCaptionLineSpacingValue = 1.15; // Значение межстрочного интервала
+        private const double DefaultTableCaptionLineSpacingBefore = 0.0; // Интервал перед подписью
+        private const double DefaultTableCaptionLineSpacingAfter = 0.35; // Интервал после подписи
+
+        // ======================= ТЕКСТ В ТАБЛИЦЕ =======================
+        private const double DefaultTableFontSize = 11.0; // Стандартный размер шрифта
+        private const string DefaultTableIndentOrOutdent = "Нет"; // Тип первой строки — "Отступ" или "Выступ"
+        private const double DefaultTableFirstLineIndent = 1.25; // Отступ первой строки подписи (в см)
+        private const double DefaultTableIndentLeft = 0.0; // Левый отступ подписи
+        private const double DefaultTableIndentRight = 0.0; // Правый отступ подписи
+        private const string DefaultTableAlignment = "Left"; // Выравнивание подписи
+        private const string DefaultTableLineSpacingType = "Множитель"; // Тип межстрочного интервала (например, "Множитель")
+        private const double DefaultTableLineSpacingValue = 1.15; // Значение межстрочного интервала
+        private const double DefaultTableLineSpacingBefore = 0.0; // Интервал перед подписью
+        private const double DefaultTableLineSpacingAfter = 0.35; // Интервал после подписи
 
         // ======================= СТАНДАРТНЫЕ ЗНАЧЕНИЯ ДЛЯ ЗАГОЛОВКОВ =======================
         private const string DefaultHeaderFont = "Arial";
@@ -275,6 +312,11 @@ namespace GOST_Control
             return await _gostService.GetGostByIdAsync(gostId);
         }
 
+        /// <summary>
+        /// Проверяет, является ли параграф частью титульного листа документа.
+        /// </summary>
+        /// <param name="paragraph"></param>
+        /// <returns></returns>
         private bool IsTitleParagraph(Paragraph paragraph)
         {
             if (paragraph?.InnerText == null) return false;
@@ -293,6 +335,13 @@ namespace GOST_Control
             return titleKeywords.Any(k => text.Contains(k));
         }
 
+        /// <summary>
+        /// Отделяет титульный лист
+        /// </summary>
+        /// <param name="body"></param>
+        /// <param name="titlePageParagraphs"></param>
+        /// <param name="bodyParagraphsAfterTitle"></param>
+        /// <param name="allParagraphs"></param>
         private void ExtractTitleAndBody(Body body, out List<Paragraph> titlePageParagraphs, out List<Paragraph> bodyParagraphsAfterTitle, out List<Paragraph> allParagraphs)
         {
             titlePageParagraphs = new List<Paragraph>();
@@ -388,17 +437,26 @@ namespace GOST_Control
                         bool listSpacingValid = true;
                         bool listHangingValid = true;
                         bool headerIndentsValid = true;
-                        bool tocIndentsValid = true;
+                        bool tocIndentsValid = true; 
+                        bool stylesValid = true;
                         bool plainTextLinksValid = true;
-
+                        bool imagesValid = true;
+                        bool tablesValid = true;
                         // Список хранения ошибок
                         var errors = new List<string>();
+
+
+                        stylesValid = CheckStyleFonts(wordDoc, gost);
+                        if (!stylesValid)
+                        {
+                            ErrorControlFont.Text = "Ошибка в стилях документа!";
+                            ErrorControlFont.Foreground = Brushes.Red;
+                        }
+
 
                         // ======================= ТИТУЛЬНИК =======================
                         List<Paragraph> allParagraphs;
                         ExtractTitleAndBody(body, out var titlePageParagraphs, out var bodyParagraphsAfterTitle, out allParagraphs);
-
-                        //ExtractTitleAndBody(body, out var titlePageParagraphs, out var bodyParagraphsAfterTitle);
 
                         // ======================= ПРОСТОЙ ТЕКСТ =======================
                         if (!string.IsNullOrEmpty(gost.FontName))
@@ -556,17 +614,25 @@ namespace GOST_Control
                             errors.Add("Гиперссылки оформлены не корректно!");
                         }
 
-                        bool stylesValid = CheckStyleFonts(wordDoc, gost);
-                        if (!stylesValid)
+                        // ======================= Картинки =======================
+                        imagesValid = CheckImages(wordDoc, gost);
+                        if (!imagesValid)
                         {
-                            ErrorControlFont.Text = "Ошибка в стилях документа!";
-                            ErrorControlFont.Foreground = Brushes.Red;
+                            errors.Add("Некорректные подписи под рисунками.");
+                        }
+
+                        // ======================= Таблицы =======================
+                        tablesValid = CheckTables(wordDoc, gost);
+                        if (!tablesValid)
+                        {
+                            errors.Add("Некорректные подписи таблицы или текс.");
                         }
 
                         // Общий результат проверки
-                        if (fontNameValid && fontSizeValid && marginsValid && lineSpacingValid && firstLineIndentValid && textAlignmentValid && pageNumberingValid && sectionsValid &&
-                            paperSizeValid && orientationValid && tocValid && bulletedListsValid && textIndentsValid && paragraphSpacingValid && headerSpacingValid && tocSpacingValid &&
-                            listSpacingValid && listHangingValid && headerIndentsValid && tocIndentsValid && plainTextLinksValid && stylesValid)
+                        if (fontNameValid && fontSizeValid && marginsValid && lineSpacingValid && firstLineIndentValid && textAlignmentValid && pageNumberingValid && 
+                            sectionsValid && paperSizeValid && orientationValid && tocValid && bulletedListsValid && textIndentsValid && paragraphSpacingValid && 
+                            headerSpacingValid && tocSpacingValid &&listSpacingValid && listHangingValid && headerIndentsValid && tocIndentsValid && plainTextLinksValid &&
+                            stylesValid && imagesValid && tablesValid)
                         {
                             GostControl.Text = "Документ соответствует ГОСТу.";
                             GostControl.Foreground = Brushes.Green;
@@ -641,6 +707,12 @@ namespace GOST_Control
                 // Оглавление
                 HighlightTocErrors(errorDoc, gost);
 
+                // Изображение
+                HighlightImageCaptionErrors(errorDoc, gost, errors);
+
+                // Таблицы
+                HighlightTableErrors(bodyParagraphsAfterTitle, errorDoc, gost, errors);
+
                 // списки
                 HighlightListErrors(errorDoc, gost, errors);
 
@@ -668,26 +740,1265 @@ namespace GOST_Control
             }
         }
 
+        /// <summary>
+        /// Проверяет таблицы и их подписи на соответствие ГОСТу
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <param name="gost"></param>
+        /// <returns></returns>
+        private bool CheckTables(WordprocessingDocument doc, Gost gost)
+        {
+            var body = doc.MainDocumentPart.Document.Body;
+            var tables = body.Elements<Table>().ToList();
+
+            var errors = new List<string>();
+            bool allTablesValid = true;
+
+            foreach (var table in tables)
+            {
+                bool tableValid = true;
+
+                
+                // 1. Проверка подписи таблицы (должна быть над таблицей)
+                var tableCaption = GetTableCaption(table);
+                
+                if (tableCaption == null)
+                {
+                    continue;
+                }
+
+                // Проверка формата подписи
+                if (!CheckTableCaptionFormat(tableCaption, errors))
+                {
+                    tableValid = false;
+                }
+
+                // Проверка стиля подписи таблицы
+                if (!CheckTableCaptionStyle(tableCaption, gost, errors))
+                {
+                    tableValid = false;
+                }
+
+                // Проверка содержимого таблицы
+                if (!CheckTableContent(table, gost, errors))
+                {
+                    tableValid = false;
+                }
+
+                if (!tableValid)
+                {
+                    allTablesValid = false;
+                }
+            }
+
+            if (!allTablesValid)
+                Dispatcher.UIThread.Post(() => {
+
+                    TextTables.Text = "Ошибки в таблицах:\n" + string.Join("\n", errors);
+                    TextTables.Foreground = Brushes.Red;
+
+                });
+            else
+                Dispatcher.UIThread.Post(() => {
+                    TextTables.Text = tables.Any() ? "Все таблицы соответствуют ГОСТу" : "Таблицы не обнаружены - проверка не требуется";
+                    TextTables.Foreground = Brushes.Green;
+                });
+
+            return allTablesValid;
+        }
+
+        /// <summary>
+        /// Получает подпись таблицы (должна быть непосредственно перед таблицей)
+        /// </summary>
+        /// <param name="table"></param>
+        /// <returns></returns>
+        private Paragraph GetTableCaption(Table table)
+        {
+            var previousSibling = table.PreviousSibling();
+            while (previousSibling != null)
+            {
+                if (previousSibling is Paragraph paragraph && !IsEmptyParagraph(paragraph))
+                    return paragraph;
+
+                previousSibling = previousSibling.PreviousSibling();
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Проверяет стиль подписи таблицы
+        /// </summary>
+        /// <param name="captionParagraph"></param>
+        /// <param name="gost"></param>
+        /// <param name="errors"></param>
+        /// <returns></returns>
+        private bool CheckTableCaptionStyle(Paragraph captionParagraph, Gost gost, List<string> errors)
+        {
+            bool isValid = true;
+            var errorDetails = new List<string>();
+
+            // Проверка шрифта
+            if (!string.IsNullOrEmpty(gost.TableCaptionFontName))
+            {
+                foreach (var run in captionParagraph.Elements<Run>())
+                {
+                    if (ShouldSkipRun(run)) continue;
+
+                    var font = run.RunProperties?.RunFonts?.Ascii?.Value ?? DefaultTableCaptionFont;
+                    if (font != null && font != gost.TableCaptionFontName)
+                    {
+                        errorDetails.Add($"Шрифт подписи таблицы должен быть: {gost.TableCaptionFontName}, а не {font}");
+                        isValid = false;
+                    }
+                }
+            }
+
+            // Проверка размера шрифта
+            if (gost.TableCaptionFontSize.HasValue)
+            {
+                foreach (var run in captionParagraph.Elements<Run>())
+                {
+                    if (ShouldSkipRun(run)) continue;
+
+                    var fontSizeVal = run.RunProperties?.FontSize?.Val?.Value;
+                    double actualFontSize = fontSizeVal != null ? double.Parse(fontSizeVal) / 2 : DefaultTableCaptionFontSize;
+
+                    if (Math.Abs(actualFontSize - gost.TableCaptionFontSize.Value) > 0.1)
+                    {
+                        errorDetails.Add($"Размер шрифта подписи должен быть {gost.TableCaptionFontSize.Value}, а не {actualFontSize}");
+                        isValid = false;
+                    }
+                }
+            }
+
+            // Проверка выравнивания
+            if (!string.IsNullOrEmpty(gost.TableCaptionAlignment))
+            {
+                string currentAlignment = GetAlignmentString(captionParagraph.ParagraphProperties?.Justification) ?? DefaultTableCaptionAlignment;
+                if (currentAlignment != gost.TableCaptionAlignment)
+                {
+                    errorDetails.Add($"Выравнивание подписи должно быть: {gost.TableCaptionAlignment}, а не {currentAlignment}");
+                    isValid = false;
+                }
+            }
+
+            // Проверка отступов
+            if (gost.TableCaptionFirstLineIndent.HasValue || gost.TableCaptionIndentLeft.HasValue || gost.TableCaptionIndentRight.HasValue)
+            {
+                var indent = captionParagraph.ParagraphProperties?.Indentation;
+
+                // Проверка левого отступа
+                if (gost.TableCaptionIndentLeft.HasValue)
+                {
+                    double actualLeft = indent?.Left?.Value != null ? TwipsToCm(double.Parse(indent.Left.Value)) : DefaultTableCaptionIndentLeft;
+                    if (Math.Abs(actualLeft - gost.TableCaptionIndentLeft.Value) > 0.05)
+                    {
+                        errorDetails.Add($"Левый отступ подписи: {actualLeft:F2} см (требуется {gost.TableCaptionIndentLeft.Value:F2} см)");
+                        isValid = false;
+                    }
+                }
+
+                // Проверка правого отступа
+                if (gost.TableCaptionIndentRight.HasValue)
+                {
+                    double actualRight = indent?.Right?.Value != null ? TwipsToCm(double.Parse(indent.Right.Value)) : DefaultTableCaptionIndentRight;
+                    if (Math.Abs(actualRight - gost.TableCaptionIndentRight.Value) > 0.05)
+                    {
+                        errorDetails.Add($"Правый отступ подписи: {actualRight:F2} см (требуется {gost.TableCaptionIndentRight.Value:F2} см)");
+                        isValid = false;
+                    }
+                }
 
 
+                // Отступы
+                if (!string.IsNullOrEmpty(gost.TableCaptionIndentOrOutdent))
+                {
+                    string gostType = gost.TableCaptionIndentOrOutdent.Trim().ToLower(); // "отступ", "выступ", "нет"
+                    string currentType = "не задан";
+                    double? currentValue = null;
 
+                    // Проверка на выступ
+                    if (indent?.Hanging != null && double.TryParse(indent.Hanging.Value, out var hangingVal) && hangingVal != 0)
+                    {
+                        currentType = "выступ";
+                        currentValue = TwipsToCm(hangingVal);
+                    }
+                    // Проверка на отступ
+                    else if (indent?.FirstLine != null && double.TryParse(indent.FirstLine.Value, out var firstLineVal) && firstLineVal != 0)
+                    {
+                        currentType = "отступ";
+                        currentValue = TwipsToCm(firstLineVal);
+                    }
 
+                    if (gostType == "нет")
+                    {
+                        // ГОСТ не требует ни отступа, ни выступа
+                        if (currentType != "не задан")
+                        {
+                            errorDetails.Add($"Тип первой строки: {currentType} (Требуется: нет)!");
+                            isValid = false;
+                        }
+                    }
+                    else
+                    {
+                        // ГОСТ требует отступ или выступ
+                        if (currentType != gostType)
+                        {
+                            errorDetails.Add($"Тип первой строки: {currentType} (Требуется: {gost.TableCaptionIndentOrOutdent})");
+                            isValid = false;
+                        }
 
+                        // Проверка на соответствие значения
+                        if (currentValue.HasValue)
+                        {
+                            if (Math.Abs(currentValue.Value - gost.TableCaptionFirstLineIndent.Value) > 0.05)
+                            {
+                                errorDetails.Add($"{currentType} первой строки: {currentValue.Value:F2} см (Требуется: {gost.TableCaptionFirstLineIndent.Value:F2} см)");
+                                isValid = false;
+                            }
+                        }
+                        else
+                        {
+                            errorDetails.Add($"Отсутствует {gost.TableCaptionIndentOrOutdent.ToLower()} первой строки (по ГОСТу требуется)");
+                            isValid = false;
+                        }
+                    }
+                }
+            }
 
+            // Проверка межстрочных интервалов
+            if (gost.TableCaptionLineSpacingValue.HasValue || gost.TableCaptionLineSpacingBefore.HasValue || gost.TableCaptionLineSpacingAfter.HasValue)
+            {
+                var spacing = captionParagraph.ParagraphProperties?.SpacingBetweenLines;
 
+                // Проверка межстрочного интервала
+                if (gost.TableCaptionLineSpacingValue.HasValue)
+                {
+                    double actualSpacing = spacing?.Line != null ? CalculateActualSpacing(spacing) : DefaultTableCaptionLineSpacingValue;
+                    if (Math.Abs(actualSpacing - gost.TableCaptionLineSpacingValue.Value) > 0.1)
+                    {
+                        errorDetails.Add($"Межстрочный интервал подписи должен быть {gost.TableCaptionLineSpacingValue.Value}, а не {actualSpacing}");
+                        isValid = false;
+                    }
+                }
 
+                // Проверка интервала перед
+                if (gost.TableCaptionLineSpacingBefore.HasValue)
+                {
+                    double actualBefore = spacing?.Before?.Value != null ? ConvertTwipsToPoints(spacing.Before.Value) : DefaultTableCaptionLineSpacingBefore;
+                    if (Math.Abs(actualBefore - gost.TableCaptionLineSpacingBefore.Value) > 0.1)
+                    {
+                        errorDetails.Add($"Интервал перед подписью должен быть {gost.TableCaptionLineSpacingBefore.Value}, а не {actualBefore}");
+                        isValid = false;
+                    }
+                }
 
+                // Проверка интервала после
+                if (gost.TableCaptionLineSpacingAfter.HasValue)
+                {
+                    double actualAfter = spacing?.After?.Value != null ? ConvertTwipsToPoints(spacing.After.Value) : DefaultTableCaptionLineSpacingAfter;
+                    if (Math.Abs(actualAfter - gost.TableCaptionLineSpacingAfter.Value) > 0.1)
+                    {
+                        errorDetails.Add($"Интервал после подписи должен быть {gost.TableCaptionLineSpacingAfter.Value}, а не {actualAfter}");
+                        isValid = false;
+                    }
+                }
+            }
 
+            if (!isValid)
+            {
+                errors.Add($"Подпись таблицы '{GetShortText2(captionParagraph.InnerText)}':");
+                errors.AddRange(errorDetails.Select(d => $"  • {d}"));
+                HighlightParagraph(captionParagraph);
+            }
 
+            return isValid;
+        }
 
+        /// <summary>
+        /// Проверяет содержимое таблицы (шрифт, выравнивание, отступы)
+        /// </summary>
+        /// <param name="table"></param>
+        /// <param name="gost"></param>
+        /// <param name="errors"></param>
+        /// <returns></returns>
+        private bool CheckTableContent(Table table, Gost gost, List<string> errors)
+        {
+            bool isValid = true;
+            var errorDetails = new List<string>();
 
+            foreach (var row in table.Elements<TableRow>())
+            {
+                foreach (var cell in row.Elements<TableCell>())
+                {
+                    foreach (var paragraph in cell.Elements<Paragraph>())
+                    {
+                        // Проверка шрифта
+                        if (!string.IsNullOrEmpty(gost.FontName))
+                        {
+                            foreach (var run in paragraph.Elements<Run>())
+                            {
+                                if (ShouldSkipRun(run)) continue;
 
+                                var font = run.RunProperties?.RunFonts?.Ascii?.Value ?? DefaultTextFont;
+                                if (font != null && font != gost.FontName)
+                                {
+                                    errorDetails.Add($"Шрифт в таблице должен быть: {gost.FontName}, а не {font}");
+                                    isValid = false;
+                                }
+                            }
+                        }
 
+                        // Проверка размера шрифта
+                        if (gost.TableFontSize.HasValue)
+                        {
+                            foreach (var run in paragraph.Elements<Run>())
+                            {
+                                if (ShouldSkipRun(run)) continue;
 
+                                var fontSize = run.RunProperties?.FontSize?.Val;
 
+                                double actualFontSize;
+                                if (fontSize == null)
+                                    actualFontSize = DefaultTableFontSize;
+                                else
+                                    actualFontSize = double.Parse(fontSize) / 2; // В OpenXml размер шрифта указан в полуторакратных пунктах (half-points)
 
+                                if (Math.Abs(actualFontSize - gost.TableFontSize.Value) > 0.1)
+                                {
+                                    errorDetails.Add($"Размер шрифта в таблице должен быть {gost.TableFontSize.Value:F2} pt, а не {actualFontSize:F2} pt");
+                                    isValid = false;
+                                }
+                            }
+                        }
 
+                        // Проверка выравнивания
+                        if (!string.IsNullOrEmpty(gost.TableAlignment))
+                        {
+                            string currentAlignment = GetAlignmentString(paragraph.ParagraphProperties?.Justification) ?? DefaultTableAlignment;
+                            if (currentAlignment != gost.TableAlignment)
+                            {
+                                errorDetails.Add($"Выравнивание в таблице должно быть: {gost.TableAlignment}, а не {currentAlignment}");
+                                isValid = false;
+                            }
+                        }
 
+                        // Проверка отступов
+                        var indent = paragraph.ParagraphProperties?.Indentation;
+
+                        // Проверка левого отступа
+                        if (gost.TableIndentLeft.HasValue)
+                        {
+                            double actualLeft = indent?.Left?.Value != null ? TwipsToCm(double.Parse(indent.Left.Value)) : DefaultTableIndentLeft;
+                            if (Math.Abs(actualLeft - gost.TableIndentLeft.Value) > 0.05)
+                            {
+                                errorDetails.Add($"Левый отступ в таблице: {actualLeft:F2} см (требуется {gost.TableIndentLeft.Value:F2} см)");
+                                isValid = false;
+                            }
+                        }
+
+                        // Проверка правого отступа
+                        if (gost.TableIndentRight.HasValue)
+                        {
+                            double actualRight = indent?.Right?.Value != null ? TwipsToCm(double.Parse(indent.Right.Value)) : DefaultTableIndentRight;
+                            if (Math.Abs(actualRight - gost.TableIndentRight.Value) > 0.05)
+                            {
+                                errorDetails.Add($"Правый отступ в таблице: {actualRight:F2} см (требуется {gost.TableIndentRight.Value:F2} см)");
+                                isValid = false;
+                            }
+                        }
+
+                        // Проверка типа и значения отступа первой строки
+                        if (!string.IsNullOrEmpty(gost.TableIndentOrOutdent))
+                        {
+                            string gostType = gost.TableIndentOrOutdent.Trim().ToLower(); // "отступ", "выступ", "нет"
+                            string currentType = "не задан";
+                            double? currentValue = null;
+
+                            if (indent?.Hanging != null && double.TryParse(indent.Hanging.Value, out var hangingVal) && hangingVal != 0)
+                            {
+                                currentType = "выступ";
+                                currentValue = TwipsToCm(hangingVal);
+                            }
+                            else if (indent?.FirstLine != null && double.TryParse(indent.FirstLine.Value, out var firstLineVal) && firstLineVal != 0)
+                            {
+                                currentType = "отступ";
+                                currentValue = TwipsToCm(firstLineVal);
+                            }
+
+                            if (gostType == "нет")
+                            {
+                                // ГОСТ не требует ни отступа, ни выступа
+                                if (currentType != "не задан")
+                                {
+                                    errorDetails.Add($"Тип первой строки: {currentType} (Требуется: нет)!");
+                                    isValid = false;
+                                }
+                            }
+                            else
+                            {
+                                // ГОСТ требует отступ или выступ
+                                if (currentType != gostType)
+                                {
+                                    errorDetails.Add($"Тип первой строки: {currentType} (Требуется: {gost.TableIndentOrOutdent})");
+                                    isValid = false;
+                                }
+
+                                if (currentValue.HasValue)
+                                {
+                                    if (Math.Abs(currentValue.Value - gost.TableFirstLineIndent.Value) > 0.05)
+                                    {
+                                        errorDetails.Add($"{currentType} первой строки: {currentValue.Value:F2} см (Требуется: {gost.TableFirstLineIndent.Value:F2} см)");
+                                        isValid = false;
+                                    }
+                                }
+                                else
+                                {
+                                    errorDetails.Add($"Отсутствует {gost.TableIndentOrOutdent.ToLower()} первой строки (по ГОСТу требуется)");
+                                    isValid = false;
+                                }
+                            }
+                        }
+
+                        // Проверка межстрочных интервалов
+                        if (gost.TableLineSpacingValue.HasValue || gost.TableLineSpacingBefore.HasValue || gost.TableLineSpacingAfter.HasValue)
+                        {
+                            var spacing = paragraph.ParagraphProperties?.SpacingBetweenLines;
+
+                            // Проверка межстрочного интервала
+                            if (gost.TableLineSpacingValue.HasValue)
+                            {
+                                double actualSpacing = spacing?.Line != null ? CalculateActualSpacing(spacing) : DefaultTableLineSpacingValue;
+                                if (Math.Abs(actualSpacing - gost.TableLineSpacingValue.Value) > 0.1)
+                                {
+                                    errorDetails.Add($"Межстрочный интервал в таблице должен быть {gost.TableLineSpacingValue.Value}, а не {actualSpacing}");
+                                    isValid = false;
+                                }
+                            }
+
+                            // Проверка интервала перед
+                            if (gost.TableLineSpacingBefore.HasValue)
+                            {
+                                double actualBefore = spacing?.Before?.Value != null ? ConvertTwipsToPoints(spacing.Before.Value) : DefaultTableLineSpacingBefore;
+                                if (Math.Abs(actualBefore - gost.TableLineSpacingBefore.Value) > 0.1)
+                                {
+                                    errorDetails.Add($"Интервал перед в таблице должен быть {gost.TableLineSpacingBefore.Value}, а не {actualBefore}");
+                                    isValid = false;
+                                }
+                            }
+
+                            // Проверка интервала после
+                            if (gost.TableLineSpacingAfter.HasValue)
+                            {
+                                double actualAfter = spacing?.After?.Value != null ? ConvertTwipsToPoints(spacing.After.Value) : DefaultTableLineSpacingAfter;
+                                if (Math.Abs(actualAfter - gost.TableLineSpacingAfter.Value) > 0.1)
+                                {
+                                    errorDetails.Add($"Интервал после в таблице должен быть {gost.TableLineSpacingAfter.Value}, а не {actualAfter}");
+                                    isValid = false;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (!isValid)
+            {
+                errors.Add("Содержимое таблицы:");
+                errors.AddRange(errorDetails.Distinct().Select(d => $"  • {d}"));
+            }
+
+            return isValid;
+        }
+
+        /// <summary>
+        /// Подсвечивает ошибки в таблицах, их подписях и содержимом (формат, стиль, содержимое).
+        /// </summary>
+        /// <param name="paragraphs">Список параграфов для анализа</param>
+        /// <param name="doc">Документ Word</param>
+        /// <param name="gost">Параметры ГОСТ</param>
+        /// <param name="errors">Список для записи ошибок</param>
+        private void HighlightTableErrors(List<Paragraph> paragraphs, WordprocessingDocument doc, Gost gost, List<string> errors)
+        {
+            var body = doc.MainDocumentPart.Document.Body;
+            var tables = body.Elements<Table>().ToList();
+
+            foreach (var table in tables)
+            {
+                // 1. Получаем подпись таблицы
+                var captionParagraph = GetTableCaption(table);
+                if (captionParagraph == null)
+                {
+                    errors.Add("Таблица без подписи (требуется формат: 'Таблица N - Название')");
+                    continue;
+                }
+
+                bool hasCaptionErrors = false;
+                var captionErrorDetails = new List<string>();
+
+                // 2. Проверка отступов в ПОДПИСИ таблицы
+                var captionIndent = captionParagraph.ParagraphProperties?.Indentation;
+                if (captionIndent != null &&
+                    (gost.TableCaptionFirstLineIndent.HasValue ||
+                     gost.TableCaptionIndentLeft.HasValue ||
+                     gost.TableCaptionIndentRight.HasValue))
+                {
+                    // Проверка отступа/выступа первой строки в подписи
+                    if (!string.IsNullOrEmpty(gost.TableCaptionIndentOrOutdent))
+                    {
+                        string gostType = gost.TableCaptionIndentOrOutdent.Trim().ToLower();
+                        string currentType = "не задан";
+                        double? currentValue = null;
+
+                        if (captionIndent.Hanging != null)
+                        {
+                            currentType = "выступ";
+                            currentValue = TwipsToCm(double.Parse(captionIndent.Hanging.Value));
+                        }
+                        else if (captionIndent.FirstLine != null)
+                        {
+                            currentType = "отступ";
+                            currentValue = TwipsToCm(double.Parse(captionIndent.FirstLine.Value));
+                        }
+
+                        // Проверка типа отступа
+                        if (gostType != "нет" && currentType != gostType)
+                        {
+                            captionErrorDetails.Add($"Тип первой строки: {currentType} (требуется {gost.TableCaptionIndentOrOutdent})");
+                            hasCaptionErrors = true;
+                        }
+
+                        // Проверка значения отступа
+                        if (currentValue.HasValue && gost.TableCaptionFirstLineIndent.HasValue &&
+                            Math.Abs(currentValue.Value - gost.TableCaptionFirstLineIndent.Value) > 0.05)
+                        {
+                            captionErrorDetails.Add($"{currentType} первой строки: {currentValue.Value:F2} см (требуется {gost.TableCaptionFirstLineIndent.Value:F2} см)");
+                            hasCaptionErrors = true;
+                        }
+                        else if (currentValue == null && gost.TableCaptionFirstLineIndent.HasValue)
+                        {
+                            captionErrorDetails.Add($"Отсутствует {gost.TableCaptionIndentOrOutdent.ToLower()} первой строки");
+                            hasCaptionErrors = true;
+                        }
+                    }
+
+                    // Проверка левого отступа подписи
+                    if (gost.TableCaptionIndentLeft.HasValue && captionIndent.Left != null)
+                    {
+                        double actualLeft = TwipsToCm(double.Parse(captionIndent.Left.Value));
+                        if (Math.Abs(actualLeft - gost.TableCaptionIndentLeft.Value) > 0.05)
+                        {
+                            captionErrorDetails.Add($"Левый отступ: {actualLeft:F2} см (требуется {gost.TableCaptionIndentLeft.Value:F2} см)");
+                            hasCaptionErrors = true;
+                        }
+                    }
+
+                    // Проверка правого отступа подписи
+                    if (gost.TableCaptionIndentRight.HasValue && captionIndent.Right != null)
+                    {
+                        double actualRight = TwipsToCm(double.Parse(captionIndent.Right.Value));
+                        if (Math.Abs(actualRight - gost.TableCaptionIndentRight.Value) > 0.05)
+                        {
+                            captionErrorDetails.Add($"Правый отступ: {actualRight:F2} см (требуется {gost.TableCaptionIndentRight.Value:F2} см)");
+                            hasCaptionErrors = true;
+                        }
+                    }
+                }
+
+                // 3. Если есть ошибки в подписи - выделяем ТОЛЬКО подпись
+                if (hasCaptionErrors)
+                {
+                    errors.Add($"Подпись таблицы: {string.Join(", ", captionErrorDetails)}");
+                    HighlightParagraph(captionParagraph); // Выделяем только подпись
+                }
+
+                // 4. Проверка содержимого таблицы (отдельная логика)
+                bool hasTableContentErrors = false;
+                var contentErrorDetails = new List<string>();
+
+                foreach (var row in table.Elements<TableRow>())
+                {
+                    foreach (var cell in row.Elements<TableCell>())
+                    {
+                        foreach (var paragraph in cell.Elements<Paragraph>())
+                        {
+                            bool hasCellErrors = false;
+                            var cellErrorDetails = new List<string>();
+                            var cellIndent = paragraph.ParagraphProperties?.Indentation;
+
+                            // Проверка отступов в СОДЕРЖИМОМ таблицы
+                            if (cellIndent != null &&
+                                (gost.TableFirstLineIndent.HasValue ||
+                                 gost.TableIndentLeft.HasValue ||
+                                 gost.TableIndentRight.HasValue))
+                            {
+                                // Проверка отступа/выступа первой строки в ячейке
+                                if (!string.IsNullOrEmpty(gost.TableIndentOrOutdent))
+                                {
+                                    string gostType = gost.TableIndentOrOutdent.Trim().ToLower();
+                                    string currentType = "не задан";
+                                    double? currentValue = null;
+
+                                    if (cellIndent.Hanging != null)
+                                    {
+                                        currentType = "выступ";
+                                        currentValue = TwipsToCm(double.Parse(cellIndent.Hanging.Value));
+                                    }
+                                    else if (cellIndent.FirstLine != null)
+                                    {
+                                        currentType = "отступ";
+                                        currentValue = TwipsToCm(double.Parse(cellIndent.FirstLine.Value));
+                                    }
+
+                                    // Проверка типа отступа
+                                    if (gostType != "нет" && currentType != gostType)
+                                    {
+                                        cellErrorDetails.Add($"Тип первой строки: {currentType} (требуется {gost.TableIndentOrOutdent})");
+                                        hasCellErrors = true;
+                                    }
+
+                                    // Проверка значения отступа
+                                    if (currentValue.HasValue && gost.TableFirstLineIndent.HasValue &&
+                                        Math.Abs(currentValue.Value - gost.TableFirstLineIndent.Value) > 0.05)
+                                    {
+                                        cellErrorDetails.Add($"{currentType} первой строки: {currentValue.Value:F2} см (требуется {gost.TableFirstLineIndent.Value:F2} см)");
+                                        hasCellErrors = true;
+                                    }
+                                    else if (currentValue == null && gost.TableFirstLineIndent.HasValue)
+                                    {
+                                        cellErrorDetails.Add($"Отсутствует {gost.TableIndentOrOutdent.ToLower()} первой строки");
+                                        hasCellErrors = true;
+                                    }
+                                }
+
+                                // Проверка левого отступа в ячейке
+                                if (gost.TableIndentLeft.HasValue && cellIndent.Left != null)
+                                {
+                                    double actualLeft = TwipsToCm(double.Parse(cellIndent.Left.Value));
+                                    if (Math.Abs(actualLeft - gost.TableIndentLeft.Value) > 0.05)
+                                    {
+                                        cellErrorDetails.Add($"Левый отступ: {actualLeft:F2} см (требуется {gost.TableIndentLeft.Value:F2} см)");
+                                        hasCellErrors = true;
+                                    }
+                                }
+
+                                // Проверка правого отступа в ячейке
+                                if (gost.TableIndentRight.HasValue && cellIndent.Right != null)
+                                {
+                                    double actualRight = TwipsToCm(double.Parse(cellIndent.Right.Value));
+                                    if (Math.Abs(actualRight - gost.TableIndentRight.Value) > 0.05)
+                                    {
+                                        cellErrorDetails.Add($"Правый отступ: {actualRight:F2} см (требуется {gost.TableIndentRight.Value:F2} см)");
+                                        hasCellErrors = true;
+                                    }
+                                }
+                            }
+
+                            // Если есть ошибки в ячейке - выделяем только эту ячейку
+                            if (hasCellErrors)
+                            {
+                                hasTableContentErrors = true;
+                                contentErrorDetails.AddRange(cellErrorDetails);
+                                HighlightParagraph(paragraph); // Выделяем только проблемную ячейку
+                            }
+                        }
+                    }
+                }
+
+                // 5. Если есть ошибки в содержимом таблицы
+                if (hasTableContentErrors)
+                {
+                    errors.Add($"Содержимое таблицы: {string.Join(", ", contentErrorDetails.Distinct())}");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Проверка формата подписи таблицы (например "Таблица 1 - Название")
+        /// </summary>
+        /// <param name="captionParagraph"></param>
+        /// <param name="errors"></param>
+        /// <returns></returns>
+        private bool CheckTableCaptionFormat(Paragraph captionParagraph, List<string> errors)
+        {
+            if (captionParagraph == null)
+            {
+                return false;
+            }
+
+            // Регулярное выражение для проверки формата: "Таблица N - Название"
+            string pattern = @"^Таблица\s\d+\s*[-–]\s*\D.*"; // "Таблица 1 - Описание"
+            string text = captionParagraph.InnerText.Trim();
+
+            if (!Regex.IsMatch(text, pattern, RegexOptions.IgnoreCase))
+            {
+                errors.Add($"Неверный формат подписи таблицы: '{GetShortText2(text)}'. Требуется формат: 'Таблица N - Название'");
+                HighlightParagraph(captionParagraph);
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Проверка формата подписи рисунков
+        /// </summary>
+        /// <param name="captionParagraph"></param>
+        /// <returns></returns>
+        private bool CheckImageCaptionFormat(Paragraph captionParagraph)
+        {
+            string pattern = @"^Рисунок\s\d+\s*[-–]\s*\D.+";
+            string text = captionParagraph.InnerText.Trim();
+            return Regex.IsMatch(text, pattern, RegexOptions.IgnoreCase);
+        }
+
+        /// <summary>
+        /// Метод проверки Картинок и подписей к ним
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <param name="gost"></param>
+        /// <returns></returns>
+        private bool CheckImages(WordprocessingDocument doc, Gost gost)
+        {    
+            var body = doc.MainDocumentPart.Document.Body;
+            var paragraphs = body.Elements<Paragraph>().ToList();
+
+            bool allImagesValid = true;
+            bool hasAtLeastOneImage = false;
+            var errors = new List<string>();
+
+            // Проверка шрифта подписей
+            if (!string.IsNullOrEmpty(gost.ImageCaptionFontName))
+            {
+                bool fontNameValid = true;
+                foreach (var paragraph in paragraphs)
+                {
+                    var hasImage = paragraph.Descendants<DocumentFormat.OpenXml.Office.Drawing.Drawing>().Any() || paragraph.Descendants<Picture>().Any();
+
+                    if (hasImage && paragraph.NextSibling() is Paragraph captionParagraph)
+                    {
+                        // Проверка формата "Рисунок X - Описание"
+                        if (!CheckImageCaptionFormat(captionParagraph))
+                        {
+                            errors.Add($"Неверный формат подписи: '{GetShortText2(captionParagraph.InnerText)}' (требуется 'Рисунок X - Описание')");
+                            HighlightParagraph(captionParagraph);
+                            allImagesValid = false;
+                        }
+
+                        foreach (var run in captionParagraph.Elements<Run>())
+                        {
+                            if (ShouldSkipRun(run)) continue;
+
+                            var font = run.RunProperties?.RunFonts?.Ascii?.Value;
+                            if (font != null && font != gost.ImageCaptionFontName)
+                            {
+                                fontNameValid = false;
+                                errors.Add($"Шрифт подписи под рисунком должен быть: {gost.ImageCaptionFontName}, а не {font}");
+                                HighlightRun(run);
+                            }
+                        }
+                    }
+                }
+
+                Dispatcher.UIThread.Post(() => {
+                    TextImage.Text = fontNameValid ? "Шрифт подписей соответствует ГОСТу." : "Ошибки в шрифте подписей.";
+                    TextImage.Foreground = fontNameValid ? Brushes.Green : Brushes.Red;
+                });
+                allImagesValid &= fontNameValid;
+            }
+
+            // Проверка размера шрифта подписей
+            if (gost.ImageCaptionFontSize.HasValue)
+            {
+                bool fontSizeValid = true;
+                foreach (var paragraph in paragraphs)
+                {
+                    var hasImage = paragraph.Descendants<DocumentFormat.OpenXml.Office.Drawing.Drawing>().Any() || paragraph.Descendants<Picture>().Any();
+
+                    if (hasImage && paragraph.NextSibling() is Paragraph captionParagraph)
+                    {
+                        foreach (var run in captionParagraph.Elements<Run>())
+                        {
+                            if (ShouldSkipRun(run)) continue;
+
+                            var fontSizeVal = run.RunProperties?.FontSize?.Val?.Value;
+                            double actualFontSize = fontSizeVal != null ? double.Parse(fontSizeVal) / 2 : DefaultImageCaptionFontSize;
+
+                            if (Math.Abs(actualFontSize - gost.ImageCaptionFontSize.Value) > 0.1)
+                            {
+                                fontSizeValid = false;
+                                errors.Add($"Размер шрифта подписи должен быть {gost.ImageCaptionFontSize.Value}, а не {actualFontSize}");
+                                HighlightRun(run);
+                            }
+                        }
+                    }
+                }
+
+                Dispatcher.UIThread.Post(() => {
+                    TextImage.Text = fontSizeValid ? "Размер шрифта подписей соответствует ГОСТу." : "Ошибки в размере шрифта подписей.";
+                    TextImage.Foreground = fontSizeValid ? Brushes.Green : Brushes.Red;
+                });
+                allImagesValid &= fontSizeValid;
+            }
+
+            // Проверка выравнивания подписей
+            if (!string.IsNullOrEmpty(gost.ImageCaptionAlignment))
+            {
+                bool alignmentValid = true;
+                string requiredAlignment = gost.ImageCaptionAlignment.ToLowerInvariant();
+
+                foreach (var paragraph in paragraphs)
+                {
+                    var hasImage = paragraph.Descendants<DocumentFormat.OpenXml.Office.Drawing.Drawing>().Any() || paragraph.Descendants<Picture>().Any();
+                    if (hasImage && paragraph.NextSibling() is Paragraph captionParagraph)
+                    {
+                        string currentAlignment = GetAlignmentString(captionParagraph.ParagraphProperties?.Justification)?.ToLowerInvariant() ?? DefaultImageCaptionAlignment.ToLowerInvariant();
+
+                        if (currentAlignment != requiredAlignment)
+                        {
+                            alignmentValid = false;
+                            errors.Add($"Подпись под рисунком должна быть выровнена: {requiredAlignment}, а не {currentAlignment}");
+
+                            // Подсветка абзаца
+                            HighlightParagraph(captionParagraph);
+
+                            // Также можно показать ошибку в UI
+                            Dispatcher.UIThread.Post(() => {
+                                ErrorControlViravnivanie.Text = $"{captionParagraph.InnerText.Trim()} (выравнивание: {currentAlignment}) - требуется ({requiredAlignment})";
+                                ErrorControlViravnivanie.Foreground = Brushes.Red;
+                            });
+                        }
+                    }
+                }
+
+                Dispatcher.UIThread.Post(() => {
+                    TextImage.Text = alignmentValid ? "Выравнивание подписей соответствует ГОСТу." : "Ошибки в выравнивании подписей.";
+                    TextImage.Foreground = alignmentValid ? Brushes.Green : Brushes.Red;
+                });
+
+                allImagesValid &= alignmentValid;
+            }
+
+            // Проверка отступов
+            if (gost.ImageCaptionFirstLineIndent.HasValue || gost.ImageCaptionIndentLeft.HasValue || gost.ImageCaptionIndentRight.HasValue)
+            {
+                bool indentsValid = true;  // Индикатор корректности отступов
+                foreach (var paragraph in paragraphs)
+                {
+                    var hasImage = paragraph.Descendants<DocumentFormat.OpenXml.Office.Drawing.Drawing>().Any() || paragraph.Descendants<Picture>().Any();
+                    if (hasImage && paragraph.NextSibling() is Paragraph captionParagraph)
+                    {
+                        var indent = captionParagraph.ParagraphProperties?.Indentation;
+                        var errorDetails = new List<string>();  // Список ошибок
+
+                        // --- 1. Проверка левого отступа ---
+                        if (gost.ImageCaptionIndentLeft.HasValue)
+                        {
+                            double actualLeft = indent?.Left?.Value != null ? TwipsToCm(double.Parse(indent.Left.Value)) : DefaultImageCaptionIndentLeft;
+                            if (Math.Abs(actualLeft - gost.ImageCaptionIndentLeft.Value) > 0.05)
+                            {
+                                errorDetails.Add($"Левый отступ подписи: {actualLeft:F2} см (требуется {gost.ImageCaptionIndentLeft.Value:F2} см)");
+                                indentsValid = false;
+                            }
+                        }
+
+                        // --- 2. Проверка правого отступа ---
+                        if (gost.ImageCaptionIndentRight.HasValue)
+                        {
+                            double actualRight = indent?.Right?.Value != null ? TwipsToCm(double.Parse(indent.Right.Value)) : DefaultImageCaptionIndentRight;
+                            if (Math.Abs(actualRight - gost.ImageCaptionIndentRight.Value) > 0.05)
+                            {
+                                errorDetails.Add($"Правый отступ подписи: {actualRight:F2} см (требуется {gost.ImageCaptionIndentRight.Value:F2} см)");
+                                indentsValid = false;
+                            }
+                        }
+
+                        // --- 3. Проверка типа и значения отступа первой строки ---
+                        if (!string.IsNullOrEmpty(gost.ImageCaptionIndentOrOutdent))
+                        {
+                            string gostType = gost.ImageCaptionIndentOrOutdent.Trim().ToLower(); // "отступ", "выступ", "нет"
+                            string currentType = "не задан";
+                            double? currentValue = null;
+
+                            if (indent?.Hanging != null && double.TryParse(indent.Hanging.Value, out var hangingVal) && hangingVal != 0)
+                            {
+                                currentType = "выступ";
+                                currentValue = TwipsToCm(hangingVal);
+                            }
+                            else if (indent?.FirstLine != null && double.TryParse(indent.FirstLine.Value, out var firstLineVal) && firstLineVal != 0)
+                            {
+                                currentType = "отступ";
+                                currentValue = TwipsToCm(firstLineVal);
+                            }
+
+                            if (gostType == "нет")
+                            {
+                                // ГОСТ не требует ни отступа, ни выступа
+                                if (currentType != "не задан")
+                                {
+                                    errorDetails.Add($"Тип первой строки: {currentType} (Требуется: нет)!");
+                                    indentsValid = false;
+                                }
+                            }
+                            else
+                            {
+                                // ГОСТ требует отступ или выступ
+                                if (currentType != gostType)
+                                {
+                                    errorDetails.Add($"Тип первой строки: {currentType} (Требуется: {gost.ImageCaptionIndentOrOutdent})");
+                                    indentsValid = false;
+                                }
+
+                                if (currentValue.HasValue)
+                                {
+                                    if (Math.Abs(currentValue.Value - gost.ImageCaptionFirstLineIndent.Value) > 0.05)
+                                    {
+                                        errorDetails.Add($"{currentType} первой строки: {currentValue.Value:F2} см (Требуется: {gost.ImageCaptionFirstLineIndent.Value:F2} см)");
+                                        indentsValid = false;
+                                    }
+                                }
+                                else
+                                {
+                                    errorDetails.Add($"Отсутствует {gost.ImageCaptionIndentOrOutdent.ToLower()} первой строки (по ГОСТу требуется)");
+                                    indentsValid = false;
+                                }
+                            }
+                        }
+
+                        // --- Обработка ошибок ---
+                        if (errorDetails.Any())
+                        {
+                            errors.Add($"Подпись под рисунком: {string.Join(", ", errorDetails)}");
+                            HighlightParagraph(captionParagraph);
+                        }
+                    }
+                }
+
+                Dispatcher.UIThread.Post(() => {
+                    TextImage.Text = indentsValid ? "Отступы подписей соответствуют ГОСТу." : "Ошибки в отступах подписей.";
+                    TextImage.Foreground = indentsValid ? Brushes.Green : Brushes.Red;
+                });
+
+                allImagesValid &= indentsValid;
+            }
+
+            // Проверка межстрочных интервалов подписей
+            if (gost.ImageCaptionLineSpacingValue.HasValue || gost.ImageCaptionLineSpacingBefore.HasValue || gost.ImageCaptionLineSpacingAfter.HasValue)
+            {
+                bool spacingValid = true;
+                foreach (var paragraph in paragraphs)
+                {
+                    var hasImage = paragraph.Descendants<DocumentFormat.OpenXml.Office.Drawing.Drawing>().Any() || paragraph.Descendants<Picture>().Any();
+                    if (hasImage && paragraph.NextSibling() is Paragraph captionParagraph)
+                    {
+                        var spacing = captionParagraph.ParagraphProperties?.SpacingBetweenLines;
+                        var errorDetails = new List<string>();
+
+                        // Проверка межстрочного интервала
+                        if (gost.ImageCaptionLineSpacingValue.HasValue)
+                        {
+                            double actualSpacing = spacing?.Line != null ?
+                                CalculateActualSpacing(spacing) : DefaultImageCaptionLineSpacingValue;
+
+                            if (Math.Abs(actualSpacing - gost.ImageCaptionLineSpacingValue.Value) > 0.1)
+                            {
+                                errorDetails.Add($"Межстрочный интервал подписи должен быть {gost.ImageCaptionLineSpacingValue.Value}, а не {actualSpacing}");
+                                spacingValid = false;
+                            }
+                        }
+
+                        // Проверка интервала перед
+                        if (gost.ImageCaptionLineSpacingBefore.HasValue)
+                        {
+                            double actualBefore = spacing?.Before?.Value != null ? ConvertTwipsToPoints(spacing.Before.Value) : DefaultImageCaptionLineSpacingBefore;
+                            if (Math.Abs(actualBefore - gost.ImageCaptionLineSpacingBefore.Value) > 0.1)
+                            {
+                                errorDetails.Add($"Интервал перед подписью должен быть {gost.ImageCaptionLineSpacingBefore.Value}, а не {actualBefore}");
+                                spacingValid = false;
+                            }
+                        }
+
+                        // Проверка интервала после
+                        if (gost.ImageCaptionLineSpacingAfter.HasValue)
+                        {
+                            double actualAfter = spacing?.After?.Value != null ? ConvertTwipsToPoints(spacing.After.Value) : DefaultImageCaptionLineSpacingAfter;
+                            if (Math.Abs(actualAfter - gost.ImageCaptionLineSpacingAfter.Value) > 0.1)
+                            {
+                                errorDetails.Add($"Интервал после подписи должен быть {gost.ImageCaptionLineSpacingAfter.Value}, а не {actualAfter}");
+                                spacingValid = false;
+                            }
+                        }
+
+                        if (errorDetails.Any())
+                        {
+                            errors.Add($"Подпись под рисунком: {string.Join(", ", errorDetails)}");
+                            HighlightParagraph(captionParagraph);
+                        }
+                    }
+                }
+
+                Dispatcher.UIThread.Post(() => {
+                    TextImage.Text = spacingValid ? "Интервалы подписей соответствуют ГОСТу." : "Ошибки в интервалах подписей.";
+                    TextImage.Foreground = spacingValid ? Brushes.Green : Brushes.Red;
+                });
+                allImagesValid &= spacingValid;
+            }
+
+            // Проверка наличия изображений
+            foreach (var paragraph in paragraphs)
+            {
+                var hasImage = paragraph.Descendants<DocumentFormat.OpenXml.Office.Drawing.Drawing>().Any() || paragraph.Descendants<Picture>().Any();
+
+                if (hasImage)
+                {
+                    hasAtLeastOneImage = true;
+                    break;
+                }
+            }
+
+            if (!hasAtLeastOneImage)
+            {
+                Dispatcher.UIThread.Post(() => {
+                    TextImage.Text = "Рисунки не обнаружены — проверка не требуется.";
+                    TextImage.Foreground = Brushes.Green;
+                });
+                return true;
+            }
+
+            // Общий результат проверки
+            if (allImagesValid)
+            {
+                Dispatcher.UIThread.Post(() => {
+                    TextImage.Text = "Все изображения и подписи соответствуют ГОСТу.";
+                    TextImage.Foreground = Brushes.Green;
+                });
+            }
+            else
+            {
+                Dispatcher.UIThread.Post(() => {
+                    TextImage.Text = "Ошибки в подписях под изображениями:\n" + string.Join("\n", errors.Take(3));
+                    if (errors.Count > 3) TextImage.Text += $"\n...и ещё {errors.Count - 3} ошибок";
+                    TextImage.Foreground = Brushes.Red;
+                });
+            }
+
+            return allImagesValid;
+        }
+
+        /// <summary>
+        /// Метод выделяет ошибки в подписях под изображениями (шрифт, размер, выравнивание, отступы, интервалы)
+        /// </summary>
+        private void HighlightImageCaptionErrors(WordprocessingDocument doc, Gost gost, List<string> errors)
+        {
+            var body = doc.MainDocumentPart.Document.Body;
+            var paragraphs = body.Elements<Paragraph>().ToList();
+
+            foreach (var paragraph in paragraphs)
+            {
+                var hasImage = paragraph.Descendants<DocumentFormat.OpenXml.Office.Drawing.Drawing>().Any() || paragraph.Descendants<Picture>().Any();
+
+                if (!hasImage || !(paragraph.NextSibling() is Paragraph captionParagraph))
+                    continue;
+
+                bool hasError = false;
+                var errorDetails = new List<string>();
+
+                // Проверка формата "Рисунок X - Описание"
+                if (!CheckImageCaptionFormat(captionParagraph))
+                {
+                    errors.Add($"Неверный формат подписи: '{GetShortText2(captionParagraph.InnerText)}'");
+                    HighlightParagraph(captionParagraph);
+                    hasError = true;
+                }
+
+                // 1. Проверка шрифта и размера
+                foreach (var run in captionParagraph.Elements<Run>())
+                {
+                    if (ShouldSkipRun(run))
+                        continue;
+
+                    // Проверка шрифта
+                    if (!string.IsNullOrEmpty(gost.ImageCaptionFontName))
+                    {
+                        var font = run.RunProperties?.RunFonts?.Ascii?.Value;
+                        if (font != null && !string.Equals(font, gost.ImageCaptionFontName, StringComparison.OrdinalIgnoreCase))
+                        {
+                            errorDetails.Add($"Шрифт: '{font}' (требуется '{gost.ImageCaptionFontName}')");
+                            hasError = true;
+                        }
+                    }
+
+                    // Проверка размера шрифта
+                    if (gost.ImageCaptionFontSize.HasValue)
+                    {
+                        var fontSizeVal = run.RunProperties?.FontSize?.Val?.Value;
+                        if (fontSizeVal != null)
+                        {
+                            double actualFontSize = double.Parse(fontSizeVal) / 2;
+                            if (Math.Abs(actualFontSize - gost.ImageCaptionFontSize.Value) > 0.1)
+                            {
+                                errorDetails.Add($"Размер шрифта: {actualFontSize:F1} pt (требуется {gost.ImageCaptionFontSize.Value:F1} pt)");
+                                hasError = true;
+                            }
+                        }
+                    }
+                }
+
+                // 2. Проверка выравнивания
+                if (!string.IsNullOrEmpty(gost.ImageCaptionAlignment))
+                {
+                    var justification = captionParagraph.ParagraphProperties?.Justification;
+                    string currentAlignment = GetAlignmentString(justification);
+                    if (!string.Equals(currentAlignment, gost.ImageCaptionAlignment, StringComparison.OrdinalIgnoreCase))
+                    {
+                        errorDetails.Add($"Выравнивание: {currentAlignment} (требуется {gost.ImageCaptionAlignment})");
+                        hasError = true;
+                    }
+                }
+
+                // 3. Проверка отступов
+                var indent = captionParagraph.ParagraphProperties?.Indentation;
+                if (indent != null && (gost.ImageCaptionFirstLineIndent.HasValue || gost.ImageCaptionIndentLeft.HasValue || gost.ImageCaptionIndentRight.HasValue))
+                {
+                    // Проверка отступа/выступа первой строки
+                    if (!string.IsNullOrEmpty(gost.ImageCaptionIndentOrOutdent))
+                    {
+                        string gostType = gost.ImageCaptionIndentOrOutdent.Trim().ToLower(); // "отступ", "выступ", "нет"
+                        string currentType = "не задан";
+                        double? currentValue = null;
+
+                        if (indent?.Hanging != null && double.TryParse(indent.Hanging.Value, out var hangingVal) && hangingVal != 0)
+                        {
+                            currentType = "выступ";
+                            currentValue = TwipsToCm(hangingVal);
+                        }
+                        else if (indent?.FirstLine != null && double.TryParse(indent.FirstLine.Value, out var firstLineVal) && firstLineVal != 0)
+                        {
+                            currentType = "отступ";
+                            currentValue = TwipsToCm(firstLineVal);
+                        }
+
+                        if (gostType == "нет")
+                        {
+                            // ГОСТ не допускает ни отступа, ни выступа
+                            if (currentType != "не задан")
+                            {
+                                errorDetails.Add($"Тип первой строки: {currentType} (Требуется: нет)");
+                                hasError = true;
+                            }
+                        }
+                        else
+                        {
+                            if (currentType != gostType)
+                            {
+                                errorDetails.Add($"Тип первой строки: {currentType} (Требуется: {gost.ImageCaptionIndentOrOutdent})");
+                                hasError = true;
+                            }
+
+                            if (currentValue.HasValue && gost.ImageCaptionFirstLineIndent.HasValue)
+                            {
+                                if (Math.Abs(currentValue.Value - gost.ImageCaptionFirstLineIndent.Value) > 0.05)
+                                {
+                                    errorDetails.Add($"{currentType} первой строки: {currentValue.Value:F2} см (Требуется: {gost.ImageCaptionFirstLineIndent.Value:F2} см)");
+                                    hasError = true;
+                                }
+                            }
+                            else if (!currentValue.HasValue)
+                            {
+                                errorDetails.Add($"Отсутствует {gost.ImageCaptionIndentOrOutdent.ToLower()} первой строки (по ГОСТу требуется)");
+                                hasError = true;
+                            }
+                        }
+                    }
+
+                    // Проверка левого отступа
+                    if (gost.ImageCaptionIndentLeft.HasValue)
+                    {
+                        double actualLeft = indent.Left != null ? TwipsToCm(double.Parse(indent.Left.Value)) : DefaultImageCaptionIndentLeft;
+
+                        if (Math.Abs(actualLeft - gost.ImageCaptionIndentLeft.Value) > 0.05)
+                        {
+                            errorDetails.Add($"Левый отступ: {actualLeft:F2} см (требуется {gost.ImageCaptionIndentLeft.Value:F2} см)");
+                            hasError = true;
+                        }
+                    }
+
+                    // Проверка правого отступа
+                    if (gost.ImageCaptionIndentRight.HasValue)
+                    {
+                        double actualRight = indent.Right != null ?
+                            TwipsToCm(double.Parse(indent.Right.Value)) : DefaultImageCaptionIndentRight;
+
+                        if (Math.Abs(actualRight - gost.ImageCaptionIndentRight.Value) > 0.05)
+                        {
+                            errorDetails.Add($"Правый отступ: {actualRight:F2} см (требуется {gost.ImageCaptionIndentRight.Value:F2} см)");
+                            hasError = true;
+                        }
+                    }
+                }
+
+                // 4. Проверка межстрочных интервалов
+                var spacing = captionParagraph.ParagraphProperties?.SpacingBetweenLines;
+                if (spacing != null && (gost.ImageCaptionLineSpacingValue.HasValue || gost.ImageCaptionLineSpacingBefore.HasValue || gost.ImageCaptionLineSpacingAfter.HasValue))
+                {
+                    // Проверка межстрочного интервала
+                    if (gost.ImageCaptionLineSpacingValue.HasValue && spacing.Line != null)
+                    {
+                        double actualSpacing = CalculateActualSpacing(spacing);
+                        if (Math.Abs(actualSpacing - gost.ImageCaptionLineSpacingValue.Value) > 0.01)
+                        {
+                            errorDetails.Add($"Межстрочный интервал: {actualSpacing:F2} (требуется {gost.ImageCaptionLineSpacingValue.Value:F2})");
+                            hasError = true;
+                        }
+                    }
+
+                    // Проверка интервала перед
+                    if (gost.ImageCaptionLineSpacingBefore.HasValue)
+                    {
+                        double actualBefore = spacing.Before != null ?
+                            ConvertTwipsToPoints(spacing.Before.Value) : DefaultImageCaptionLineSpacingBefore;
+
+                        if (Math.Abs(actualBefore - gost.ImageCaptionLineSpacingBefore.Value) > 0.1)
+                        {
+                            errorDetails.Add($"Интервал перед: {actualBefore:F1} pt (требуется {gost.ImageCaptionLineSpacingBefore.Value:F1} pt)");
+                            hasError = true;
+                        }
+                    }
+
+                    // Проверка интервала после
+                    if (gost.ImageCaptionLineSpacingAfter.HasValue)
+                    {
+                        double actualAfter = spacing.After != null ?
+                            ConvertTwipsToPoints(spacing.After.Value) : DefaultImageCaptionLineSpacingAfter;
+
+                        if (Math.Abs(actualAfter - gost.ImageCaptionLineSpacingAfter.Value) > 0.1)
+                        {
+                            errorDetails.Add($"Интервал после: {actualAfter:F1} pt (требуется {gost.ImageCaptionLineSpacingAfter.Value:F1} pt)");
+                            hasError = true;
+                        }
+                    }
+                }
+
+                // Подсветка только при наличии ошибок
+                if (hasError)
+                {
+                    foreach (var run in captionParagraph.Elements<Run>())
+                    {
+                        if (!string.IsNullOrWhiteSpace(run.InnerText))
+                        {
+                            run.RunProperties ??= new RunProperties();
+                            run.RunProperties.RemoveAllChildren<Highlight>();
+                            run.RunProperties.Append(new Highlight { Val = HighlightColorValues.Red });
+                        }
+                    }
+
+                    var shortText = GetShortText2(captionParagraph.InnerText?.Trim() ?? "");
+                    errors.Add($"Подпись '{shortText}': {string.Join(", ", errorDetails)}");
+                }
+            }
+
+            doc.MainDocumentPart.Document.Save();
+        }
 
         /// <summary>
         /// Проверяет на наличие гиперссылок
@@ -4328,7 +5639,7 @@ namespace GOST_Control
 
         /// <summary>
         /// Проверяет, является ли параграф элементом списка
-        /// </summary>
+        /// </summary>ё
         private bool IsListItem(Paragraph paragraph)
         {
             // 1. Проверка нумерации
