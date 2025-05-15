@@ -57,7 +57,7 @@
 							   FontSize="15"/>
 
 					<TextBlock Margin="0 5 0 0"
-							   Name="TextTables"
+							   Name="ErrorControlTables"
 							   Text="Таблицы"
 							   FontWeight="Bold"
 							   FontSize="15"/>

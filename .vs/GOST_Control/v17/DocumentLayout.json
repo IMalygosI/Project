@@ -7,8 +7,8 @@
       "RelativeMoniker": "D:0:0:{38027419-4475-4D13-8781-7F0DF1472C39}|GOST_Control\\GOST_Control.csproj|solutionrelative:gost_control\\gost_\u0441heck.axaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\dimau\\Desktop\\\u0414\u0438\u043F\u043B\u043E\u043C\\Project\\GOST_Control\\bin\\Debug\\net8.0\\gosts.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:GOST_Control\\bin\\Debug\\net8.0\\gosts.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+      "AbsoluteMoniker": "D:0:0:{38027419-4475-4D13-8781-7F0DF1472C39}|GOST_Control\\GOST_Control.csproj|c:\\users\\dimau\\desktop\\\u0434\u0438\u043F\u043B\u043E\u043C\\project\\gost_control\\checkingtabledoc.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{38027419-4475-4D13-8781-7F0DF1472C39}|GOST_Control\\GOST_Control.csproj|solutionrelative:gost_control\\checkingtabledoc.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -23,14 +23,14 @@
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "gosts.json",
-              "DocumentMoniker": "C:\\Users\\dimau\\Desktop\\\u0414\u0438\u043F\u043B\u043E\u043C\\Project\\GOST_Control\\bin\\Debug\\net8.0\\gosts.json",
-              "RelativeDocumentMoniker": "GOST_Control\\bin\\Debug\\net8.0\\gosts.json",
-              "ToolTip": "C:\\Users\\dimau\\Desktop\\\u0414\u0438\u043F\u043B\u043E\u043C\\Project\\GOST_Control\\bin\\Debug\\net8.0\\gosts.json",
-              "RelativeToolTip": "GOST_Control\\bin\\Debug\\net8.0\\gosts.json",
-              "ViewState": "AgIAABgAAAAAAAAAAAAAADQAAAAqAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-05-06T14:29:26.109Z",
+              "Title": "CheckingTableDoc.cs",
+              "DocumentMoniker": "C:\\Users\\dimau\\Desktop\\\u0414\u0438\u043F\u043B\u043E\u043C\\Project\\GOST_Control\\CheckingTableDoc.cs",
+              "RelativeDocumentMoniker": "GOST_Control\\CheckingTableDoc.cs",
+              "ToolTip": "C:\\Users\\dimau\\Desktop\\\u0414\u0438\u043F\u043B\u043E\u043C\\Project\\GOST_Control\\CheckingTableDoc.cs",
+              "RelativeToolTip": "GOST_Control\\CheckingTableDoc.cs",
+              "ViewState": "AgIAAC8BAAAAAAAAAAAqwHUBAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-15T21:41:33.915Z",
               "IsPinned": true,
               "EditorCaption": ""
             },
@@ -50,9 +50,9 @@
               "RelativeDocumentMoniker": "GOST_Control\\GOST_\u0421heck.axaml.cs",
               "ToolTip": "C:\\Users\\dimau\\Desktop\\\u0414\u0438\u043F\u043B\u043E\u043C\\Project\\GOST_Control\\GOST_\u0421heck.axaml.cs",
               "RelativeToolTip": "GOST_Control\\GOST_\u0421heck.axaml.cs",
-              "ViewState": "AgIAAB4AAAAAAAAAAAAAABYEAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAIoQAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-07T05:19:57.89Z",
+              "WhenOpened": "2025-05-13T21:35:34.835Z",
               "EditorCaption": ""
             }
           ]
