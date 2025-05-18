@@ -15,288 +15,232 @@
 			  RowDefinitions="*,*,*"
 			  ShowGridLines="False">
 
-			<ScrollViewer Grid.ColumnSpan="3"
-						  Grid.RowSpan="3"
-						  Grid.Column="0"
-						  Grid.Row="0"
-						  VerticalScrollBarVisibility="Auto"
-						  HorizontalScrollBarVisibility="Disabled">
-				
-				<StackPanel HorizontalAlignment="Left">
+			<TextBlock Name="GostControl" 
+					   Grid.Column="1"
+					   Grid.Row="1"
+					   HorizontalAlignment="Center"
+					   TextWrapping="Wrap"
+					   Text="Проверка ГОСТа"
+					   FontWeight="Bold"
+					   FontSize="30"/>
 
-					<TextBlock Name="GostControl"
-							   Text="Проверка соответствия ГОСТ"
-							   FontWeight="Bold"
-							   FontSize="30"/>
+			<Border Grid.ColumnSpan="1"
+					Grid.RowSpan="3"
+					Grid.Column="0"
+					Grid.Row="0"
+					Height="900"
+					Width="600"
+					HorizontalAlignment="Center"
+					VerticalAlignment="Center"
+					BorderThickness="2"
+					BorderBrush="Orange">
 
-					<TextBlock Name="GostName"
-							   Text="ГОСТ"
-							   FontWeight="Bold"
-							   FontSize="30"/>
+				<ScrollViewer VerticalScrollBarVisibility="Auto"
+							  HorizontalScrollBarVisibility="Disabled"
+							  Margin="10">
 
-					<TextBlock Margin="0 5 0 0"
-							   Text="---"
-							   FontWeight="Bold"
-							   FontSize="15"/>
-					
-					<TextBlock Margin="0 5 0 0"
-							   Text="---"
-							   Name="ErrorControlImages"
-							   FontWeight="Bold"
-							   FontSize="15"/>
+					<StackPanel HorizontalAlignment="Left">
 
-					<TextBlock Margin="0 5 0 0"
-							   Name="TextImage"
-							   Text="Изображения"
-							   FontWeight="Bold"
-							   FontSize="15"/>
-
-					<TextBlock Margin="0 5 0 0"
-							   Text="---"
-							   FontWeight="Bold"
-							   FontSize="15"/>
-
-					<TextBlock Margin="0 5 0 0"
-							   Name="ErrorControlTables"
-							   Text="Таблицы"
-							   FontWeight="Bold"
-							   FontSize="15"/>
-
-					<TextBlock Margin="0 5 0 0"
-							   Text="---"
-							   FontWeight="Bold"
-							   FontSize="15"/>
-
-					<!-- Проверка есть ли ГОСТ в базе данных -->
-					<TextBlock Name="ErrorControlGost"
-							   Margin="0 5 0 0"
-							   Text="1---"
-							   FontWeight="Bold"
-							   FontSize="15"/>
-
-					<!-- Проверка Удалось ли открыть документ -->
-					<TextBlock Name="ErrorControl"
-							   Margin="0 5 0 0"
-							   Text="2---"
-							   FontWeight="Bold"
-							   FontSize="15"/>
-
-					<TextBlock Margin="0 5 0 0"
-							   Text="---"
-							   FontWeight="Bold"
-							   FontSize="15"/>
-
-					<!-- Проверка на соответствие шрифта -->
-					<TextBlock Name="ErrorControlFont"
-							   Margin="0 5 0 0"
-							   Text="3---"
-							   FontWeight="Bold"
-							   FontSize="15"/>
-
-					<!-- Проверка на соответствие размера шрифта -->
-					<TextBlock Name="ErrorControlFontSize"
-							   Margin="0 5 0 0"
-							   Text="4---"
-							   FontWeight="Bold"
-							   FontSize="15"/>
-
-					<!-- Проверка на Поля документа -->
-					<TextBlock Name="ErrorControlMargins"
-							   Margin="0 5 0 0"
-							   Text="5---"
-							   FontWeight="Bold"
-							   FontSize="15"/>
-
-					<TextBlock Margin="0 5 0 0"
-							   Text="6-!-"
-							   Name="ErrorControlViravnivanie"
-							   FontWeight="Bold"
-							   FontSize="15"/>
-					<TextBlock Margin="0 5 0 0"
-							   Name="ErrorControlMnochitel"
-							   Text="7---"
-							   FontWeight="Bold"
-							   FontSize="15"/>
-
-					<TextBlock Margin="0 5 0 0"
-								   Name="ErrorControlIndents"
-								   Text="19-Проверка отступов-"
+						<TextBlock Name="GostName"
+								   TextWrapping="Wrap"
+								   Text="ГОСТ"
 								   FontWeight="Bold"
-								   FontSize="15"/>
+								   FontSize="30"/>
 
-					<TextBlock Margin="0 5 0 0"
-							   Name="ErrorControlParagraphSpacing_Unique"
-							   Text="20-Проверка отступов абзацев-"
-							   FontWeight="Bold"
-							   FontSize="15"/>
+						<TextBlock Name="ErrorControlGost"
+								   TextWrapping="Wrap"
+								   Text="Поиск ГОСТа"
+								   FontWeight="Bold"/>
 
-					<TextBlock Name="ErrorControlFirstLineIndent"
-							   Margin="0 5 0 0"
-							   Text="8---"
-							   FontWeight="Bold"
-							   FontSize="15"/>
+						<TextBlock Name="ErrorControl"
+								   TextWrapping="Wrap"
+								   Text="Открытие документа"
+								   FontWeight="Bold"/>
 
-					<TextBlock Name="ErrorControlNumberPage"
-							   Margin="0 5 0 0"
-							   Text="9---"
-							   FontWeight="Bold"
-							   FontSize="15"/>
+						<!-- ======================= ПРОСТОЙ ТЕКСТ ======================= -->
+						<TextBlock Text="Проверка основного текста"
+								   TextWrapping="Wrap"
+								   FontWeight="Bold"
+								   FontSize="24"
+								   Margin="0,10,0,5"/>
 
-					<TextBlock Margin="0 5 0 0"
-							   Text="Дополнительные Заголовки"
-							   Name="ErrorControlAdditionalHeaders"
-							   FontWeight="Bold"
-							   FontSize="15"/>
+						<!-- Шрифт -->
+						<TextBlock Name="ErrorControlFont"
+								   TextWrapping="Wrap"
+								   Text="Шрифт: не проверено"
+								   Foreground="Gray"/>
 
-					<TextBlock Margin="0 5 0 0"
-							   Text="10---Заголовки"
-							   FontWeight="Bold"
-							   FontSize="15"/>
+						<!-- Размер шрифта -->
+						<TextBlock Name="ErrorControlFontSize"
+								   TextWrapping="Wrap"
+								   Text="Размер шрифта: не проверено"
+								   Foreground="Gray"/>
 
-					<TextBlock Margin="0 5 0 0"
-							   Name="ErrorControlHeaderIndents"
-							   Text="-Отступы в заголовках-"
-							   FontWeight="Bold"
-							   FontSize="15"/>
+						<!-- Выравнивание -->
+						<TextBlock Name="ErrorControlViravnivanie"
+								   TextWrapping="Wrap"
+								   Text="Выравнивание текста: не проверено"
+								   Foreground="Gray"/>
 
+						<!-- Межстрочный интервал -->
+						<TextBlock Name="ErrorControlMnochitel"
+								   TextWrapping="Wrap"
+								   Text="Межстрочный интервал: не проверено"
+								   Foreground="Gray"/>
 
-					<TextBlock Margin="0 5 0 0"
-							   Name="ErrorControlSections"
-							   Text="11---"
-							   FontWeight="Bold"
-							   FontSize="15"/>
+						<!-- Интервалы между абзацами -->
+						<TextBlock Name="ErrorControlParagraphSpacing_Unique"
+								   TextWrapping="Wrap"
+								   Text="Интервалы между абзацами: не проверено"
+								   Foreground="Gray"/>
 
-					<TextBlock Margin="0 5 0 0"
-							   Name="ErrorControlHeaderSpacing"
-							   Text="---Абзацные отступы заголовков---"
-							   FontWeight="Bold"
-							   FontSize="15"/>
+						<!-- Отступы -->
+						<TextBlock Name="ErrorControlFirstLineIndent"
+								   TextWrapping="Wrap"
+								   Text="Отступы: не проверено"
+								   Foreground="Gray"/>
 
-					<TextBlock Margin="0 5 0 0"
-							   Text="---"
-							   FontWeight="Bold"
-							   FontSize="18"/>
+						<!-- ======================= НАСТРОЙКА ДОКУМЕНТА ======================= -->
+						<TextBlock Text="Проверка настроек документа"
+								   TextWrapping="Wrap"
+								   FontWeight="Bold"
+								   FontSize="24"
+								   Margin="0,10,0,5"/>
 
-					<TextBlock Name="ErrorControlPaperSize"
-							   Margin="0 5 0 0"
-							   Text="12.Формат бумаги: не проверено"
-							   FontWeight="Bold"
-							   FontSize="15"/>
+						<!-- Нумерация страниц -->
+						<TextBlock Name="ErrorControlNumberPage"
+								   TextWrapping="Wrap"
+								   Text="Нумерация страниц: не проверено"
+								   Foreground="Gray"/>
 
-					<TextBlock Name="ErrorControlOrientation"
-							   Margin="0 5 0 0"
-							   Text="13.Ориентация: не проверено"
-							   FontWeight="Bold"
-							   FontSize="15"/>
+						<!-- Размер бумаги -->
+						<TextBlock Name="ErrorControlPaperSize"
+								   TextWrapping="Wrap"
+								   Text="Размер бумаги: не проверено"
+								   Foreground="Gray"/>
 
-					<TextBlock Margin="0 5 0 0"
-							   Text="---"
-							   FontWeight="Bold"
-							   FontSize="18"/>
+						<!-- Ориентация страницы -->
+						<TextBlock Name="ErrorControlOrientation"
+								   TextWrapping="Wrap"
+								   Text="Ориентация страницы: не проверено"
+								   Foreground="Gray"/>
 
-					<TextBlock Margin="0 5 0 0"
-							   Text="Оглавление"
-							   Name="ErrorControlTOC_Unique"
-							   FontWeight="Bold"
-							   FontSize="15"/>
+						<!-- Поля документа -->
+						<TextBlock Name="ErrorControlMargins"
+								   TextWrapping="Wrap"
+								   Text="Поля документа: не проверено"
+								   Foreground="Gray"/>
 
-					<TextBlock Margin="0 5 0 0"
-							   Name="Error_ControlToc_Spacing"
-							   Text="---Абзацные отступы Оглавление---"
-							   FontWeight="Bold"
-							   FontSize="15"/>
+						<!-- ======================= ЗАГОЛОВКИ ======================= -->
+						<TextBlock Text="Проверка заголовков"
+								   TextWrapping="Wrap"
+								   FontWeight="Bold"
+								   FontSize="24"
+								   Margin="0,10,0,5"/>
 
-					<TextBlock Margin="0 5 0 0"
-							   Name="ErrorControlTocIndents"
-							   Text="--- Отступы Слева, справа, первая строка у Оглавление---"
-							   FontWeight="Bold"
-							   FontSize="15"/>
+						<!-- Обязательные разделы -->
+						<TextBlock Name="ErrorControlSections"
+								   TextWrapping="Wrap"
+								   Text="Обязательные разделы: не проверено"
+								   Foreground="Gray"/>
 
-					<TextBlock Margin="0 5 0 0"
-							   Name="ErrorControlTocLineSpacing"
-							   Text="---Междустрочный интервал Оглавление---"
-							   FontWeight="Bold"
-							   FontSize="15"/>
+						<!-- Интервалы заголовков -->
+						<TextBlock Name="ErrorControlHeaderSpacing"
+								   TextWrapping="Wrap"
+								   Text="Интервалы заголовков: не проверено"
+								   Foreground="Gray"/>
 
-					<TextBlock Margin="0 5 0 0"
-							   Text="---"
-							   FontWeight="Bold"
-							   FontSize="18"/>
+						<!-- Отступы заголовков -->
+						<TextBlock Name="ErrorControlHeaderIndents"
+								   TextWrapping="Wrap"
+								   Text="Отступы заголовков: не проверено" Foreground="Gray"/>
 
-					<TextBlock Margin="0 5 0 0"
-							   Name="Error_ControlListParagraphSpacing"
-							   Text="-проверять межстрочные интервалы и интервалы до и после для списков-"
-							   FontWeight="Bold"
-							   FontSize="18"/>
+						<!-- Дополнительные заголовки -->
+						<TextBlock Name="ErrorControlAdditionalHeaders"
+								   TextWrapping="Wrap"
+								   Text="Дополнительные заголовки: не проверено"
+								   Foreground="Gray"/>
 
-					<TextBlock Margin="0 5 0 0"
-							   Name="Error_ControlBulletedLists"
-							   Text="-проверять шрифт и размер шрифта для списков-"
-							   FontWeight="Bold"
-							   FontSize="18"/>
+						<!-- ======================= ТАБЛИЦЫ ======================= -->
+						<TextBlock Text="Проверка таблиц"
+								   TextWrapping="Wrap"
+								   FontWeight="Bold"
+								   FontSize="24"
+								   Margin="0,10,0,5"/>
 
-					<TextBlock Margin="0 5 0 0"
-							   Name="Error_ControlListIndents"
-							   Text="-проверять отступы для списков для списков-"
-							   FontWeight="Bold"
-							   FontSize="18"/>
-					
-					<TextBlock Margin="0 5 0 0"
-							   Text="---"
-							   FontWeight="Bold"
-							   FontSize="18"/>
+						<!-- Таблицы -->
+						<TextBlock Name="ErrorControlTables"
+								   TextWrapping="Wrap"
+								   Text="Таблицы: не проверено"
+								   Foreground="Gray"/>
 
-					<TextBlock Margin="0 5 0 0"
-							   Name="ErrorControlBulletedLists"
-							   Text="16-Проверка маркированного списка-"
-							   FontWeight="Bold"
-							   FontSize="15"/>
+						<!-- ======================= ИЗОБРАЖЕНИЯ ======================= -->
+						<TextBlock Text="Проверка изображений"
+								   TextWrapping="Wrap"
+								   FontWeight="Bold"
+								   FontSize="24"
+								   Margin="0,10,0,5"/>
 
-					<TextBlock Margin="0 5 0 0"
-							   Name="ErrorControlNumberedList"
-							   Text="17-Проверка нумерованного списка-"
-							   FontWeight="Bold"
-							   FontSize="15"/>
+						<!-- Изображения -->
+						<TextBlock Name="ErrorControlImages"
+								   TextWrapping="Wrap"
+								   Text="Изображения: не проверено"
+								   Foreground="Gray"/>
 
-					<TextBlock Margin="0 5 0 0"
-							   Name="ErrorControlMultilevelList"
-							   Text="18-Проверка многоуровневого списка-"
-							   FontWeight="Bold"
-							   FontSize="15"/>
+						<!-- ======================= ОГЛАВЛЕНИЯ ======================= -->
+						<TextBlock Text="Проверка оглавления"
+								   TextWrapping="Wrap"
+								   FontWeight="Bold"
+								   FontSize="24"
+								   Margin="0,10,0,5"/>
 
-					<TextBlock Margin="0 5 0 0"
-							   Name="ErrorControlListSpacing"
-							   Text="---Абзацные отступы интервалов в Списках---"
-							   FontWeight="Bold"
-							   FontSize="15"/>
+						<!-- Оглавление -->
+						<TextBlock Name="Error_ControlToc_Spacing"
+								   TextWrapping="Wrap"
+								   Text="Оглавление: не проверено"
+								   Foreground="Gray"/>		
 
-					<TextBlock Margin="0 5 0 0"
-							   Name="ErrorControlListIndents"
-							   Text="--- Отступы левой и правой строки с 1 стр Списков---"
-							   FontWeight="Bold"
-							   FontSize="15"/>
+						<!-- ======================= СПИСКИ ======================= -->
+						<TextBlock Text="Проверка списков"
+								   TextWrapping="Wrap"
+								   FontWeight="Bold"
+								   FontSize="24" Margin="0,10,0,5"/>
 
-					<TextBlock Margin="0 5 0 0"
-							   Text="---"
-							   FontWeight="Bold"
-							   FontSize="15"/>
-					
-					<TextBlock Margin="0 5 0 0"
-							   Name="ErrorControlLinks"
-							   Text="-Гиперссылки-"
-							   FontWeight="Bold"
-							   FontSize="15"/>
+						<!-- Маркированные списки -->
+						<TextBlock Name="ErrorControlBulletedLists"
+								   TextWrapping="Wrap"
+								   Text="Списки: не проверено"
+								   Foreground="Gray"/>
 
-					<TextBlock Margin="0 5 0 0"
-							   Text="---"
-							   FontWeight="Bold"
-							   FontSize="15"/>
+						<!-- Интервалы списков -->
+						<TextBlock Name="ErrorControlListSpacing"
+								   TextWrapping="Wrap"
+								   Text="Интервалы списков: не проверено"
+								   Foreground="Gray"/>
 
+						<!-- Отступы списков -->
+						<TextBlock Name="ErrorControlListIndents"
+								   TextWrapping="Wrap"
+								   Text="Отступы списков: не проверено"
+								   Foreground="Gray"/>
 
-				</StackPanel>
+						<!-- ======================= ГИПЕРССЫЛКИ ======================= -->
+						<TextBlock Text="Проверка гиперссылок"
+								   TextWrapping="Wrap"
+								   FontWeight="Bold"
+								   FontSize="24"
+								   Margin="0,10,0,5"/>
 
-			</ScrollViewer>
-				
+						<!-- Гиперссылки -->
+						<TextBlock Name="ErrorControlLinks"
+								   TextWrapping="Wrap"
+								   Text="Гиперссылки: не проверено"
+								   Foreground="Gray"/>
+
+					</StackPanel>
+				</ScrollViewer>
+			</Border>
+
 			<TextBlock Grid.ColumnSpan="3"
 					   Grid.Row="1"
 					   Name="FilePathTextBlock"
