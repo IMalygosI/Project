@@ -5,10 +5,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{38027419-4475-4D13-8781-7F0DF1472C39}|GOST_Control\\GOST_Control.csproj|c:\\users\\dimau\\desktop\\\u0434\u0438\u043F\u043B\u043E\u043C\\project\\gost_control\\gost_\u0441heck.axaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{38027419-4475-4D13-8781-7F0DF1472C39}|GOST_Control\\GOST_Control.csproj|solutionrelative:gost_control\\gost_\u0441heck.axaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{38027419-4475-4D13-8781-7F0DF1472C39}|GOST_Control\\GOST_Control.csproj|c:\\users\\dimau\\desktop\\\u0434\u0438\u043F\u043B\u043E\u043C\\project\\gost_control\\gost.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{38027419-4475-4D13-8781-7F0DF1472C39}|GOST_Control\\GOST_Control.csproj|solutionrelative:gost_control\\gost.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -36,22 +32,10 @@
               "RelativeDocumentMoniker": "GOST_Control\\GOST_\u0421heck.axaml.cs",
               "ToolTip": "C:\\Users\\dimau\\Desktop\\\u0414\u0438\u043F\u043B\u043E\u043C\\Project\\GOST_Control\\GOST_\u0421heck.axaml.cs",
               "RelativeToolTip": "GOST_Control\\GOST_\u0421heck.axaml.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAF8CAAAAAAAAAAAuwHgCAAAhAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-05-18T23:48:39.271Z",
               "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "Gost.cs",
-              "DocumentMoniker": "C:\\Users\\dimau\\Desktop\\\u0414\u0438\u043F\u043B\u043E\u043C\\Project\\GOST_Control\\Gost.cs",
-              "RelativeDocumentMoniker": "GOST_Control\\Gost.cs",
-              "ToolTip": "C:\\Users\\dimau\\Desktop\\\u0414\u0438\u043F\u043B\u043E\u043C\\Project\\GOST_Control\\Gost.cs",
-              "RelativeToolTip": "GOST_Control\\Gost.cs",
-              "ViewState": "AgIAAL8AAAAAAAAAAAAzwAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-18T23:48:21.257Z"
             }
           ]
         }

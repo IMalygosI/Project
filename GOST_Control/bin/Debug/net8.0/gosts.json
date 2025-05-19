@@ -63,7 +63,7 @@
     "RequireBulletedLists": true,
     "BulletFontName": "Times New Roman",
     "BulletFontSize": 14,
-    "BulletAlignment": "Right",
+    "BulletAlignment": "Both",
     "ListLevel1IndentOrOutdent": "Отступ",
     "ListLevel1Indent": 1.25,
     "ListLevel1BulletIndentLeft": 0,

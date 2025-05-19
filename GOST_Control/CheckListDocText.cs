@@ -28,6 +28,8 @@ namespace GOST_Control
         private const double DefaultListHangingIndent = 0.64;
         private const double DefaultListLeftIndent = 0.62;
         private const double DefaultListRightIndent = 0.0;
+        private const string BulletAlignment = "Left";
+        
         // для многоуровневых
         private const double DefaultListLevel1BulletIndentLeft = 1.87;
         private const double DefaultListLevel2BulletIndentLeft = 2.5;
@@ -185,6 +187,17 @@ namespace GOST_Control
                     var errorDetails = new List<string>();
                     bool paragraphHasError = false;
                     var runsWithText = paragraph.Elements<Run>().Where(r => !string.IsNullOrWhiteSpace(r.InnerText)).ToList();
+
+                    // Проверка выравнивания
+                    if (!string.IsNullOrEmpty(gost.BulletAlignment))
+                    {
+                        var currentAlignment = GetAlignmentString(paragraph.ParagraphProperties?.Justification) ?? BulletAlignment;
+                        if (currentAlignment != gost.BulletAlignment)
+                        {
+                            errorDetails.Add($"выравнивание: '{currentAlignment}' (требуется '{gost.BulletAlignment}')");
+                            paragraphHasError = true;
+                        }
+                    }
 
                     // Проверка формата нумерации
                     if (IsNumberedList(paragraph))
@@ -764,6 +777,41 @@ namespace GOST_Control
             var text = firstRun.InnerText.Trim();
 
             return Regex.IsMatch(text, @"^(\d+[\.\)]|[a-z]\)|[A-Z]\.|I+\.|V+\.|X+\.)");// Форматы нумерации: 1., 1), a., a), I., и т.д.
+        }
+
+        /// <summary>
+        /// Вспомогательный метод который преобразует объект выравнивания в строковое представление
+        /// </summary>
+        /// <param name="justification"></param>
+        /// <returns></returns>
+        private string GetAlignmentString(Justification justification)
+        {
+            if (justification == null) return "Left";
+
+            string alignment;
+
+            if (justification.Val?.Value == JustificationValues.Left)
+            {
+                alignment = "Left";
+            }
+            else if (justification.Val?.Value == JustificationValues.Center)
+            {
+                alignment = "Center";
+            }
+            else if (justification.Val?.Value == JustificationValues.Right)
+            {
+                alignment = "Right";
+            }
+            else if (justification.Val?.Value == JustificationValues.Both)
+            {
+                alignment = "Both";
+            }
+            else
+            {
+                alignment = "Left";
+            }
+
+            return alignment;
         }
     }
 }
