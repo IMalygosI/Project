@@ -15,6 +15,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 using TextBox = Avalonia.Controls.TextBox;
 
 namespace GOST_Control;
@@ -27,7 +28,8 @@ public partial class SettingGost : Window
     // Текущие настройки ГОСТа
     public Gost CurrentGost { get; set; }
     // Путь к файлу JSON
-    private const string JsonFilePath = "gosts.json";
+    private const string JsonFilePath = "gosts_modified.json"; // Изменяемый файл
+    private readonly JsonGostService _gostService;
 
     /// <summary>
     /// Загрузка данных из Json
@@ -35,35 +37,28 @@ public partial class SettingGost : Window
     public SettingGost()
     {
         InitializeComponent();
-
         TextDoc.Background = Brushes.White;
 
-        // Загрузка JSON
-        if (File.Exists(JsonFilePath))
+        // Инициализируем сервис
+        _gostService = new JsonGostService("GOST_Control.Resources.gosts.json", JsonFilePath);
+
+        LoadGostAsync().ConfigureAwait(false);
+
+        DataContext = this;
+        InitializePaperSizeUI();
+    }
+
+    private async Task LoadGostAsync()
+    {
+        try
         {
-            var json = File.ReadAllText(JsonFilePath);
-            var options = new JsonSerializerOptions
-            {
-                Converters = { new JsonStringEnumConverter() }
-            };
-            try
-            {
-                var gosts = JsonSerializer.Deserialize<List<Gost>>(json, options);
-                CurrentGost = gosts?.FirstOrDefault() ?? new Gost();
-            }
-            catch
-            {
-                CurrentGost = new Gost();
-            }
+            var gosts = await _gostService.GetAllGostsAsync();
+            CurrentGost = gosts.FirstOrDefault() ?? new Gost();
         }
-        else
+        catch
         {
             CurrentGost = new Gost();
         }
-
-        DataContext = this;
-
-        InitializePaperSizeUI();
     }
 
     /// <summary>
@@ -71,25 +66,12 @@ public partial class SettingGost : Window
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void Button_Click_Save(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private async void Button_Click_Save(object? sender, RoutedEventArgs e)
     {
         try
         {
-            // Настройки сериализации
-            var options = new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping, // Для кириллицы
-                NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.Strict,  // Обработка чисел
-                Converters = { new JsonStringEnumConverter() }  // Конвертер для Enum типов
-            };
-
-            var gosts = new List<Gost> { CurrentGost };
-            string json = JsonSerializer.Serialize(gosts, options);
-
-            // Записываем в файл JSON
-            File.WriteAllText(JsonFilePath, json, System.Text.Encoding.UTF8);
-            Close(true); // Закрытие окна или дополнительная логика после сохранения
+            await _gostService.AddOrUpdateGostAsync(CurrentGost);
+            Close(true);
         }
         catch (Exception ex)
         {

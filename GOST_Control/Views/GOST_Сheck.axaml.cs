@@ -67,7 +67,8 @@ namespace GOST_Control
             {
                 _gostService = await Task.Run(() =>
                 {
-                    return new JsonGostService("gosts.json");
+                    // Используйте полное имя ресурса, которое вы увидели в консоли
+                    return new JsonGostService("GOST_Control.Resources.gosts.json", "gosts_modified.json");
                 });
 
                 Dispatcher.UIThread.Post(() => { FilePathTextBlock.Text = $"Путь к файлу: {_filePath}"; });

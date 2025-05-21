@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
+using System.Reflection;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -13,40 +12,64 @@ namespace GOST_Control
     /// </summary>
     internal class JsonGostService
     {
-        private readonly string _jsonFilePath;
         private List<Gost> _gosts;
+        private readonly string _resourceName;
+        private readonly string _externalFilePath;
 
         /// <summary>
         /// Конструктор с указанием пути к JSON файлу
         /// </summary>
-        /// <param name="jsonFilePath">Путь к файлу с данными ГОСТов</param>
-        public JsonGostService(string jsonFilePath)
+        /// <param name="resourceName">Имя встроенного ресурса</param>
+        /// <param name="externalFilePath">Путь к внешнему файлу для сохранения изменений (опционально)</param>
+        public JsonGostService(string resourceName, string externalFilePath = null)
         {
-            _jsonFilePath = jsonFilePath;
-            _gosts = new List<Gost>();
-            LoadGosts().Wait(); // Загружаем данные при создании сервиса
+            _resourceName = resourceName;
+            _externalFilePath = externalFilePath ?? Path.Combine(AppContext.BaseDirectory, "gosts_modified.json");
+            _gosts = LoadInitialData();
         }
 
         /// <summary>
-        /// Загружает данные ГОСТов из JSON файла
+        /// Загрузка действубщего
         /// </summary>
-        private async Task LoadGosts()
+        /// <returns></returns>
+        private List<Gost> LoadInitialData()
         {
-            try
+            // Сначала пытаемся загрузить из внешнего файла (если есть изменения)
+            if (File.Exists(_externalFilePath))
             {
-                if (!File.Exists(_jsonFilePath))
+                try
                 {
-                    // Создаем пустой файл, если его нет
-                    await SaveGosts();
-                    return;
+                    var json = File.ReadAllText(_externalFilePath);
+                    return JsonSerializer.Deserialize<List<Gost>>(json) ?? LoadFromEmbeddedResource();
                 }
-
-                var json = await File.ReadAllTextAsync(_jsonFilePath);
-                _gosts = JsonSerializer.Deserialize<List<Gost>>(json) ?? new List<Gost>();
+                catch
+                {
+                    return LoadFromEmbeddedResource();
+                }
             }
-            catch (Exception ex)
+
+            return LoadFromEmbeddedResource();
+        }
+
+        /// <summary>
+        /// Загрузка вшитого файла из папки "Resources"
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="FileNotFoundException"></exception>
+        private List<Gost> LoadFromEmbeddedResource()
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+
+            using (Stream stream = assembly.GetManifestResourceStream(_resourceName))
             {
-                throw new Exception($"Ошибка загрузки данных из JSON: {ex.Message}");
+                if (stream == null)
+                    throw new FileNotFoundException($"Resource '{_resourceName}' not found.");
+
+                using (StreamReader reader = new StreamReader(stream))
+                {
+                    string json = reader.ReadToEnd();
+                    return JsonSerializer.Deserialize<List<Gost>>(json) ?? new List<Gost>();
+                }
             }
         }
 
@@ -59,7 +82,7 @@ namespace GOST_Control
             {
                 var options = new JsonSerializerOptions { WriteIndented = true };
                 var json = JsonSerializer.Serialize(_gosts, options);
-                await File.WriteAllTextAsync(_jsonFilePath, json);
+                await File.WriteAllTextAsync(_externalFilePath, json);
             }
             catch (Exception ex)
             {
@@ -70,11 +93,9 @@ namespace GOST_Control
         /// <summary>
         /// Получает ГОСТ по его идентификатору
         /// </summary>
-        /// <param name="gostId">Идентификатор ГОСТа</param>
-        /// <returns>Найденный ГОСТ или null</returns>
         public async Task<Gost?> GetGostByIdAsync(int gostId)
         {
-            return _gosts.Find(g => g.GostId == gostId);
+            return await Task.FromResult(_gosts.Find(g => g.GostId == gostId));
         }
 
         /// <summary>
@@ -82,7 +103,7 @@ namespace GOST_Control
         /// </summary>
         public async Task<List<Gost>> GetAllGostsAsync()
         {
-            return _gosts;
+            return await Task.FromResult(_gosts);
         }
 
         /// <summary>
@@ -99,15 +120,6 @@ namespace GOST_Control
             {
                 _gosts.Add(gost);
             }
-            await SaveGosts();
-        }
-
-        /// <summary>
-        /// Удаляет ГОСТ
-        /// </summary>
-        public async Task DeleteGostAsync(int gostId)
-        {
-            _gosts.RemoveAll(g => g.GostId == gostId);
             await SaveGosts();
         }
     }

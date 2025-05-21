@@ -13,13 +13,6 @@ namespace GOST_Control
         public MainWindow()
         {
             InitializeComponent();
-
-            // Создаем файл gosts.json при первом запуске, если его нет
-            string jsonPath = Path.Combine(AppContext.BaseDirectory, "gosts.json");
-            if (!File.Exists(jsonPath))
-            {
-                File.WriteAllText(jsonPath, "[]");
-            }
         }
 
         private readonly FileDialogFilter fileFilter = new()
@@ -28,6 +21,11 @@ namespace GOST_Control
             Name = "Документы Word"
         };
 
+        /// <summary>
+        /// Выбор документа
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private async void Button_Click_SelectFile(object? sender, RoutedEventArgs e)
         {
             try
