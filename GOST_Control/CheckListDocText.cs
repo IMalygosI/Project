@@ -456,10 +456,18 @@ namespace GOST_Control
         {
             return await Task.Run(() =>
             {
-                if (!gost.ListLevel1Indent.HasValue && !gost.ListLevel1Indent.HasValue && !gost.ListLevel2Indent.HasValue &&
-                    !gost.ListLevel3Indent.HasValue && !gost.ListLevel4Indent.HasValue && !gost.ListLevel5Indent.HasValue &&
-                    !gost.ListLevel6Indent.HasValue && !gost.ListLevel7Indent.HasValue && !gost.ListLevel8Indent.HasValue &&
-                    !gost.ListLevel9Indent.HasValue && !gost.ListLevel1BulletIndentLeft.HasValue && !gost.ListLevel1BulletIndentRight.HasValue)
+                bool hasIndentRequirements = gost.ListLevel1Indent.HasValue || gost.ListLevel2Indent.HasValue || gost.ListLevel3Indent.HasValue || gost.ListLevel4Indent.HasValue ||
+                gost.ListLevel5Indent.HasValue || gost.ListLevel6Indent.HasValue || gost.ListLevel7Indent.HasValue || gost.ListLevel8Indent.HasValue || gost.ListLevel9Indent.HasValue;
+
+                bool hasLeftIndentRequirements = gost.ListLevel1BulletIndentLeft.HasValue || gost.ListLevel2BulletIndentLeft.HasValue || gost.ListLevel3BulletIndentLeft.HasValue || 
+                gost.ListLevel4BulletIndentLeft.HasValue || gost.ListLevel5BulletIndentLeft.HasValue || gost.ListLevel6BulletIndentLeft.HasValue || gost.ListLevel7BulletIndentLeft.HasValue ||
+                gost.ListLevel8BulletIndentLeft.HasValue || gost.ListLevel9BulletIndentLeft.HasValue;
+
+                bool hasRightIndentRequirements = gost.ListLevel1BulletIndentRight.HasValue || gost.ListLevel2BulletIndentRight.HasValue || gost.ListLevel3BulletIndentRight.HasValue || 
+                gost.ListLevel4BulletIndentRight.HasValue || gost.ListLevel5BulletIndentRight.HasValue || gost.ListLevel6BulletIndentRight.HasValue ||gost.ListLevel7BulletIndentRight.HasValue || 
+                gost.ListLevel8BulletIndentRight.HasValue || gost.ListLevel9BulletIndentRight.HasValue;
+
+                if (!hasIndentRequirements && !hasLeftIndentRequirements && !hasRightIndentRequirements)
                 {
                     Dispatcher.UIThread.Post(() =>
                     {
@@ -495,11 +503,40 @@ namespace GOST_Control
                         _ => null
                     };
 
-                    // Если для уровня нет специфичного требования, используем общее значение
-                    if (!gostRequiredIndent.HasValue)
+                    // Получаем требуемый отступ слева для текущего уровня
+                    double? gostRequiredLeftIndent = level switch
                     {
-                        gostRequiredIndent = gost.ListLevel1Indent;
-                    }
+                        1 => gost.ListLevel1BulletIndentLeft,
+                        2 => gost.ListLevel2BulletIndentLeft,
+                        3 => gost.ListLevel3BulletIndentLeft,
+                        4 => gost.ListLevel4BulletIndentLeft,
+                        5 => gost.ListLevel5BulletIndentLeft,
+                        6 => gost.ListLevel6BulletIndentLeft,
+                        7 => gost.ListLevel7BulletIndentLeft,
+                        8 => gost.ListLevel8BulletIndentLeft,
+                        9 => gost.ListLevel9BulletIndentLeft,
+                        _ => null
+                    };
+
+                    // Получаем требуемый отступ справа для текущего уровня
+                    double? gostRequiredRightIndent = level switch
+                    {
+                        1 => gost.ListLevel1BulletIndentRight,
+                        2 => gost.ListLevel2BulletIndentRight,
+                        3 => gost.ListLevel3BulletIndentRight,
+                        4 => gost.ListLevel4BulletIndentRight,
+                        5 => gost.ListLevel5BulletIndentRight,
+                        6 => gost.ListLevel6BulletIndentRight,
+                        7 => gost.ListLevel7BulletIndentRight,
+                        8 => gost.ListLevel8BulletIndentRight,
+                        9 => gost.ListLevel9BulletIndentRight,
+                        _ => null
+                    };
+
+                    // Если для уровня нет специфичного требования, используем общее значение
+                    gostRequiredIndent ??= gost.ListLevel1Indent;
+                    gostRequiredLeftIndent ??= gost.ListLevel1BulletIndentLeft;
+                    gostRequiredRightIndent ??= gost.ListLevel1BulletIndentRight;
 
                     // 2. Получаем ФАКТИЧЕСКИЕ значения из документа
                     double? leftIndentValue = indent?.Left?.Value != null ? TwipsToCm(double.Parse(indent.Left.Value)) : null;
@@ -555,11 +592,11 @@ namespace GOST_Control
                         }
                     }
 
-                    // 4. Проверка левого отступа (с сохранением исходной логики)
-                    if (gost.ListLevel1BulletIndentLeft.HasValue)
+                    // 4. Проверка левого отступа (теперь для каждого уровня)
+                    if (gostRequiredLeftIndent.HasValue)
                     {
                         double actualLeft = leftIndentValue ?? GetListLevelIndentLeft(level);
-                        double requiredLeft = gost.ListLevel1BulletIndentLeft.Value;
+                        double requiredLeft = gostRequiredLeftIndent.Value;
 
                         if (Math.Abs(actualLeft - requiredLeft) > 0.05)
                         {
@@ -568,11 +605,11 @@ namespace GOST_Control
                         }
                     }
 
-                    // 5. Проверка правого отступа (с сохранением исходной логики)
-                    if (gost.ListLevel1BulletIndentRight.HasValue)
+                    // 5. Проверка правого отступа (теперь для каждого уровня)
+                    if (gostRequiredRightIndent.HasValue)
                     {
                         double actualRight = rightIndentValue ?? GetListLevelIndentRight(level);
-                        double requiredRight = gost.ListLevel1BulletIndentRight.Value;
+                        double requiredRight = gostRequiredRightIndent.Value;
 
                         if (Math.Abs(actualRight - requiredRight) > 0.05)
                         {

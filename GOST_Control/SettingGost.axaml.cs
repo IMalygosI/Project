@@ -1,8 +1,10 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Data;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
+using Avalonia.Threading;
 using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Vml;
 using DocumentFormat.OpenXml.Wordprocessing;
@@ -389,28 +391,19 @@ public partial class SettingGost : Window
     private void OnTextInput_NumberOnly(object sender, Avalonia.Input.TextInputEventArgs e)
     {
         var textBox = sender as TextBox;
+        var currentText = textBox.Text ?? "";
 
-        // Проверка на вводимые символы (цифры или точка)
-        if (e.Text.Any(c => !char.IsDigit(c) && c != '.' && c != ','))
+        // Разрешаем цифры, точку, запятую и Backspace
+        if (!char.IsDigit(e.Text[0]) && e.Text != "." && e.Text != "," && e.Text != "\b")
         {
-            e.Handled = true;  // Блокируем ввод, если это не цифра или точка
+            e.Handled = true;
             return;
         }
 
-        var currentText = textBox.Text;
-
-        // Блокировка ввода второй точки
-        if (currentText.Contains(".") && e.Text == "." && !currentText.EndsWith("."))
+        // Блокировка второй точки/запятой
+        if ((e.Text == "." || e.Text == ",") && (currentText.Contains('.') || currentText.Contains(',')))
         {
-            e.Handled = true;  // Блокируем, если точка уже есть
-            return;
-        }
-
-        // Запрещаем удаление точки, если после неё есть цифры
-        if (e.Text.Length == 0 && currentText.EndsWith("."))
-        {
-            e.Handled = true;  // Запрещаем удаление точки
-            return;
+            e.Handled = true;
         }
     }
 
@@ -460,53 +453,11 @@ public partial class SettingGost : Window
     }
 
     /// <summary>
-    /// Макс значение для стандартных полей
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void OnLineSpacingGenericLostFocus(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
-    {
-        if (sender is TextBox textBox)
-        {
-            string inputText = textBox.Text?.Trim() ?? "";
-
-            if (string.IsNullOrWhiteSpace(inputText))
-            {
-                textBox.Text = "0";
-                return;
-            }
-
-            inputText = inputText.Replace(',', '.');
-
-            int firstDotIndex = inputText.IndexOf('.');
-            if (firstDotIndex != -1)
-            {
-                string beforeDot = inputText.Substring(0, firstDotIndex + 1);
-                string afterDot = inputText.Substring(firstDotIndex + 1).Replace(".", string.Empty);
-                inputText = beforeDot + afterDot;
-            }
-
-            if (double.TryParse(inputText, NumberStyles.Any, CultureInfo.InvariantCulture, out double value))
-            {
-                if (value > 55.68)
-                    value = 55.68;
-
-                value = Math.Round(value, 2);
-                textBox.Text = value.ToString("0.##", CultureInfo.InvariantCulture);
-            }
-            else
-            {
-                textBox.Text = "0";
-            }
-        }
-    }
-
-    /// <summary>
     /// Макс значение для отступов листа слева и справа
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void OnMarginLeftRightLostFocus(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private void OnMarginLeftRightLostFocus(object? sender, RoutedEventArgs e)
     {
         if (sender is TextBox textBox)
         {
@@ -518,24 +469,13 @@ public partial class SettingGost : Window
                 return;
             }
 
-            inputText = inputText.Replace(',', '.');
+            inputText = inputText.Replace('.', ','); // Работа с запятой
 
-            int firstDotIndex = inputText.IndexOf('.');
-            if (firstDotIndex != -1)
+            if (double.TryParse(inputText, NumberStyles.Any, CultureInfo.GetCultureInfo("ru-RU"), out double value))
             {
-                string beforeDot = inputText.Substring(0, firstDotIndex + 1);
-                string afterDot = inputText.Substring(firstDotIndex + 1).Replace(".", string.Empty);
-                inputText = beforeDot + afterDot;
-            }
-
-            if (double.TryParse(inputText, NumberStyles.Any, CultureInfo.InvariantCulture, out double value))
-            {
-                double maxValue = 19.73;  // Максимальное значение для отступа слева и справа
-                if (value > maxValue)
-                    value = maxValue;
-
+                value = Math.Clamp(value, -55.87, 55.87);
                 value = Math.Round(value, 2);
-                textBox.Text = value.ToString("0.##", CultureInfo.InvariantCulture);
+                textBox.Text = value.ToString("0.##", CultureInfo.GetCultureInfo("ru-RU"));
             }
             else
             {
@@ -543,6 +483,7 @@ public partial class SettingGost : Window
             }
         }
     }
+
 
     /// <summary>
     /// Макс значение для отступов листа сверху и снизу
@@ -739,4 +680,1438 @@ public partial class SettingGost : Window
     }
 
 
+    private void OnFirstLineIndentLostFocus(object? sender, RoutedEventArgs e)
+    {
+        if (sender is TextBox textBox)
+        {
+            string inputText = textBox.Text?.Trim() ?? "";
+
+            if (string.IsNullOrWhiteSpace(inputText))
+            {
+                textBox.Text = "0";
+                CurrentGost.TextIndentOrOutdent = "Нет";
+                CurrentGost.FirstLineIndent = 0;
+                return;
+            }
+
+            inputText = inputText.Replace('.', ',');
+
+            if (double.TryParse(inputText, NumberStyles.Any, CultureInfo.GetCultureInfo("ru-RU"), out double value))
+            {
+                value = Math.Clamp(value, 0, 55.87);
+                value = Math.Round(value, 2);
+                textBox.Text = value.ToString("0.##", CultureInfo.GetCultureInfo("ru-RU"));
+                CurrentGost.FirstLineIndent = value;
+
+                if (value == 0)
+                {
+                    CurrentGost.TextIndentOrOutdent = "Нет";
+                }
+                else if (CurrentGost.TextIndentOrOutdent == "Нет")
+                {
+                    CurrentGost.TextIndentOrOutdent = "Отступ";
+                }
+            }
+            else
+            {
+                textBox.Text = "0";
+                CurrentGost.FirstLineIndent = 0;
+                CurrentGost.TextIndentOrOutdent = "Нет";
+            }
+        }
+    }
+
+    private void OnIndentTypeChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (CurrentGost.TextIndentOrOutdent == "Нет")
+        {
+            CurrentGost.FirstLineIndent = 0;
+        }
+        else if (CurrentGost.FirstLineIndent == 0)
+        {
+            CurrentGost.FirstLineIndent = 1.27;
+        }
+
+    }
+
+    private string GetDefaultLineSpacingValue()
+    {
+        return CurrentGost.LineSpacingType switch
+        {
+            "Множитель" => "1,0",
+            "Точно" => "0,5",
+            "Минимум" => "0,5",
+            _ => "0"
+        };
+    }
+
+    private void OnFirstLineIndentChanged(object sender, TextChangedEventArgs e)
+    {
+        if (sender is TextBox textBox && textBox.IsFocused)
+        {
+            string inputText = textBox.Text?.Trim() ?? "";
+
+            if (!string.IsNullOrEmpty(inputText) &&
+                double.TryParse(inputText.Replace('.', ','), NumberStyles.Any, CultureInfo.InvariantCulture, out double value))
+            {
+                if (value != 0 && CurrentGost.TextIndentOrOutdent == "Нет")
+                {
+                    CurrentGost.TextIndentOrOutdent = "Отступ";
+                }
+                else if (value == 0)
+                {
+                    CurrentGost.TextIndentOrOutdent = "Нет";
+                }
+            }
+        }
+    }
+
+    private void OnLineSpacingLostFocus(object? sender, RoutedEventArgs e)
+    {
+        if (sender is TextBox textBox)
+        {
+            string inputText = textBox.Text?.Trim() ?? "";
+
+            if (string.IsNullOrWhiteSpace(inputText))
+            {
+                textBox.Text = GetDefaultLineSpacingValue();
+                CurrentGost.LineSpacingValue = double.Parse(GetDefaultLineSpacingValue(), CultureInfo.GetCultureInfo("ru-RU"));
+                return;
+            }
+
+            inputText = inputText.Replace('.', ',');
+
+            if (double.TryParse(inputText, NumberStyles.Any, CultureInfo.GetCultureInfo("ru-RU"), out double value))
+            {
+                double minValue = GetMinLineSpacingValue();
+                double maxValue = 132;
+
+                // Если значение меньше минимального для текущего типа - корректируем
+                if (value < minValue)
+                {
+                    value = minValue;
+                }
+
+                value = Math.Clamp(value, minValue, maxValue);
+                value = Math.Round(value, 2);
+
+                textBox.Text = value.ToString("0.##", CultureInfo.GetCultureInfo("ru-RU"));
+                CurrentGost.LineSpacingValue = value;
+            }
+            else
+            {
+                string defaultValue = GetDefaultLineSpacingValue();
+                textBox.Text = defaultValue;
+                CurrentGost.LineSpacingValue = double.Parse(defaultValue, CultureInfo.GetCultureInfo("ru-RU"));
+            }
+        }
+    }
+
+
+    private double GetMinLineSpacingValue()
+    {
+        return CurrentGost.LineSpacingType switch
+        {
+            "Множитель" => 0.5, // Минимальный множитель (в см)
+            "Точно" => 0.03,    // Минимальный точный интервал (в см)
+            "Минимум" => 0.03,  // Минимальный интервал (в см)
+            _ => 0.03           // Значение по умолчанию (в см)
+        };
+    }
+
+    private void OnLineSpacingGenericLostFocus(object? sender, RoutedEventArgs e)
+    {
+        if (sender is TextBox textBox)
+        {
+            string inputText = textBox.Text?.Trim() ?? "";
+
+            if (string.IsNullOrWhiteSpace(inputText))
+            {
+                textBox.Text = "0";
+                return;
+            }
+
+            inputText = inputText.Replace('.', ',');
+
+            var parts = inputText.Split(',');
+            if (parts.Length > 2)
+            {
+                inputText = parts[0] + "," + string.Join("", parts.Skip(1));
+            }
+
+            if (double.TryParse(inputText, NumberStyles.Any, CultureInfo.GetCultureInfo("ru-RU"), out double value))
+            {
+                double maxValue = 55.87; // По умолчанию
+                double minValue = 0;
+
+                if (textBox.Name == "LineSpacingTextBox")
+                {
+                    maxValue = 132;
+                }
+
+                value = Math.Clamp(value, minValue, maxValue);
+                value = Math.Round(value, 2);
+                textBox.Text = value.ToString("0.##", CultureInfo.GetCultureInfo("ru-RU"));
+            }
+            else
+            {
+                textBox.Text = "0";
+            }
+        }
+    }
+
+    // Методы для работы с отступами заголовков
+    private void OnHeaderIndentTypeChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (CurrentGost.HeaderIndentOrOutdent == "Нет")
+        {
+            CurrentGost.HeaderFirstLineIndent = 0;
+        }
+        else if (CurrentGost.HeaderFirstLineIndent == 0)
+        {
+            CurrentGost.HeaderFirstLineIndent = 1.27;
+        }
+    }
+
+    private void OnHeaderFirstLineIndentLostFocus(object? sender, RoutedEventArgs e)
+    {
+        if (sender is TextBox textBox)
+        {
+            string inputText = textBox.Text?.Trim() ?? "";
+
+            if (string.IsNullOrWhiteSpace(inputText))
+            {
+                textBox.Text = "0";
+                CurrentGost.HeaderIndentOrOutdent = "Нет";
+                CurrentGost.HeaderFirstLineIndent = 0;
+                return;
+            }
+
+            inputText = inputText.Replace('.', ',');
+
+            if (double.TryParse(inputText, NumberStyles.Any, CultureInfo.GetCultureInfo("ru-RU"), out double value))
+            {
+                value = Math.Clamp(value, 0, 55.87);
+                value = Math.Round(value, 2);
+                textBox.Text = value.ToString("0.##", CultureInfo.GetCultureInfo("ru-RU"));
+                CurrentGost.HeaderFirstLineIndent = value;
+
+                if (value == 0)
+                {
+                    CurrentGost.HeaderIndentOrOutdent = "Нет";
+                }
+                else if (CurrentGost.HeaderIndentOrOutdent == "Нет")
+                {
+                    CurrentGost.HeaderIndentOrOutdent = "Отступ";
+                }
+            }
+            else
+            {
+                textBox.Text = "0";
+                CurrentGost.HeaderFirstLineIndent = 0;
+                CurrentGost.HeaderIndentOrOutdent = "Нет";
+            }
+        }
+    }
+
+    private void OnHeaderFirstLineIndentChanged(object sender, TextChangedEventArgs e)
+    {
+        if (sender is TextBox textBox && textBox.IsFocused)
+        {
+            string inputText = textBox.Text?.Trim() ?? "";
+
+            if (!string.IsNullOrEmpty(inputText) &&
+                double.TryParse(inputText.Replace('.', ','), NumberStyles.Any, CultureInfo.InvariantCulture, out double value))
+            {
+                if (value != 0 && CurrentGost.HeaderIndentOrOutdent == "Нет")
+                {
+                    CurrentGost.HeaderIndentOrOutdent = "Отступ";
+                }
+                else if (value == 0)
+                {
+                    CurrentGost.HeaderIndentOrOutdent = "Нет";
+                }
+            }
+        }
+    }
+
+    // Методы для работы с междустрочными интервалами заголовков
+    private string GetDefaultHeaderLineSpacingValue()
+    {
+        return CurrentGost.HeaderLineSpacingType switch
+        {
+            "Множитель" => "1,0",
+            "Точно" => "0,5",
+            "Минимум" => "0,5",
+            _ => "0"
+        };
+    }
+
+    private double GetMinHeaderLineSpacingValue()
+    {
+        return CurrentGost.HeaderLineSpacingType switch
+        {
+            "Множитель" => 0.5,
+            "Точно" => 0.03,
+            "Минимум" => 0.03,
+            _ => 0.03
+        };
+    }
+
+    private void OnHeaderLineSpacingLostFocus(object? sender, RoutedEventArgs e)
+    {
+        if (sender is TextBox textBox)
+        {
+            string inputText = textBox.Text?.Trim() ?? "";
+
+            if (string.IsNullOrWhiteSpace(inputText))
+            {
+                textBox.Text = GetDefaultHeaderLineSpacingValue();
+                CurrentGost.HeaderLineSpacingValue = double.Parse(GetDefaultHeaderLineSpacingValue(), CultureInfo.GetCultureInfo("ru-RU"));
+                return;
+            }
+
+            inputText = inputText.Replace('.', ',');
+
+            if (double.TryParse(inputText, NumberStyles.Any, CultureInfo.GetCultureInfo("ru-RU"), out double value))
+            {
+                double minValue = GetMinHeaderLineSpacingValue();
+                double maxValue = 132;
+
+                if (value < minValue)
+                {
+                    value = minValue;
+                }
+
+                value = Math.Clamp(value, minValue, maxValue);
+                value = Math.Round(value, 2);
+
+                textBox.Text = value.ToString("0.##", CultureInfo.GetCultureInfo("ru-RU"));
+                CurrentGost.HeaderLineSpacingValue = value;
+            }
+            else
+            {
+                string defaultValue = GetDefaultHeaderLineSpacingValue();
+                textBox.Text = defaultValue;
+                CurrentGost.HeaderLineSpacingValue = double.Parse(defaultValue, CultureInfo.GetCultureInfo("ru-RU"));
+            }
+        }
+    }
+
+
+
+
+
+    // ======================= Методы для работы с отступами дополнительных заголовков =======================
+
+    private void OnAdditionalHeaderIndentTypeChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (CurrentGost.AdditionalHeaderIndentOrOutdent == "Нет")
+        {
+            CurrentGost.AdditionalHeaderFirstLineIndent = 0;
+        }
+        else if (CurrentGost.AdditionalHeaderFirstLineIndent == 0)
+        {
+            CurrentGost.AdditionalHeaderFirstLineIndent = 1.27;
+        }
+    }
+
+    private void OnAdditionalHeaderFirstLineIndentLostFocus(object? sender, RoutedEventArgs e)
+    {
+        if (sender is TextBox textBox)
+        {
+            string inputText = textBox.Text?.Trim() ?? "";
+
+            if (string.IsNullOrWhiteSpace(inputText))
+            {
+                textBox.Text = "0";
+                CurrentGost.AdditionalHeaderIndentOrOutdent = "Нет";
+                CurrentGost.AdditionalHeaderFirstLineIndent = 0;
+                return;
+            }
+
+            inputText = inputText.Replace('.', ',');
+
+            if (double.TryParse(inputText, NumberStyles.Any, CultureInfo.GetCultureInfo("ru-RU"), out double value))
+            {
+                value = Math.Clamp(value, 0, 55.87);
+                value = Math.Round(value, 2);
+                textBox.Text = value.ToString("0.##", CultureInfo.GetCultureInfo("ru-RU"));
+                CurrentGost.AdditionalHeaderFirstLineIndent = value;
+
+                if (value == 0)
+                {
+                    CurrentGost.AdditionalHeaderIndentOrOutdent = "Нет";
+                }
+                else if (CurrentGost.AdditionalHeaderIndentOrOutdent == "Нет")
+                {
+                    CurrentGost.AdditionalHeaderIndentOrOutdent = "Отступ";
+                }
+            }
+            else
+            {
+                textBox.Text = "0";
+                CurrentGost.AdditionalHeaderFirstLineIndent = 0;
+                CurrentGost.AdditionalHeaderIndentOrOutdent = "Нет";
+            }
+        }
+    }
+
+    private void OnAdditionalHeaderFirstLineIndentChanged(object sender, TextChangedEventArgs e)
+    {
+        if (sender is TextBox textBox && textBox.IsFocused)
+        {
+            string inputText = textBox.Text?.Trim() ?? "";
+
+            if (!string.IsNullOrEmpty(inputText) &&
+                double.TryParse(inputText.Replace('.', ','), NumberStyles.Any, CultureInfo.InvariantCulture, out double value))
+            {
+                if (value != 0 && CurrentGost.AdditionalHeaderIndentOrOutdent == "Нет")
+                {
+                    CurrentGost.AdditionalHeaderIndentOrOutdent = "Отступ";
+                }
+                else if (value == 0)
+                {
+                    CurrentGost.AdditionalHeaderIndentOrOutdent = "Нет";
+                }
+            }
+        }
+    }
+
+    // Методы для работы с междустрочными интервалами дополнительных заголовков
+    private string GetDefaultAdditionalHeaderLineSpacingValue()
+    {
+        return CurrentGost.AdditionalHeaderLineSpacingType switch
+        {
+            "Множитель" => "1,0",
+            "Точно" => "0,5",
+            "Минимум" => "0,5",
+            _ => "0"
+        };
+    }
+
+    private double GetMinAdditionalHeaderLineSpacingValue()
+    {
+        return CurrentGost.AdditionalHeaderLineSpacingType switch
+        {
+            "Множитель" => 0.5,
+            "Точно" => 0.03,
+            "Минимум" => 0.03,
+            _ => 0.03
+        };
+    }
+
+    private void OnAdditionalHeaderLineSpacingLostFocus(object? sender, RoutedEventArgs e)
+    {
+        if (sender is TextBox textBox)
+        {
+            string inputText = textBox.Text?.Trim() ?? "";
+
+            if (string.IsNullOrWhiteSpace(inputText))
+            {
+                textBox.Text = GetDefaultAdditionalHeaderLineSpacingValue();
+                CurrentGost.AdditionalHeaderLineSpacingValue = double.Parse(GetDefaultAdditionalHeaderLineSpacingValue(), CultureInfo.GetCultureInfo("ru-RU"));
+                return;
+            }
+
+            inputText = inputText.Replace('.', ',');
+
+            if (double.TryParse(inputText, NumberStyles.Any, CultureInfo.GetCultureInfo("ru-RU"), out double value))
+            {
+                double minValue = GetMinAdditionalHeaderLineSpacingValue();
+                double maxValue = 132;
+
+                if (value < minValue)
+                {
+                    value = minValue;
+                }
+
+                value = Math.Clamp(value, minValue, maxValue);
+                value = Math.Round(value, 2);
+
+                textBox.Text = value.ToString("0.##", CultureInfo.GetCultureInfo("ru-RU"));
+                CurrentGost.AdditionalHeaderLineSpacingValue = value;
+            }
+            else
+            {
+                string defaultValue = GetDefaultAdditionalHeaderLineSpacingValue();
+                textBox.Text = defaultValue;
+                CurrentGost.AdditionalHeaderLineSpacingValue = double.Parse(defaultValue, CultureInfo.GetCultureInfo("ru-RU"));
+            }
+        }
+    }
+
+    private void OnAdditionalHeaderMarginLeftRightLostFocus(object? sender, RoutedEventArgs e)
+    {
+        if (sender is TextBox textBox)
+        {
+            string inputText = textBox.Text?.Trim() ?? "";
+
+            if (string.IsNullOrWhiteSpace(inputText))
+            {
+                textBox.Text = "0";
+                return;
+            }
+
+            inputText = inputText.Replace('.', ',');
+
+            if (double.TryParse(inputText, NumberStyles.Any, CultureInfo.GetCultureInfo("ru-RU"), out double value))
+            {
+                value = Math.Clamp(value, -55.87, 55.87);
+                value = Math.Round(value, 2);
+                textBox.Text = value.ToString("0.##", CultureInfo.GetCultureInfo("ru-RU"));
+
+                // Обновляем соответствующее свойство в зависимости от того, какое это поле
+                if (textBox.Name.Contains("Left"))
+                {
+                    CurrentGost.AdditionalHeaderIndentLeft = value;
+                }
+                else if (textBox.Name.Contains("Right"))
+                {
+                    CurrentGost.AdditionalHeaderIndentRight = value;
+                }
+            }
+            else
+            {
+                textBox.Text = "0";
+            }
+        }
+    }
+
+
+
+    // ======================= Методы для работы с отступами оглавления =======================
+
+    private void OnTocIndentTypeChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (CurrentGost.TocIndentOrOutdent == "Нет")
+        {
+            CurrentGost.TocFirstLineIndent = 0;
+        }
+        else if (CurrentGost.TocFirstLineIndent == 0)
+        {
+            CurrentGost.TocFirstLineIndent = 1.27;
+        }
+    }
+
+    private void OnTocFirstLineIndentLostFocus(object? sender, RoutedEventArgs e)
+    {
+        if (sender is TextBox textBox)
+        {
+            string inputText = textBox.Text?.Trim() ?? "";
+
+            if (string.IsNullOrWhiteSpace(inputText))
+            {
+                textBox.Text = "0";
+                CurrentGost.TocIndentOrOutdent = "Нет";
+                CurrentGost.TocFirstLineIndent = 0;
+                return;
+            }
+
+            inputText = inputText.Replace('.', ',');
+
+            if (double.TryParse(inputText, NumberStyles.Any, CultureInfo.GetCultureInfo("ru-RU"), out double value))
+            {
+                value = Math.Clamp(value, 0, 55.87);
+                value = Math.Round(value, 2);
+                textBox.Text = value.ToString("0.##", CultureInfo.GetCultureInfo("ru-RU"));
+                CurrentGost.TocFirstLineIndent = value;
+
+                if (value == 0)
+                {
+                    CurrentGost.TocIndentOrOutdent = "Нет";
+                }
+                else if (CurrentGost.TocIndentOrOutdent == "Нет")
+                {
+                    CurrentGost.TocIndentOrOutdent = "Отступ";
+                }
+            }
+            else
+            {
+                textBox.Text = "0";
+                CurrentGost.TocFirstLineIndent = 0;
+                CurrentGost.TocIndentOrOutdent = "Нет";
+            }
+        }
+    }
+
+    private void OnTocFirstLineIndentChanged(object sender, TextChangedEventArgs e)
+    {
+        if (sender is TextBox textBox && textBox.IsFocused)
+        {
+            string inputText = textBox.Text?.Trim() ?? "";
+
+            if (!string.IsNullOrEmpty(inputText) &&
+                double.TryParse(inputText.Replace('.', ','), NumberStyles.Any, CultureInfo.InvariantCulture, out double value))
+            {
+                if (value != 0 && CurrentGost.TocIndentOrOutdent == "Нет")
+                {
+                    CurrentGost.TocIndentOrOutdent = "Отступ";
+                }
+                else if (value == 0)
+                {
+                    CurrentGost.TocIndentOrOutdent = "Нет";
+                }
+            }
+        }
+    }
+
+    // Методы для работы с междустрочными интервалами оглавления
+    private string GetDefaultTocLineSpacingValue()
+    {
+        return CurrentGost.TocLineSpacingType switch
+        {
+            "Множитель" => "1,0",
+            "Точно" => "0,5",
+            "Минимум" => "0,5",
+            _ => "0"
+        };
+    }
+
+    private double GetMinTocLineSpacingValue()
+    {
+        return CurrentGost.TocLineSpacingType switch
+        {
+            "Множитель" => 0.5,
+            "Точно" => 0.03,
+            "Минимум" => 0.03,
+            _ => 0.03
+        };
+    }
+
+    private void OnTocLineSpacingLostFocus(object? sender, RoutedEventArgs e)
+    {
+        if (sender is TextBox textBox)
+        {
+            string inputText = textBox.Text?.Trim() ?? "";
+
+            if (string.IsNullOrWhiteSpace(inputText))
+            {
+                textBox.Text = GetDefaultTocLineSpacingValue();
+                CurrentGost.TocLineSpacing = double.Parse(GetDefaultTocLineSpacingValue(), CultureInfo.GetCultureInfo("ru-RU"));
+                return;
+            }
+
+            inputText = inputText.Replace('.', ',');
+
+            if (double.TryParse(inputText, NumberStyles.Any, CultureInfo.GetCultureInfo("ru-RU"), out double value))
+            {
+                double minValue = GetMinTocLineSpacingValue();
+                double maxValue = 132;
+
+                if (value < minValue)
+                {
+                    value = minValue;
+                }
+
+                value = Math.Clamp(value, minValue, maxValue);
+                value = Math.Round(value, 2);
+
+                textBox.Text = value.ToString("0.##", CultureInfo.GetCultureInfo("ru-RU"));
+                CurrentGost.TocLineSpacing = value;
+            }
+            else
+            {
+                string defaultValue = GetDefaultTocLineSpacingValue();
+                textBox.Text = defaultValue;
+                CurrentGost.TocLineSpacing = double.Parse(defaultValue, CultureInfo.GetCultureInfo("ru-RU"));
+            }
+        }
+    }
+
+    private void OnTocMarginLeftRightLostFocus(object? sender, RoutedEventArgs e)
+    {
+        if (sender is TextBox textBox)
+        {
+            string inputText = textBox.Text?.Trim() ?? "";
+
+            if (string.IsNullOrWhiteSpace(inputText))
+            {
+                textBox.Text = "0";
+                return;
+            }
+
+            inputText = inputText.Replace('.', ',');
+
+            if (double.TryParse(inputText, NumberStyles.Any, CultureInfo.GetCultureInfo("ru-RU"), out double value))
+            {
+                value = Math.Clamp(value, -55.87, 55.87);
+                value = Math.Round(value, 2);
+                textBox.Text = value.ToString("0.##", CultureInfo.GetCultureInfo("ru-RU"));
+
+                // Обновляем соответствующее свойство в зависимости от того, какое это поле
+                if (textBox.Name.Contains("Left"))
+                {
+                    CurrentGost.TocIndentLeft = value;
+                }
+                else if (textBox.Name.Contains("Right"))
+                {
+                    CurrentGost.TocIndentRight = value;
+                }
+            }
+            else
+            {
+                textBox.Text = "0";
+            }
+        }
+    }
+
+
+
+
+
+    // ======================= Методы для работы с отступами подписей к изображениям =======================
+
+    private void OnImageCaptionIndentTypeChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (CurrentGost.ImageCaptionIndentOrOutdent == "Нет")
+        {
+            CurrentGost.ImageCaptionFirstLineIndent = 0;
+        }
+        else if (CurrentGost.ImageCaptionFirstLineIndent == 0)
+        {
+            CurrentGost.ImageCaptionFirstLineIndent = 1.27;
+        }
+    }
+
+    private void OnImageCaptionFirstLineIndentLostFocus(object? sender, RoutedEventArgs e)
+    {
+        if (sender is TextBox textBox)
+        {
+            string inputText = textBox.Text?.Trim() ?? "";
+
+            if (string.IsNullOrWhiteSpace(inputText))
+            {
+                textBox.Text = "0";
+                CurrentGost.ImageCaptionIndentOrOutdent = "Нет";
+                CurrentGost.ImageCaptionFirstLineIndent = 0;
+                return;
+            }
+
+            inputText = inputText.Replace('.', ',');
+
+            if (double.TryParse(inputText, NumberStyles.Any, CultureInfo.GetCultureInfo("ru-RU"), out double value))
+            {
+                value = Math.Clamp(value, 0, 55.87);
+                value = Math.Round(value, 2);
+                textBox.Text = value.ToString("0.##", CultureInfo.GetCultureInfo("ru-RU"));
+                CurrentGost.ImageCaptionFirstLineIndent = value;
+
+                if (value == 0)
+                {
+                    CurrentGost.ImageCaptionIndentOrOutdent = "Нет";
+                }
+                else if (CurrentGost.ImageCaptionIndentOrOutdent == "Нет")
+                {
+                    CurrentGost.ImageCaptionIndentOrOutdent = "Отступ";
+                }
+            }
+            else
+            {
+                textBox.Text = "0";
+                CurrentGost.ImageCaptionFirstLineIndent = 0;
+                CurrentGost.ImageCaptionIndentOrOutdent = "Нет";
+            }
+        }
+    }
+
+    private void OnImageCaptionFirstLineIndentChanged(object sender, TextChangedEventArgs e)
+    {
+        if (sender is TextBox textBox && textBox.IsFocused)
+        {
+            string inputText = textBox.Text?.Trim() ?? "";
+
+            if (!string.IsNullOrEmpty(inputText) &&
+                double.TryParse(inputText.Replace('.', ','), NumberStyles.Any, CultureInfo.InvariantCulture, out double value))
+            {
+                if (value != 0 && CurrentGost.ImageCaptionIndentOrOutdent == "Нет")
+                {
+                    CurrentGost.ImageCaptionIndentOrOutdent = "Отступ";
+                }
+                else if (value == 0)
+                {
+                    CurrentGost.ImageCaptionIndentOrOutdent = "Нет";
+                }
+            }
+        }
+    }
+
+    // Методы для работы с междустрочными интервалами подписей к изображениям
+    private string GetDefaultImageCaptionLineSpacingValue()
+    {
+        return CurrentGost.ImageCaptionLineSpacingType switch
+        {
+            "Множитель" => "1,0",
+            "Точно" => "0,5",
+            "Минимум" => "0,5",
+            _ => "0"
+        };
+    }
+
+    private double GetMinImageCaptionLineSpacingValue()
+    {
+        return CurrentGost.ImageCaptionLineSpacingType switch
+        {
+            "Множитель" => 0.5,
+            "Точно" => 0.03,
+            "Минимум" => 0.03,
+            _ => 0.03
+        };
+    }
+
+    private void OnImageCaptionLineSpacingLostFocus(object? sender, RoutedEventArgs e)
+    {
+        if (sender is TextBox textBox)
+        {
+            string inputText = textBox.Text?.Trim() ?? "";
+
+            if (string.IsNullOrWhiteSpace(inputText))
+            {
+                textBox.Text = GetDefaultImageCaptionLineSpacingValue();
+                CurrentGost.ImageCaptionLineSpacingValue = double.Parse(GetDefaultImageCaptionLineSpacingValue(), CultureInfo.GetCultureInfo("ru-RU"));
+                return;
+            }
+
+            inputText = inputText.Replace('.', ',');
+
+            if (double.TryParse(inputText, NumberStyles.Any, CultureInfo.GetCultureInfo("ru-RU"), out double value))
+            {
+                double minValue = GetMinImageCaptionLineSpacingValue();
+                double maxValue = 132;
+
+                if (value < minValue)
+                {
+                    value = minValue;
+                }
+
+                value = Math.Clamp(value, minValue, maxValue);
+                value = Math.Round(value, 2);
+
+                textBox.Text = value.ToString("0.##", CultureInfo.GetCultureInfo("ru-RU"));
+                CurrentGost.ImageCaptionLineSpacingValue = value;
+            }
+            else
+            {
+                string defaultValue = GetDefaultImageCaptionLineSpacingValue();
+                textBox.Text = defaultValue;
+                CurrentGost.ImageCaptionLineSpacingValue = double.Parse(defaultValue, CultureInfo.GetCultureInfo("ru-RU"));
+            }
+        }
+    }
+
+    private void OnImageCaptionMarginLeftRightLostFocus(object? sender, RoutedEventArgs e)
+    {
+        if (sender is TextBox textBox)
+        {
+            string inputText = textBox.Text?.Trim() ?? "";
+
+            if (string.IsNullOrWhiteSpace(inputText))
+            {
+                textBox.Text = "0";
+                return;
+            }
+
+            inputText = inputText.Replace('.', ',');
+
+            if (double.TryParse(inputText, NumberStyles.Any, CultureInfo.GetCultureInfo("ru-RU"), out double value))
+            {
+                value = Math.Clamp(value, -55.87, 55.87);
+                value = Math.Round(value, 2);
+                textBox.Text = value.ToString("0.##", CultureInfo.GetCultureInfo("ru-RU"));
+
+                // Обновляем соответствующее свойство в зависимости от того, какое это поле
+                if (textBox.Name.Contains("Left"))
+                {
+                    CurrentGost.ImageCaptionIndentLeft = value;
+                }
+                else if (textBox.Name.Contains("Right"))
+                {
+                    CurrentGost.ImageCaptionIndentRight = value;
+                }
+            }
+            else
+            {
+                textBox.Text = "0";
+            }
+        }
+    }
+
+    // ======================= Методы для работы с отступами подписей над таблицами =======================
+
+    private void OnTableCaptionIndentTypeChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (CurrentGost.TableCaptionIndentOrOutdent == "Нет")
+        {
+            CurrentGost.TableCaptionFirstLineIndent = 0;
+        }
+        else if (CurrentGost.TableCaptionFirstLineIndent == 0)
+        {
+            CurrentGost.TableCaptionFirstLineIndent = 1.27;
+        }
+    }
+
+    private void OnTableCaptionFirstLineIndentLostFocus(object? sender, RoutedEventArgs e)
+    {
+        if (sender is TextBox textBox)
+        {
+            string inputText = textBox.Text?.Trim() ?? "";
+
+            if (string.IsNullOrWhiteSpace(inputText))
+            {
+                textBox.Text = "0";
+                CurrentGost.TableCaptionIndentOrOutdent = "Нет";
+                CurrentGost.TableCaptionFirstLineIndent = 0;
+                return;
+            }
+
+            inputText = inputText.Replace('.', ',');
+
+            if (double.TryParse(inputText, NumberStyles.Any, CultureInfo.GetCultureInfo("ru-RU"), out double value))
+            {
+                value = Math.Clamp(value, 0, 55.87);
+                value = Math.Round(value, 2);
+                textBox.Text = value.ToString("0.##", CultureInfo.GetCultureInfo("ru-RU"));
+                CurrentGost.TableCaptionFirstLineIndent = value;
+
+                if (value == 0)
+                {
+                    CurrentGost.TableCaptionIndentOrOutdent = "Нет";
+                }
+                else if (CurrentGost.TableCaptionIndentOrOutdent == "Нет")
+                {
+                    CurrentGost.TableCaptionIndentOrOutdent = "Отступ";
+                }
+            }
+            else
+            {
+                textBox.Text = "0";
+                CurrentGost.TableCaptionFirstLineIndent = 0;
+                CurrentGost.TableCaptionIndentOrOutdent = "Нет";
+            }
+        }
+    }
+
+    private void OnTableCaptionFirstLineIndentChanged(object sender, TextChangedEventArgs e)
+    {
+        if (sender is TextBox textBox && textBox.IsFocused)
+        {
+            string inputText = textBox.Text?.Trim() ?? "";
+
+            if (!string.IsNullOrEmpty(inputText) &&
+                double.TryParse(inputText.Replace('.', ','), NumberStyles.Any, CultureInfo.InvariantCulture, out double value))
+            {
+                if (value != 0 && CurrentGost.TableCaptionIndentOrOutdent == "Нет")
+                {
+                    CurrentGost.TableCaptionIndentOrOutdent = "Отступ";
+                }
+                else if (value == 0)
+                {
+                    CurrentGost.TableCaptionIndentOrOutdent = "Нет";
+                }
+            }
+        }
+    }
+
+    // Методы для работы с междустрочными интервалами подписей над таблицами
+    private string GetDefaultTableCaptionLineSpacingValue()
+    {
+        return CurrentGost.TableCaptionLineSpacingType switch
+        {
+            "Множитель" => "1,0",
+            "Точно" => "0,5",
+            "Минимум" => "0,5",
+            _ => "0"
+        };
+    }
+
+    private double GetMinTableCaptionLineSpacingValue()
+    {
+        return CurrentGost.TableCaptionLineSpacingType switch
+        {
+            "Множитель" => 0.5,
+            "Точно" => 0.03,
+            "Минимум" => 0.03,
+            _ => 0.03
+        };
+    }
+
+    private void OnTableCaptionLineSpacingLostFocus(object? sender, RoutedEventArgs e)
+    {
+        if (sender is TextBox textBox)
+        {
+            string inputText = textBox.Text?.Trim() ?? "";
+
+            if (string.IsNullOrWhiteSpace(inputText))
+            {
+                textBox.Text = GetDefaultTableCaptionLineSpacingValue();
+                CurrentGost.TableCaptionLineSpacingValue = double.Parse(GetDefaultTableCaptionLineSpacingValue(), CultureInfo.GetCultureInfo("ru-RU"));
+                return;
+            }
+
+            inputText = inputText.Replace('.', ',');
+
+            if (double.TryParse(inputText, NumberStyles.Any, CultureInfo.GetCultureInfo("ru-RU"), out double value))
+            {
+                double minValue = GetMinTableCaptionLineSpacingValue();
+                double maxValue = 132;
+
+                if (value < minValue)
+                {
+                    value = minValue;
+                }
+
+                value = Math.Clamp(value, minValue, maxValue);
+                value = Math.Round(value, 2);
+
+                textBox.Text = value.ToString("0.##", CultureInfo.GetCultureInfo("ru-RU"));
+                CurrentGost.TableCaptionLineSpacingValue = value;
+            }
+            else
+            {
+                string defaultValue = GetDefaultTableCaptionLineSpacingValue();
+                textBox.Text = defaultValue;
+                CurrentGost.TableCaptionLineSpacingValue = double.Parse(defaultValue, CultureInfo.GetCultureInfo("ru-RU"));
+            }
+        }
+    }
+
+    private void OnTableCaptionMarginLeftRightLostFocus(object? sender, RoutedEventArgs e)
+    {
+        if (sender is TextBox textBox)
+        {
+            string inputText = textBox.Text?.Trim() ?? "";
+
+            if (string.IsNullOrWhiteSpace(inputText))
+            {
+                textBox.Text = "0";
+                return;
+            }
+
+            inputText = inputText.Replace('.', ',');
+
+            if (double.TryParse(inputText, NumberStyles.Any, CultureInfo.GetCultureInfo("ru-RU"), out double value))
+            {
+                value = Math.Clamp(value, -55.87, 55.87);
+                value = Math.Round(value, 2);
+                textBox.Text = value.ToString("0.##", CultureInfo.GetCultureInfo("ru-RU"));
+
+                // Обновляем соответствующее свойство в зависимости от того, какое это поле
+                if (textBox.Name.Contains("Left"))
+                {
+                    CurrentGost.TableCaptionIndentLeft = value;
+                }
+                else if (textBox.Name.Contains("Right"))
+                {
+                    CurrentGost.TableCaptionIndentRight = value;
+                }
+            }
+            else
+            {
+                textBox.Text = "0";
+            }
+        }
+    }
+
+    // ======================= Методы для работы с отступами таблиц =======================
+
+    private void OnTableIndentTypeChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (CurrentGost.TableIndentOrOutdent == "Нет")
+        {
+            CurrentGost.TableFirstLineIndent = 0;
+        }
+        else if (CurrentGost.TableFirstLineIndent == 0)
+        {
+            CurrentGost.TableFirstLineIndent = 1.27;
+        }
+    }
+
+    private void OnTableFirstLineIndentLostFocus(object? sender, RoutedEventArgs e)
+    {
+        if (sender is TextBox textBox)
+        {
+            string inputText = textBox.Text?.Trim() ?? "";
+
+            if (string.IsNullOrWhiteSpace(inputText))
+            {
+                textBox.Text = "0";
+                CurrentGost.TableIndentOrOutdent = "Нет";
+                CurrentGost.TableFirstLineIndent = 0;
+                return;
+            }
+
+            inputText = inputText.Replace('.', ',');
+
+            if (double.TryParse(inputText, NumberStyles.Any, CultureInfo.GetCultureInfo("ru-RU"), out double value))
+            {
+                value = Math.Clamp(value, 0, 55.87);
+                value = Math.Round(value, 2);
+                textBox.Text = value.ToString("0.##", CultureInfo.GetCultureInfo("ru-RU"));
+                CurrentGost.TableFirstLineIndent = value;
+
+                if (value == 0)
+                {
+                    CurrentGost.TableIndentOrOutdent = "Нет";
+                }
+                else if (CurrentGost.TableIndentOrOutdent == "Нет")
+                {
+                    CurrentGost.TableIndentOrOutdent = "Отступ";
+                }
+            }
+            else
+            {
+                textBox.Text = "0";
+                CurrentGost.TableFirstLineIndent = 0;
+                CurrentGost.TableIndentOrOutdent = "Нет";
+            }
+        }
+    }
+
+    private void OnTableFirstLineIndentChanged(object sender, TextChangedEventArgs e)
+    {
+        if (sender is TextBox textBox && textBox.IsFocused)
+        {
+            string inputText = textBox.Text?.Trim() ?? "";
+
+            if (!string.IsNullOrEmpty(inputText) &&
+                double.TryParse(inputText.Replace('.', ','), NumberStyles.Any, CultureInfo.InvariantCulture, out double value))
+            {
+                if (value != 0 && CurrentGost.TableIndentOrOutdent == "Нет")
+                {
+                    CurrentGost.TableIndentOrOutdent = "Отступ";
+                }
+                else if (value == 0)
+                {
+                    CurrentGost.TableIndentOrOutdent = "Нет";
+                }
+            }
+        }
+    }
+
+    private string GetDefaultTableLineSpacingValue()
+    {
+        return CurrentGost.TableSpacingType switch
+        {
+            "Множитель" => "1,0",
+            "Точно" => "0,5",
+            "Минимум" => "0,5",
+            _ => "0"
+        };
+    }
+
+    private double GetMinTableLineSpacingValue()
+    {
+        return CurrentGost.TableSpacingType switch
+        {
+            "Множитель" => 0.5,
+            "Точно" => 0.03,
+            "Минимум" => 0.03,
+            _ => 0.03
+        };
+    }
+
+    private void OnTableLineSpacingLostFocus(object? sender, RoutedEventArgs e)
+    {
+        if (sender is TextBox textBox)
+        {
+            string inputText = textBox.Text?.Trim() ?? "";
+
+            if (string.IsNullOrWhiteSpace(inputText))
+            {
+                textBox.Text = GetDefaultTableLineSpacingValue();
+                CurrentGost.TableLineSpacingValue = double.Parse(GetDefaultTableLineSpacingValue(), CultureInfo.GetCultureInfo("ru-RU"));
+                return;
+            }
+
+            inputText = inputText.Replace('.', ',');
+
+            if (double.TryParse(inputText, NumberStyles.Any, CultureInfo.GetCultureInfo("ru-RU"), out double value))
+            {
+                double minValue = GetMinTableLineSpacingValue();
+                double maxValue = 132;
+
+                if (value < minValue)
+                {
+                    value = minValue;
+                }
+
+                value = Math.Clamp(value, minValue, maxValue);
+                value = Math.Round(value, 2);
+
+                textBox.Text = value.ToString("0.##", CultureInfo.GetCultureInfo("ru-RU"));
+                CurrentGost.TableLineSpacingValue = value;
+            }
+            else
+            {
+                string defaultValue = GetDefaultTableLineSpacingValue();
+                textBox.Text = defaultValue;
+                CurrentGost.TableLineSpacingValue = double.Parse(defaultValue, CultureInfo.GetCultureInfo("ru-RU"));
+            }
+        }
+    }
+
+    private void OnTableMarginLeftRightLostFocus(object? sender, RoutedEventArgs e)
+    {
+        if (sender is TextBox textBox)
+        {
+            string inputText = textBox.Text?.Trim() ?? "";
+
+            if (string.IsNullOrWhiteSpace(inputText))
+            {
+                textBox.Text = "0";
+                return;
+            }
+
+            inputText = inputText.Replace('.', ',');
+
+            if (double.TryParse(inputText, NumberStyles.Any, CultureInfo.GetCultureInfo("ru-RU"), out double value))
+            {
+                value = Math.Clamp(value, -55.87, 55.87);
+                value = Math.Round(value, 2);
+                textBox.Text = value.ToString("0.##", CultureInfo.GetCultureInfo("ru-RU"));
+
+                // Обновляем соответствующее свойство в зависимости от того, какое это поле
+                if (textBox.Name.Contains("Left"))
+                {
+                    CurrentGost.TableIndentLeft = value;
+                }
+                else if (textBox.Name.Contains("Right"))
+                {
+                    CurrentGost.TableIndentRight = value;
+                }
+            }
+            else
+            {
+                textBox.Text = "0";
+            }
+        }
+    }
+
+
+    // ======================= Методы для работы с отступами Списков =======================
+
+    private void OnBulletIndentTypeChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (sender is ComboBox comboBox && comboBox.SelectedItem != null)
+        {
+            string indentType = comboBox.SelectedItem.ToString();
+
+            // Определяем уровень списка по имени комбобокса
+            string level = comboBox.Name.Replace("IndentOrOutdent", "");
+
+            // Получаем свойства для текущего уровня
+            var indentOrOutdentProperty = typeof(Gost).GetProperty($"{level}IndentOrOutdent");
+            var firstLineIndentProperty = typeof(Gost).GetProperty($"{level}FirstLineIndent");
+
+            if (indentOrOutdentProperty == null || firstLineIndentProperty == null) return;
+
+            // Устанавливаем тип отступа
+            indentOrOutdentProperty.SetValue(CurrentGost, indentType);
+
+            // Получаем текущее значение отступа
+            double currentIndent = (double)firstLineIndentProperty.GetValue(CurrentGost);
+
+            if (indentType == "Нет")
+            {
+                firstLineIndentProperty.SetValue(CurrentGost, 0.0);
+            }
+            else if (currentIndent == 0)
+            {
+                firstLineIndentProperty.SetValue(CurrentGost, 1.27);
+            }
+        }
+    }
+
+
+
+    private void OnBulletFirstLineIndentLostFocus(object? sender, RoutedEventArgs e)
+    {
+        if (sender is TextBox textBox)
+        {
+            string propertyPrefix = textBox.Name.Replace("FirstLineIndentTextBox", "")
+                                      .Replace("IndentTextBox", "");
+
+            string inputText = textBox.Text?.Trim() ?? "";
+
+            var indentProperty = typeof(Gost).GetProperty($"{propertyPrefix}Indent");
+            var indentOrOutdentProperty = typeof(Gost).GetProperty($"{propertyPrefix}IndentOrOutdent");
+
+            if (string.IsNullOrWhiteSpace(inputText))
+            {
+                textBox.Text = "0";
+                indentOrOutdentProperty?.SetValue(CurrentGost, "Нет");
+                indentProperty?.SetValue(CurrentGost, 0.0); 
+                return;
+            }
+
+            inputText = inputText.Replace('.', ',');
+
+            if (double.TryParse(inputText, NumberStyles.Any, CultureInfo.GetCultureInfo("ru-RU"), out double value))
+            {
+                value = Math.Clamp(value, 0, 55.87);
+                value = Math.Round(value, 2);
+                textBox.Text = value.ToString("0.##", CultureInfo.GetCultureInfo("ru-RU"));
+
+                indentProperty?.SetValue(CurrentGost, value);
+
+                if (value == 0)
+                {
+                    indentOrOutdentProperty?.SetValue(CurrentGost, "Нет");
+                }
+                else if ((string)(indentOrOutdentProperty?.GetValue(CurrentGost) ?? "Нет") == "Нет")
+                {
+                    indentOrOutdentProperty?.SetValue(CurrentGost, "Отступ");
+                }
+            }
+            else
+            {
+                textBox.Text = "0";
+                indentProperty?.SetValue(CurrentGost, 0.0); 
+                indentOrOutdentProperty?.SetValue(CurrentGost, "Нет");
+            }
+        }
+    }
+
+    private void OnBulletFirstLineIndentChanged(object sender, TextChangedEventArgs e)
+    {
+        if (sender is TextBox textBox && textBox.IsFocused)
+        {
+            string propertyPrefix = textBox.Name.Replace("FirstLineIndentTextBox", "")
+                                      .Replace("IndentTextBox", "");
+
+            string inputText = textBox.Text?.Trim() ?? "";
+
+            if (!string.IsNullOrEmpty(inputText) &&
+                double.TryParse(inputText.Replace('.', ','), NumberStyles.Any, CultureInfo.InvariantCulture, out double value))
+            {
+                if (value != 0 && (string)(typeof(Gost).GetProperty($"{propertyPrefix}IndentOrOutdent")?.GetValue(CurrentGost) ?? "Нет") == "Нет")
+                {
+                    typeof(Gost).GetProperty($"{propertyPrefix}IndentOrOutdent")?.SetValue(CurrentGost, "Отступ");
+                }
+                else if (value == 0)
+                {
+                    typeof(Gost).GetProperty($"{propertyPrefix}IndentOrOutdent")?.SetValue(CurrentGost, "Нет");
+                }
+            }
+        }
+    }
+
+    // Методы для работы с междустрочными интервалами списков
+    private string GetDefaultBulletLineSpacingValue()
+    {
+        return CurrentGost.BulletLineSpacingType switch
+        {
+            "Множитель" => "1,0",
+            "Точно" => "0,5",
+            "Минимум" => "0,5",
+            _ => "0"
+        };
+    }
+
+    private double GetMinBulletLineSpacingValue()
+    {
+        return CurrentGost.BulletLineSpacingType switch
+        {
+            "Множитель" => 0.5,
+            "Точно" => 0.03,
+            "Минимум" => 0.03,
+            _ => 0.03
+        };
+    }
+
+    private void OnBulletLineSpacingLostFocus(object? sender, RoutedEventArgs e)
+    {
+        if (sender is TextBox textBox)
+        {
+            string inputText = textBox.Text?.Trim() ?? "";
+
+            if (string.IsNullOrWhiteSpace(inputText))
+            {
+                textBox.Text = GetDefaultBulletLineSpacingValue();
+                CurrentGost.BulletLineSpacingValue = double.Parse(GetDefaultBulletLineSpacingValue(), CultureInfo.GetCultureInfo("ru-RU"));
+                return;
+            }
+
+            inputText = inputText.Replace('.', ',');
+
+            if (double.TryParse(inputText, NumberStyles.Any, CultureInfo.GetCultureInfo("ru-RU"), out double value))
+            {
+                double minValue = CurrentGost.BulletLineSpacingType switch
+                {
+                    "Множитель" => 0.5,
+                    "Точно" => 0.03,
+                    "Минимум" => 0.03,
+                    _ => 0.03
+                };
+
+                if (value < minValue)
+                {
+                    value = minValue;
+                }
+
+                value = Math.Clamp(value, minValue, 132);
+                value = Math.Round(value, 2);
+
+                textBox.Text = value.ToString("0.##", CultureInfo.GetCultureInfo("ru-RU"));
+                CurrentGost.BulletLineSpacingValue = value;
+            }
+            else
+            {
+                string defaultValue = GetDefaultBulletLineSpacingValue();
+                textBox.Text = defaultValue;
+                CurrentGost.BulletLineSpacingValue = double.Parse(defaultValue, CultureInfo.GetCultureInfo("ru-RU"));
+            }
+        }
+    }
+
+    // Общий метод для обработки отступов слева/справа для всех уровней списков
+    private void OnBulletMarginLeftRightLostFocus(object? sender, RoutedEventArgs e)
+    {
+        if (sender is TextBox textBox)
+        {
+            string propertyName = textBox.Name.Replace("TextBox", "");
+            string inputText = textBox.Text?.Trim() ?? "";
+
+            var property = typeof(Gost).GetProperty(propertyName);
+            if (property == null) return;
+
+            Type propertyType = property.PropertyType;
+            bool isNullableDouble = propertyType == typeof(double?);
+
+            if (string.IsNullOrWhiteSpace(inputText))
+            {
+                textBox.Text = "0";
+                // Устанавливаем правильный тип значения
+                if (isNullableDouble)
+                    property.SetValue(CurrentGost, (double?)0);
+                else
+                    property.SetValue(CurrentGost, 0.0);
+                return;
+            }
+
+            inputText = inputText.Replace('.', ',');
+
+            if (double.TryParse(inputText, NumberStyles.Any, CultureInfo.GetCultureInfo("ru-RU"), out double value))
+            {
+                value = Math.Clamp(value, -55.87, 55.87);
+                value = Math.Round(value, 2);
+                textBox.Text = value.ToString("0.##", CultureInfo.GetCultureInfo("ru-RU"));
+
+                // Устанавливаем значение с учетом типа свойства
+                if (isNullableDouble)
+                    property.SetValue(CurrentGost, (double?)value);
+                else
+                    property.SetValue(CurrentGost, value);
+            }
+            else
+            {
+                textBox.Text = "0";
+                // Устанавливаем правильный тип значения
+                if (isNullableDouble)
+                    property.SetValue(CurrentGost, (double?)0);
+                else
+                    property.SetValue(CurrentGost, 0.0);
+            }
+        }
+    }
 }

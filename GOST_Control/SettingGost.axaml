@@ -23,8 +23,8 @@
 		<Grid Name="GostControl_Okko"
 			  ColumnDefinitions="0.2*,*,*,*,0.2*"
 			  RowDefinitions="0.2*,*,*,*,0.2*"
-			  ShowGridLines="False">
-
+			  ShowGridLines="False">					
+						
 			<Border BorderThickness="2"
 					BorderBrush="Black"
 					Grid.Column="1"
@@ -42,1309 +42,1352 @@
 
 					<ScrollViewer VerticalScrollBarVisibility="Auto"
 								  HorizontalScrollBarVisibility="Disabled">
-						
-					<Border BorderThickness="0 0 0 0"
-							BorderBrush="Black"
-							Grid.Column="1"
-							Grid.Row="0"
-							Grid.RowSpan="3">
 
-						<Grid Grid.RowSpan="3"
-							  Grid.Column="0"
-							  Grid.Row="0"
-							  ColumnDefinitions="*,*"	
-							  RowDefinitions="40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40"							  
-							  ShowGridLines="False">
+						<Border BorderThickness="0 0 0 0"
+								BorderBrush="Black"
+								Grid.Column="1"
+								Grid.Row="0"
+								Grid.RowSpan="3">
 
-							<Border BorderThickness="2 0 0 0"
-									BorderBrush="Black"
-									Grid.Column="1"
-									Grid.Row="1"
-									Grid.RowSpan="3"/>
+							<Grid Grid.RowSpan="3"
+								  Grid.Column="0"
+								  Grid.Row="0"
+								  ColumnDefinitions="*,*"
+								  RowDefinitions="40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40"
+								  ShowGridLines="False">
 
-							<Border Grid.Column="0"
-									Grid.Row="0"
-									Grid.ColumnSpan="2"
-									BorderThickness="0 0 0 2"
-									BorderBrush="Black">
-								<TextBlock Text="Настройка маркированных списков"
-										   FontWeight="Bold"
+								<Border BorderThickness="2 0 0 0"
+										BorderBrush="Black"
+										Grid.Column="1"
+										Grid.Row="1"
+										Grid.RowSpan="3"/>
+
+								<Border Grid.Column="0"
+										Grid.Row="0"
+										Grid.ColumnSpan="2"
+										BorderThickness="0 0 0 2"
+										BorderBrush="Black">
+									<TextBlock Text="Настройка маркированных списков"
+											   FontWeight="Bold"
+											   FontSize="16"
+											   HorizontalAlignment="Center"
+											   VerticalAlignment="Center"/>
+								</Border>
+
+								<Border Grid.Column="0"
+										Grid.Row="1"
+										BorderThickness="0 0 0 2"
+										BorderBrush="Black">
+									<TextBlock Text="Тип Шрифта"
+											   HorizontalAlignment="Center"
+											   VerticalAlignment="Center"/>
+								</Border>
+
+								<Border Grid.Column="1"
+										Grid.Row="1"
+										BorderThickness="0 0 0 2"
+										BorderBrush="Black">
+									<ComboBox HorizontalAlignment="Center"
+											  VerticalAlignment="Center"
+											  Width="240"
+											  Height="30"
+											  SelectedItem="{Binding CurrentGost.BulletFontName, Mode=TwoWay}">
+										<ComboBox.Items>
+											<x:String>Arial</x:String>
+											<x:String>Arial Black</x:String>
+											<x:String>Bahnschrift</x:String>
+											<x:String>Caladea</x:String>
+											<x:String>Calibri</x:String>
+											<x:String>Calibri Light</x:String>
+											<x:String>Cambria</x:String>
+											<x:String>Cambria Math</x:String>
+											<x:String>Candara</x:String>
+											<x:String>Comic Sans MS</x:String>
+											<x:String>Consolas</x:String>
+											<x:String>Constantia</x:String>
+											<x:String>Corbel</x:String>
+											<x:String>Courier New</x:String>
+											<x:String>Ebrima</x:String>
+											<x:String>Franklin Gothic Medium</x:String>
+											<x:String>Gabriola</x:String>
+											<x:String>Gadugi</x:String>
+											<x:String>Georgia</x:String>
+											<x:String>Impact</x:String>
+											<x:String>Ink Free</x:String>
+											<x:String>Javanese Text</x:String>
+											<x:String>Leelawadee UI</x:String>
+											<x:String>Lucida Console</x:String>
+											<x:String>Lucida Sans Unicode</x:String>
+											<x:String>Malgun Gothic</x:String>
+											<x:String>Microsoft Himalaya</x:String>
+											<x:String>Microsoft JhengHei</x:String>
+											<x:String>Microsoft New Tai Lue</x:String>
+											<x:String>Microsoft PhagsPa</x:String>
+											<x:String>Microsoft Sans Serif</x:String>
+											<x:String>Microsoft Tai Le</x:String>
+											<x:String>Microsoft YaHei</x:String>
+											<x:String>Microsoft Yi Baiti</x:String>
+											<x:String>MS Gothic</x:String>
+											<x:String>MV Boli</x:String>
+											<x:String>Myanmar Text</x:String>
+											<x:String>Nirmala UI</x:String>
+											<x:String>Palatino Linotype</x:String>
+											<x:String>Segoe MDL2 Assets</x:String>
+											<x:String>Segoe Print</x:String>
+											<x:String>Segoe Script</x:String>
+											<x:String>Segoe UI</x:String>
+											<x:String>Segoe UI Historic</x:String>
+											<x:String>Segoe UI Emoji</x:String>
+											<x:String>Segoe UI Symbol</x:String>
+											<x:String>SimSun</x:String>
+											<x:String>Sitka</x:String>
+											<x:String>Sylfaen</x:String>
+											<x:String>Symbol</x:String>
+											<x:String>Tahoma</x:String>
+											<x:String>Times New Roman</x:String>
+											<x:String>Trebuchet MS</x:String>
+											<x:String>Verdana</x:String>
+											<x:String>Webdings</x:String>
+											<x:String>Wingdings</x:String>
+											<x:String>Yu Gothic</x:String>
+											<x:String>Yu Gothic UI Semilight</x:String>
+											<x:String>Yu Gothic</x:String>
+										</ComboBox.Items>
+									</ComboBox>
+								</Border>
+
+								<Border Grid.Column="0"
+										Grid.Row="2"
+										BorderThickness="0 0 0 2"
+										BorderBrush="Black">
+									<TextBlock Text="Размер Шрифта"
+											   HorizontalAlignment="Center"
+											   VerticalAlignment="Center"/>
+								</Border>
+
+								<Border Grid.Column="1"
+										Grid.Row="2"
+										BorderThickness="0 0 0 2"
+										BorderBrush="Black">
+									<ComboBox HorizontalAlignment="Center"
+											  VerticalAlignment="Center"
+											  Width="240"
+											  Height="30"
+											  SelectedItem="{Binding CurrentGost.BulletFontSize, Mode=TwoWay}">
+										<ComboBox.Items>
+											<x:Double>8</x:Double>
+											<x:Double>9</x:Double>
+											<x:Double>10</x:Double>
+											<x:Double>11</x:Double>
+											<x:Double>12</x:Double>
+											<x:Double>14</x:Double>
+											<x:Double>16</x:Double>
+											<x:Double>18</x:Double>
+											<x:Double>20</x:Double>
+											<x:Double>22</x:Double>
+											<x:Double>24</x:Double>
+											<x:Double>26</x:Double>
+											<x:Double>28</x:Double>
+											<x:Double>36</x:Double>
+											<x:Double>48</x:Double>
+											<x:Double>72</x:Double>
+										</ComboBox.Items>
+									</ComboBox>
+								</Border>
+
+								<TextBlock Text="Выравнивание текста"
+										   Grid.Column="0"
+										   Grid.Row="3"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<ComboBox Grid.Column="1"
+										  Grid.Row="3"
+										  HorizontalAlignment="Center"
+										  VerticalAlignment="Center"
+										  Width="240"
+										  Height="30"
+										  SelectedItem="{Binding CurrentGost.BulletAlignment, Mode=TwoWay}">
+									<ComboBox.Items>
+										<x:String>Left</x:String>
+										<x:String>Center</x:String>
+										<x:String>Right</x:String>
+										<x:String>Both</x:String>
+									</ComboBox.Items>
+									<ComboBox.ItemTemplate>
+										<DataTemplate>
+											<TextBlock Text="{Binding Converter={StaticResource TextOrPageOrientationToRussianConverter}, ConverterParameter=Alignment}"/>
+										</DataTemplate>
+									</ComboBox.ItemTemplate>
+								</ComboBox>
+
+								<Border BorderThickness="0 2 0 2"
+										BorderBrush="Black"
+										Grid.Column="0"
+										Grid.Row="4"
+										Grid.ColumnSpan="2"/>
+
+								<TextBlock Text="Интервалы"
 										   FontSize="16"
+										   FontWeight="Bold"
+										   Grid.Column="0"
+										   Grid.Row="4"
+										   Grid.ColumnSpan="2"
 										   HorizontalAlignment="Center"
 										   VerticalAlignment="Center"/>
-							</Border>
 
-							<Border Grid.Column="0"
-									Grid.Row="1"
-									BorderThickness="0 0 0 2"
-									BorderBrush="Black">
-								<TextBlock Text="Тип Шрифта"
+								<TextBlock Text="Междустрочный интервал 'Тип'"
+										   Grid.Column="0"
+										   Grid.Row="5"
 										   HorizontalAlignment="Center"
 										   VerticalAlignment="Center"/>
-							</Border>
 
-							<Border Grid.Column="1"
-									Grid.Row="1"
-									BorderThickness="0 0 0 2"
-									BorderBrush="Black">
-								<ComboBox HorizontalAlignment="Center"
+								<ComboBox Grid.Column="1"
+										  Grid.Row="5"
+										  HorizontalAlignment="Center"
 										  VerticalAlignment="Center"
 										  Width="240"
 										  Height="30"
-										  SelectedItem="{Binding CurrentGost.BulletFontName, Mode=TwoWay}">
+										  SelectedItem="{Binding CurrentGost.BulletLineSpacingType, Mode=TwoWay}">
 									<ComboBox.Items>
-										<x:String>Arial</x:String>
-										<x:String>Arial Black</x:String>
-										<x:String>Bahnschrift</x:String>
-										<x:String>Caladea</x:String>
-										<x:String>Calibri</x:String>
-										<x:String>Calibri Light</x:String>
-										<x:String>Cambria</x:String>
-										<x:String>Cambria Math</x:String>
-										<x:String>Candara</x:String>
-										<x:String>Comic Sans MS</x:String>
-										<x:String>Consolas</x:String>
-										<x:String>Constantia</x:String>
-										<x:String>Corbel</x:String>
-										<x:String>Courier New</x:String>
-										<x:String>Ebrima</x:String>
-										<x:String>Franklin Gothic Medium</x:String>
-										<x:String>Gabriola</x:String>
-										<x:String>Gadugi</x:String>
-										<x:String>Georgia</x:String>
-										<x:String>Impact</x:String>
-										<x:String>Ink Free</x:String>
-										<x:String>Javanese Text</x:String>
-										<x:String>Leelawadee UI</x:String>
-										<x:String>Lucida Console</x:String>
-										<x:String>Lucida Sans Unicode</x:String>
-										<x:String>Malgun Gothic</x:String>
-										<x:String>Microsoft Himalaya</x:String>
-										<x:String>Microsoft JhengHei</x:String>
-										<x:String>Microsoft New Tai Lue</x:String>
-										<x:String>Microsoft PhagsPa</x:String>
-										<x:String>Microsoft Sans Serif</x:String>
-										<x:String>Microsoft Tai Le</x:String>
-										<x:String>Microsoft YaHei</x:String>
-										<x:String>Microsoft Yi Baiti</x:String>
-										<x:String>MS Gothic</x:String>
-										<x:String>MV Boli</x:String>
-										<x:String>Myanmar Text</x:String>
-										<x:String>Nirmala UI</x:String>
-										<x:String>Palatino Linotype</x:String>
-										<x:String>Segoe MDL2 Assets</x:String>
-										<x:String>Segoe Print</x:String>
-										<x:String>Segoe Script</x:String>
-										<x:String>Segoe UI</x:String>
-										<x:String>Segoe UI Historic</x:String>
-										<x:String>Segoe UI Emoji</x:String>
-										<x:String>Segoe UI Symbol</x:String>
-										<x:String>SimSun</x:String>
-										<x:String>Sitka</x:String>
-										<x:String>Sylfaen</x:String>
-										<x:String>Symbol</x:String>
-										<x:String>Tahoma</x:String>
-										<x:String>Times New Roman</x:String>
-										<x:String>Trebuchet MS</x:String>
-										<x:String>Verdana</x:String>
-										<x:String>Webdings</x:String>
-										<x:String>Wingdings</x:String>
-										<x:String>Yu Gothic</x:String>
-										<x:String>Yu Gothic UI Semilight</x:String>
-										<x:String>Yu Gothic</x:String>
+										<x:String>Множитель</x:String>
+										<x:String>Минимум</x:String>
+										<x:String>Точно</x:String>
 									</ComboBox.Items>
 								</ComboBox>
-							</Border>
 
-							<Border Grid.Column="0"
-									Grid.Row="2"
-									BorderThickness="0 0 0 2"
-									BorderBrush="Black">
-								<TextBlock Text="Размер Шрифта"
+								<TextBlock Text="Междустрочный интервал"
+										   Grid.Column="0"
+										   Grid.Row="6"
 										   HorizontalAlignment="Center"
 										   VerticalAlignment="Center"/>
-							</Border>
 
-							<Border Grid.Column="1"
-									Grid.Row="2"
-									BorderThickness="0 0 0 2"
-									BorderBrush="Black">
-								<ComboBox HorizontalAlignment="Center"
+								<TextBox Grid.Column="1"
+										 Grid.Row="6"
+										 Watermark="Междустрочный интервал"
+										 MaxLength="6"
+										 Width="240"
+										 Height="30"
+										 HorizontalAlignment="Center"
+										 VerticalAlignment="Center"
+										 Text="{Binding CurrentGost.BulletLineSpacingValue, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter='132|0.03'}"
+										 TextInput="OnTextInput_NumberOnly"
+										 LostFocus="OnBulletLineSpacingLostFocus"/>
+
+								<Border BorderThickness="0 2 0 2"
+										BorderBrush="Black"
+										Grid.Column="0"
+										Grid.Row="7"
+										Grid.ColumnSpan="2"/>
+
+								<TextBlock Text="Интервалы между абзацами"
+										   FontSize="16"
+										   FontWeight="Bold"
+										   Grid.Column="0"
+										   Grid.Row="7"
+										   Grid.ColumnSpan="2"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<TextBlock Text="Перед"
+										   Grid.Column="0"
+										   Grid.Row="8"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<TextBox Grid.Column="1"
+										 Grid.Row="8"
+										 Watermark="Перед"
+										 Width="240"
+										 Height="30"
+										 MaxLength="6"
+										 HorizontalAlignment="Center"
+										 VerticalAlignment="Center"
+										 Text="{Binding CurrentGost.BulletLineSpacingBefore, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+										 TextInput="OnTextInput_NumberOnly"
+										 LostFocus="OnLineSpacingGenericLostFocus"/>
+
+								<TextBlock Text="После"
+										   Grid.Column="0"
+										   Grid.Row="9"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<TextBox Grid.Column="1"
+										 Grid.Row="9"
+										 Watermark="После"
+										 Width="240"
+										 Height="30"
+										 MaxLength="6"
+										 HorizontalAlignment="Center"
+										 VerticalAlignment="Center"
+										 Text="{Binding CurrentGost.BulletLineSpacingAfter, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+										 TextInput="OnTextInput_NumberOnly"
+										 LostFocus="OnLineSpacingGenericLostFocus"/>
+
+								<Border BorderThickness="0 2 0 2"
+										BorderBrush="Black"
+										Grid.Column="0"
+										Grid.Row="10"
+										Grid.ColumnSpan="2"/>
+
+								<TextBlock Text="Отступы 1-го уровня"
+										   FontSize="16"
+										   FontWeight="Bold"
+										   Grid.Column="0"
+										   Grid.Row="10"
+										   Grid.ColumnSpan="2"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<TextBlock Text="Тип отступа первой строки"
+										   Grid.Column="0"
+										   Grid.Row="11"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+								
+								<ComboBox Grid.Column="1"
+										  Grid.Row="11"
+										  HorizontalAlignment="Center"
 										  VerticalAlignment="Center"
 										  Width="240"
 										  Height="30"
-										  SelectedItem="{Binding CurrentGost.BulletFontSize, Mode=TwoWay}">
+										  SelectedItem="{Binding CurrentGost.ListLevel1IndentOrOutdent, Mode=TwoWay}"
+										  SelectionChanged="OnBulletIndentTypeChanged"
+										  Name="ListLevel1IndentOrOutdent">
 									<ComboBox.Items>
-										<x:Double>8</x:Double>
-										<x:Double>9</x:Double>
-										<x:Double>10</x:Double>
-										<x:Double>11</x:Double>
-										<x:Double>12</x:Double>
-										<x:Double>14</x:Double>
-										<x:Double>16</x:Double>
-										<x:Double>18</x:Double>
-										<x:Double>20</x:Double>
-										<x:Double>22</x:Double>
-										<x:Double>24</x:Double>
-										<x:Double>26</x:Double>
-										<x:Double>28</x:Double>
-										<x:Double>36</x:Double>
-										<x:Double>48</x:Double>
-										<x:Double>72</x:Double>
+										<x:String>Отступ</x:String>
+										<x:String>Выступ</x:String>
+										<x:String>Нет</x:String>
 									</ComboBox.Items>
 								</ComboBox>
-							</Border>
-
-							<TextBlock Text="Выравнивание текста"
-									   Grid.Column="0"
-									   Grid.Row="3"
-									   HorizontalAlignment="Center"
-									   VerticalAlignment="Center"/>
-
-							<ComboBox Grid.Column="1"
-									  Grid.Row="3"
-									  HorizontalAlignment="Center"
-									  VerticalAlignment="Center"
-									  Width="240"
-									  Height="30"
-									  SelectedItem="{Binding CurrentGost.BulletAlignment, Mode=TwoWay}">
-								<ComboBox.Items>
-									<x:String>Left</x:String>
-									<x:String>Center</x:String>
-									<x:String>Right</x:String>
-									<x:String>Both</x:String>
-								</ComboBox.Items>
-								<ComboBox.ItemTemplate>
-									<DataTemplate>
-										<TextBlock Text="{Binding Converter={StaticResource TextOrPageOrientationToRussianConverter}, ConverterParameter=Alignment}"/>
-									</DataTemplate>
-								</ComboBox.ItemTemplate>
-							</ComboBox>
-
-							<Border BorderThickness="0 2 0 2"
-									BorderBrush="Black"
-									Grid.Column="0"
-									Grid.Row="4"
-									Grid.ColumnSpan="2"/>
-
-							<TextBlock Text="Интервалы"
-									   FontSize="16"
-									   FontWeight="Bold"
-									   Grid.Column="0"
-									   Grid.Row="4"
-									   Grid.ColumnSpan="2"
-									   HorizontalAlignment="Center"
-									   VerticalAlignment="Center"/>
-
-							<TextBlock Text="Междустрочный интервал 'Тип'"
-									   Grid.Column="0"
-									   Grid.Row="5"
-									   HorizontalAlignment="Center"
-									   VerticalAlignment="Center"/>
-
-							<ComboBox Grid.Column="1"
-									  Grid.Row="5"
-									  HorizontalAlignment="Center"
-									  VerticalAlignment="Center"
-									  Width="240"
-									  Height="30"
-									  SelectedItem="{Binding CurrentGost.BulletLineSpacingType, Mode=TwoWay}">
-								<ComboBox.Items>
-									<x:String>Множитель</x:String>
-									<x:String>Минимум</x:String>
-									<x:String>Точно</x:String>
-								</ComboBox.Items>
-							</ComboBox>
-
-							<TextBlock Text="Междустрочный интервал"
-									   Grid.Column="0"
-									   Grid.Row="6"
-									   HorizontalAlignment="Center"
-									   VerticalAlignment="Center"/>
-
-							<TextBox Grid.Column="1"
-									 Grid.Row="6"
-									 Watermark="Междустрочный интервал"
-									 MaxLength="6"
-									 Width="240"
-									 Height="30"
-									 HorizontalAlignment="Center"
-									 VerticalAlignment="Center"
-									 Text="{Binding CurrentGost.BulletLineSpacingValue, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}}"
-									 TextInput="OnTextInput_NumberOnly"
-									 LostFocus="OnLineSpacingBoxLostFocus"/>
-
-							<Border BorderThickness="0 2 0 2"
-									BorderBrush="Black"
-									Grid.Column="0"
-									Grid.Row="7"
-									Grid.ColumnSpan="2"/>
-
-							<TextBlock Text="Интервалы между абзацами"
-									   FontSize="16"
-									   FontWeight="Bold"
-									   Grid.Column="0"
-									   Grid.Row="7"
-									   Grid.ColumnSpan="2"
-									   HorizontalAlignment="Center"
-									   VerticalAlignment="Center"/>
-
-							<TextBlock Text="Перед"
-									   Grid.Column="0"
-									   Grid.Row="8"
-									   HorizontalAlignment="Center"
-									   VerticalAlignment="Center"/>
-
-							<TextBox Grid.Column="1"
-									 Grid.Row="8"
-									 Watermark="Перед"
-									 Width="240"
-									 Height="30"
-									 MaxLength="5"
-									 HorizontalAlignment="Center"
-									 VerticalAlignment="Center"
-									 Text="{Binding CurrentGost.BulletLineSpacingBefore, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
-									 TextInput="OnTextInput_NumberOnly"
-									 LostFocus="OnLineSpacingGenericLostFocus"/>
-
-							<TextBlock Text="После"
-									   Grid.Column="0"
-									   Grid.Row="9"
-									   HorizontalAlignment="Center"
-									   VerticalAlignment="Center"/>
-
-							<TextBox Grid.Column="1"
-									 Grid.Row="9"
-									 Watermark="После"
-									 Width="240"
-									 Height="30"
-									 MaxLength="5"
-									 HorizontalAlignment="Center"
-									 VerticalAlignment="Center"
-									 Text="{Binding CurrentGost.BulletLineSpacingAfter, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
-									 TextInput="OnTextInput_NumberOnly"
-									 LostFocus="OnLineSpacingGenericLostFocus"/>
-
-							<Border BorderThickness="0 2 0 2"
-									BorderBrush="Black"
-									Grid.Column="0"
-									Grid.Row="10"
-									Grid.ColumnSpan="2"/>
-
-							<TextBlock Text="Отступы 1-го уровня"
-									   FontSize="16"
-									   FontWeight="Bold"
-									   Grid.Column="0"
-									   Grid.Row="10"
-									   Grid.ColumnSpan="2"
-									   HorizontalAlignment="Center"
-									   VerticalAlignment="Center"/>
-
-							<TextBlock Text="Тип отступа первой строки"
-									   Grid.Column="0"
-									   Grid.Row="11"
-									   HorizontalAlignment="Center"
-									   VerticalAlignment="Center"/>
-
-							<ComboBox Grid.Column="1"
-									  Grid.Row="11"
-									  HorizontalAlignment="Center"
-									  VerticalAlignment="Center"
-									  Width="240"
-									  Height="30"
-									  SelectedItem="{Binding CurrentGost.ListLevel1IndentOrOutdent, Mode=TwoWay}">
-								<ComboBox.Items>
-									<x:String>Отступ</x:String>
-									<x:String>Выступ</x:String>
-									<x:String>Нет</x:String>
-								</ComboBox.Items>
-							</ComboBox>
-
-							<TextBlock Text="Отступ 1-го уровня"
-									   Grid.Column="0"
-									   Grid.Row="12"
-									   HorizontalAlignment="Center"
-									   VerticalAlignment="Center"/>
-
-							<TextBox Grid.Column="1"
-									 Grid.Row="12"
-									 Watermark="Отступ 1-го уровня"
-									 Width="240"
-									 Height="30"
-									 MaxLength="5"
-									 HorizontalAlignment="Center"
-									 VerticalAlignment="Center"
-									 Text="{Binding CurrentGost.ListLevel1Indent, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
-									 TextInput="OnTextInput_NumberOnly"
-									 LostFocus="OnLineSpacingGenericLostFocus"/>
-
-							<TextBlock Text="Отступ слева"
-									   Grid.Column="0"
-									   Grid.Row="13"
-									   HorizontalAlignment="Center"
-									   VerticalAlignment="Center"/>
-
-							<TextBox Grid.Column="1"
-									 Grid.Row="13"
-									 Watermark="Отступ слева"
-									 Width="240"
-									 Height="30"
-									 MaxLength="5"
-									 HorizontalAlignment="Center"
-									 VerticalAlignment="Center"
-									 Text="{Binding CurrentGost.ListLevel1BulletIndentLeft, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
-									 TextInput="OnTextInput_NumberOnly"
-									 LostFocus="OnLineSpacingGenericLostFocus"/>
-
-							<TextBlock Text="Отступ справа"
-									   Grid.Column="0"
-									   Grid.Row="14"
-									   HorizontalAlignment="Center"
-									   VerticalAlignment="Center"/>
-
-							<TextBox Grid.Column="1"
-									 Grid.Row="14"
-									 Watermark="Отступ справа"
-									 Width="240"
-									 Height="30"
-									 MaxLength="5"
-									 HorizontalAlignment="Center"
-									 VerticalAlignment="Center"
-									 Text="{Binding CurrentGost.ListLevel1BulletIndentRight, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
-									 TextInput="OnTextInput_NumberOnly"
-									 LostFocus="OnLineSpacingGenericLostFocus"/>
-
-							<TextBlock Text="Отступы 2-го уровня"
-									   FontSize="16"
-									   FontWeight="Bold"
-									   Grid.Column="0"
-									   Grid.Row="15"
-									   Grid.ColumnSpan="2"
-									   HorizontalAlignment="Center"
-									   VerticalAlignment="Center"/>
-
-							<TextBlock Text="Тип отступа первой строки"
-									   Grid.Column="0"
-									   Grid.Row="16"
-									   HorizontalAlignment="Center"
-									   VerticalAlignment="Center"/>
-
-							<ComboBox Grid.Column="1"
-									  Grid.Row="16"
-									  Width="240"
-									  Height="30"
-									  HorizontalAlignment="Center"
-									  VerticalAlignment="Center"
-									  SelectedItem="{Binding CurrentGost.ListLevel2IndentOrOutdent, Mode=TwoWay}">
-								<ComboBox.Items>
-									<x:String>Отступ</x:String>
-									<x:String>Выступ</x:String>
-									<x:String>Нет</x:String>
-								</ComboBox.Items>
-							</ComboBox>
-
-							<TextBlock Text="Отступ 2-го уровня"
-									   Grid.Column="0"
-									   Grid.Row="17"
-									   HorizontalAlignment="Center"
-									   VerticalAlignment="Center"/>
-
-							<TextBox Grid.Column="1"
-									 Grid.Row="17"
-									 Width="240"
-									 Height="30"
-									 MaxLength="5"
-									 HorizontalAlignment="Center"
-									 VerticalAlignment="Center"
-									 Watermark="Отступ 2-го уровня"
-									 Text="{Binding CurrentGost.ListLevel2Indent, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
-									 TextInput="OnTextInput_NumberOnly"
-									 LostFocus="OnLineSpacingGenericLostFocus"/>
-
-							<TextBlock Text="Отступ слева"
-									   Grid.Column="0"
-									   Grid.Row="18"
-									   HorizontalAlignment="Center"
-									   VerticalAlignment="Center"/>
-
-							<TextBox Grid.Column="1"
-									 Grid.Row="18"
-									 Width="240"
-									 Height="30"
-									 MaxLength="5"
-									 HorizontalAlignment="Center"
-									 VerticalAlignment="Center"
-									 Watermark="Отступ слева"
-									 Text="{Binding CurrentGost.ListLevel2BulletIndentLeft, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
-									 TextInput="OnTextInput_NumberOnly"
-									 LostFocus="OnLineSpacingGenericLostFocus"/>
-
-							<TextBlock Text="Отступ справа"
-									   Grid.Column="0"
-									   Grid.Row="19"
-									   HorizontalAlignment="Center"
-									   VerticalAlignment="Center"/>
-
-							<TextBox Grid.Column="1"
-									 Grid.Row="19"
-									 Width="240"
-									 Height="30"
-									 MaxLength="5"
-									 HorizontalAlignment="Center"
-									 VerticalAlignment="Center"
-									 Watermark="Отступ справа"
-									 Text="{Binding CurrentGost.ListLevel2BulletIndentRight, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
-									 TextInput="OnTextInput_NumberOnly"
-									 LostFocus="OnLineSpacingGenericLostFocus"/>
-
-							<!-- Отступы 3-го уровня -->
-							<TextBlock Text="Отступы 3-го уровня"
-									   FontSize="16"
-									   FontWeight="Bold"
-									   Grid.Column="0"
-									   Grid.Row="20"
-									   Grid.ColumnSpan="2"
-									   HorizontalAlignment="Center"
-									   VerticalAlignment="Center"/>
-
-							<TextBlock Text="Тип отступа первой строки"
-									   Grid.Column="0" Grid.Row="21"
-									   HorizontalAlignment="Center"
-									   VerticalAlignment="Center"/>
-							<ComboBox Grid.Column="1" Grid.Row="21"
-									  Width="240" Height="30"
-									  HorizontalAlignment="Center"
-									  VerticalAlignment="Center"
-									  SelectedItem="{Binding CurrentGost.ListLevel3IndentOrOutdent, Mode=TwoWay}">
-								<ComboBox.Items>
-									<x:String>Отступ</x:String>
-									<x:String>Выступ</x:String>
-									<x:String>Нет</x:String>
-								</ComboBox.Items>
-							</ComboBox>
-
-							<TextBlock Text="Отступ 3-го уровня"
-									   Grid.Column="0"
-									   Grid.Row="22"
-									   HorizontalAlignment="Center"
-									   VerticalAlignment="Center"/>
-
-							<TextBox Grid.Column="1"
-									 Grid.Row="22"
-									 Width="240"
-									 Height="30"
-									 MaxLength="5"
-									 HorizontalAlignment="Center"
-									 VerticalAlignment="Center"
-									 Watermark="Отступ 3-го уровня"
-									 Text="{Binding CurrentGost.ListLevel3Indent, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
-									 TextInput="OnTextInput_NumberOnly"
-									 LostFocus="OnLineSpacingGenericLostFocus"/>
-
-							<TextBlock Text="Отступ слева"
-									   Grid.Column="0"
-									   Grid.Row="23"
-									   HorizontalAlignment="Center"
-									   VerticalAlignment="Center"/>
-
-							<TextBox Grid.Column="1"
-									 Grid.Row="23"
-									 Width="240"
-									 Height="30"
-									 MaxLength="5"
-									 HorizontalAlignment="Center"
-									 VerticalAlignment="Center"
-									 Watermark="Отступ слева"
-									 Text="{Binding CurrentGost.ListLevel3BulletIndentLeft, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
-									 TextInput="OnTextInput_NumberOnly"
-									 LostFocus="OnLineSpacingGenericLostFocus"/>
-
-							<TextBlock Text="Отступ справа"
-									   Grid.Column="0"
-									   Grid.Row="24"
-									   HorizontalAlignment="Center"
-									   VerticalAlignment="Center"/>
-
-							<TextBox Grid.Column="1"
-									 Grid.Row="24"
-									 Width="240"
-									 Height="30"
-									 MaxLength="5"
-									 HorizontalAlignment="Center"
-									 VerticalAlignment="Center"
-									 Watermark="Отступ справа"
-									 Text="{Binding CurrentGost.ListLevel3BulletIndentRight, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
-									 TextInput="OnTextInput_NumberOnly"
-									 LostFocus="OnLineSpacingGenericLostFocus"/>
-
-							<!-- Отступы 4-го уровня -->
-
-							<TextBlock Text="Отступы 4-го уровня"
-									   FontSize="16"
-									   FontWeight="Bold"
-									   Grid.Column="0"
-									   Grid.Row="25"
-									   Grid.ColumnSpan="2"
-									   HorizontalAlignment="Center"
-									   VerticalAlignment="Center"/>
-
-							<TextBlock Text="Тип отступа первой строки"
-									   Grid.Column="0"
-									   Grid.Row="26"
-									   HorizontalAlignment="Center"
-									   VerticalAlignment="Center"/>
-
-							<ComboBox Grid.Column="1"
-									  Grid.Row="26"
-									  Width="240"
-									  Height="30"
-									  HorizontalAlignment="Center"
-									  VerticalAlignment="Center"
-									  SelectedItem="{Binding CurrentGost.ListLevel4IndentOrOutdent, Mode=TwoWay}">
-								<ComboBox.Items>
-									<x:String>Отступ</x:String>
-									<x:String>Выступ</x:String>
-									<x:String>Нет</x:String>
-								</ComboBox.Items>
-							</ComboBox>
-
-							<TextBlock Text="Отступ 4-го уровня"
-									   Grid.Column="0"
-									   Grid.Row="27"
-									   HorizontalAlignment="Center"
-									   VerticalAlignment="Center"/>
-
-							<TextBox Grid.Column="1"
-									 Grid.Row="27"
-									 Width="240"
-									 Height="30"
-									 MaxLength="5"
-									 HorizontalAlignment="Center"
-									 VerticalAlignment="Center"
-									 Watermark="Отступ 4-го уровня"
-									 Text="{Binding CurrentGost.ListLevel4Indent, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
-									 TextInput="OnTextInput_NumberOnly"
-									 LostFocus="OnLineSpacingGenericLostFocus"/>
-
-							<TextBlock Text="Отступ слева"
-									   Grid.Column="0"
-									   Grid.Row="28"
-									   HorizontalAlignment="Center"
-									   VerticalAlignment="Center"/>
-
-							<TextBox Grid.Column="1"
-									 Grid.Row="28"
-									 Width="240"
-									 Height="30"
-									 MaxLength="5"
-									 HorizontalAlignment="Center"
-									 VerticalAlignment="Center"
-									 Watermark="Отступ слева"
-									 Text="{Binding CurrentGost.ListLevel4BulletIndentLeft, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
-									 TextInput="OnTextInput_NumberOnly"
-									 LostFocus="OnLineSpacingGenericLostFocus"/>
-
-							<TextBlock Text="Отступ справа"
-									   Grid.Column="0"
-									   Grid.Row="29"
-									   HorizontalAlignment="Center"
-									   VerticalAlignment="Center"/>
-
-							<TextBox Grid.Column="1"
-									 Grid.Row="29"
-									 Width="240"
-									 Height="30"
-									 MaxLength="5"
-									 HorizontalAlignment="Center"
-									 VerticalAlignment="Center"
-									 Watermark="Отступ справа"
-									 Text="{Binding CurrentGost.ListLevel4BulletIndentRight, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
-									 TextInput="OnTextInput_NumberOnly"
-									 LostFocus="OnLineSpacingGenericLostFocus"/>
-
-							<!-- Отступы 5-го уровня -->
-							<TextBlock Text="Отступы 5-го уровня" 
-									   FontSize="16" 
-									   FontWeight="Bold" 
-									   Grid.Column="0" 
-									   Grid.Row="30" 
-									   Grid.ColumnSpan="2" 
-									   HorizontalAlignment="Center" 
-									   VerticalAlignment="Center"/>
-							
-							<TextBlock Text="Тип отступа первой строки" 
-									   Grid.Column="0" 
-									   Grid.Row="31" 
-									   HorizontalAlignment="Center" 
-									   VerticalAlignment="Center"/>
-							
-							<ComboBox Grid.Column="1" 
-									  Grid.Row="31" 
-									  Width="240" 
-									  Height="30" 
-									  HorizontalAlignment="Center" 
-									  VerticalAlignment="Center" 
-									  SelectedItem="{Binding CurrentGost.ListLevel5IndentOrOutdent, Mode=TwoWay}">
-								<ComboBox.Items>
-									<x:String>Отступ</x:String>
-									<x:String>Выступ</x:String>
-									<x:String>Нет</x:String>
-								</ComboBox.Items>
-							</ComboBox>
-							
-							<TextBlock Text="Отступ 5-го уровня" 
-									   Grid.Column="0" 
-									   Grid.Row="32" 
-									   HorizontalAlignment="Center" 
-									   VerticalAlignment="Center"/>
-							
-							<TextBox Grid.Column="1" 
-									 Grid.Row="32" 
-									 Width="240" 
-									 Height="30" 
-									 MaxLength="5" 
-									 HorizontalAlignment="Center" 
-									 VerticalAlignment="Center" 
-									 Watermark="Отступ 5-го уровня" 
-									 Text="{Binding CurrentGost.ListLevel5Indent, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}" 
-									 TextInput="OnTextInput_NumberOnly" 
-									 LostFocus="OnLineSpacingGenericLostFocus"/>
-							
-							<TextBlock Text="Отступ слева" 
-									   Grid.Column="0" 
-									   Grid.Row="33" 
-									   HorizontalAlignment="Center" 
-									   VerticalAlignment="Center"/>
-							
-							<TextBox Grid.Column="1" 
-									 Grid.Row="33"
-									 Width="240" 
-									 Height="30" 
-									 MaxLength="5" 
-									 HorizontalAlignment="Center" 
-									 VerticalAlignment="Center" 
-									 Watermark="Отступ слева"
-									 Text="{Binding CurrentGost.ListLevel5BulletIndentLeft, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}" 
-									 TextInput="OnTextInput_NumberOnly" 
-									 LostFocus="OnLineSpacingGenericLostFocus"/>
-							
-							<TextBlock Text="Отступ справа" 
-									   Grid.Column="0" 
-									   Grid.Row="34" 
-									   HorizontalAlignment="Center" 
-									   VerticalAlignment="Center"/>
-							
-							<TextBox Grid.Column="1"
-									 Grid.Row="34"
-									 Width="240"
-									 Height="30" 
-									 MaxLength="5" 
-									 HorizontalAlignment="Center" 
-									 VerticalAlignment="Center" 
-									 Watermark="Отступ справа" 
-									 Text="{Binding CurrentGost.ListLevel5BulletIndentRight, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}" 
-									 TextInput="OnTextInput_NumberOnly" 
-									 LostFocus="OnLineSpacingGenericLostFocus"/>
-
-
-							<!-- Отступы 6-го уровня -->
-							<TextBlock Text="Отступы 6-го уровня" 
-									   FontSize="16"
-									   FontWeight="Bold"
-									   Grid.Column="0" 
-									   Grid.Row="35"
-									   Grid.ColumnSpan="2"
-									   HorizontalAlignment="Center" 
-									   VerticalAlignment="Center"/>
-							
-							<TextBlock Text="Тип отступа первой строки"
-									   Grid.Column="0"
-									   Grid.Row="36" 
-									   HorizontalAlignment="Center"
-									   VerticalAlignment="Center"/>
-							<ComboBox Grid.Column="1" 
-									  Grid.Row="36" 
-									  Width="240" 
-									  Height="30"
-									  HorizontalAlignment="Center"
-									  VerticalAlignment="Center"
-									  SelectedItem="{Binding CurrentGost.ListLevel6IndentOrOutdent, Mode=TwoWay}">
-								<ComboBox.Items>
-									<x:String>Отступ</x:String>
-									<x:String>Выступ</x:String>
-									<x:String>Нет</x:String>
-								</ComboBox.Items>
-							</ComboBox>
-							
-							<TextBlock Text="Отступ 6-го уровня" 
-									   Grid.Column="0" 
-									   Grid.Row="37" 
-									   HorizontalAlignment="Center"
-									   VerticalAlignment="Center"/>
-							
-							<TextBox Grid.Column="1" 
-									 Grid.Row="37" 
-									 Width="240" 
-									 Height="30" 
-									 MaxLength="5" 
-									 HorizontalAlignment="Center"
-									 VerticalAlignment="Center"
-									 Watermark="Отступ 6-го уровня"
-									 Text="{Binding CurrentGost.ListLevel6Indent, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}" 
-									 TextInput="OnTextInput_NumberOnly" 
-									 LostFocus="OnLineSpacingGenericLostFocus"/>
-							
-							<TextBlock Text="Отступ слева" 
-									   Grid.Column="0"
-									   Grid.Row="38" 
-									   HorizontalAlignment="Center" 
-									   VerticalAlignment="Center"/>
-							
-							<TextBox Grid.Column="1" 
-									 Grid.Row="38" 
-									 Width="240"
-									 Height="30"
-									 MaxLength="5"
-									 HorizontalAlignment="Center"
-									 VerticalAlignment="Center" 
-									 Watermark="Отступ слева" 
-									 Text="{Binding CurrentGost.ListLevel6BulletIndentLeft, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}" 
-									 TextInput="OnTextInput_NumberOnly" 
-									 LostFocus="OnLineSpacingGenericLostFocus"/>
-							
-							<TextBlock Text="Отступ справа" 
-									   Grid.Column="0"
-									   Grid.Row="39" 
-									   HorizontalAlignment="Center"
-									   VerticalAlignment="Center"/>
-							
-							<TextBox Grid.Column="1"
-									 Grid.Row="39" 
-									 Width="240" 
-									 Height="30" 
-									 MaxLength="5" 
-									 HorizontalAlignment="Center" 
-									 VerticalAlignment="Center"
-									 Watermark="Отступ справа" 
-									 Text="{Binding CurrentGost.ListLevel6BulletIndentRight, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}" TextInput="OnTextInput_NumberOnly" LostFocus="OnLineSpacingGenericLostFocus"/>
-
-							<TextBlock Text="Отступы 7-го уровня" 
-									   FontSize="16" 
-									   FontWeight="Bold" 
-									   Grid.Column="0" 
-									   Grid.Row="40" 
-									   Grid.ColumnSpan="2" 
-									   HorizontalAlignment="Center" 
-									   VerticalAlignment="Center"/>
-							
-							<TextBlock Text="Тип отступа первой строки" 
-									   Grid.Column="0" 
-									   Grid.Row="41" 
-									   HorizontalAlignment="Center" 
-									   VerticalAlignment="Center"/>
-							
-							<ComboBox Grid.Column="1" 
-									  Grid.Row="41" 
-									  Width="240" 
-									  Height="30" 
-									  HorizontalAlignment="Center" 
-									  VerticalAlignment="Center" 
-									  SelectedItem="{Binding CurrentGost.ListLevel7IndentOrOutdent, Mode=TwoWay}">
-								<ComboBox.Items>
-									<x:String>Отступ</x:String>
-									<x:String>Выступ</x:String>
-									<x:String>Нет</x:String>
-								</ComboBox.Items>
-							</ComboBox>
-							
-							<TextBlock Text="Отступ 7-го уровня" 
-									   Grid.Column="0" 
-									   Grid.Row="42" 
-									   HorizontalAlignment="Center" 
-									   VerticalAlignment="Center"/>
-							
-							<TextBox Grid.Column="1" 
-									 Grid.Row="42" 
-									 Width="240" 
-									 Height="30" 
-									 MaxLength="5" 
-									 HorizontalAlignment="Center" 
-									 VerticalAlignment="Center" 									 
-									 Watermark="Отступ 7-го уровня" 
-									 Text="{Binding CurrentGost.ListLevel7Indent, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}" 
-									 TextInput="OnTextInput_NumberOnly" 
-									 LostFocus="OnLineSpacingGenericLostFocus"/>
-							
-							<TextBlock Text="Отступ слева" 
-									   Grid.Column="0" 
-									   Grid.Row="43" 
-									   HorizontalAlignment="Center" 
-									   VerticalAlignment="Center"/>
-							
-							<TextBox Grid.Column="1" 
-									 Grid.Row="43" 
-									 Width="240" 
-									 Height="30" 
-									 MaxLength="5" 
-									 HorizontalAlignment="Center" 
-									 VerticalAlignment="Center"
-									 Watermark="Отступ слева" 
-									 Text="{Binding CurrentGost.ListLevel7BulletIndentLeft, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}" 
-									 TextInput="OnTextInput_NumberOnly" 
-									 LostFocus="OnLineSpacingGenericLostFocus"/>
-							
-							<TextBlock Text="Отступ справа" 
-									   Grid.Column="0" 
-									   Grid.Row="44" 
-									   HorizontalAlignment="Center"
-									   VerticalAlignment="Center"/>
-							
-							<TextBox Grid.Column="1" 
-									 Grid.Row="44" 
-									 Width="240" 
-									 Height="30" 
-									 MaxLength="5" 
-									 HorizontalAlignment="Center"
-									 VerticalAlignment="Center" 
-									 Watermark="Отступ справа"
-									 Text="{Binding CurrentGost.ListLevel7BulletIndentRight, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
-									 TextInput="OnTextInput_NumberOnly"
-									 LostFocus="OnLineSpacingGenericLostFocus"/>
-
-							<!-- Отступы 8-го уровня -->
-							<TextBlock Text="Отступы 8-го уровня" 
-									   FontSize="16" 
-									   FontWeight="Bold" 
-									   Grid.Column="0" 
-									   Grid.Row="45" 
-									   Grid.ColumnSpan="2" 
-									   HorizontalAlignment="Center" 
-									   VerticalAlignment="Center"/>
-							
-							<TextBlock Text="Тип отступа первой строки"
-									   Grid.Column="0" 
-									   Grid.Row="46" 
-									   HorizontalAlignment="Center" 
-									   VerticalAlignment="Center"/>
-							
-							<ComboBox Grid.Column="1" 
-									  Grid.Row="46" 
-									  Width="240"
-									  Height="30" 
-									  HorizontalAlignment="Center" 
-									  VerticalAlignment="Center" 
-									  SelectedItem="{Binding CurrentGost.ListLevel8IndentOrOutdent, Mode=TwoWay}">
-								<ComboBox.Items>
-									<x:String>Отступ</x:String>
-									<x:String>Выступ</x:String>
-									<x:String>Нет</x:String>
-								</ComboBox.Items>
-							
-							</ComboBox>
-							
-							<TextBlock Text="Отступ 8-го уровня" 
-									   Grid.Column="0" 
-									   Grid.Row="47" 
-									   HorizontalAlignment="Center"
-									   VerticalAlignment="Center"/>
-							
-							<TextBox Grid.Column="1" 
-									 Grid.Row="47" 
-									 Width="240"
-									 Height="30"
-									 MaxLength="5" 
-									 HorizontalAlignment="Center"
-									 VerticalAlignment="Center" 
-									 Watermark="Отступ 8-го уровня" 
-									 Text="{Binding CurrentGost.ListLevel8Indent, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}" 
-									 TextInput="OnTextInput_NumberOnly" 
-									 LostFocus="OnLineSpacingGenericLostFocus"/>
-							
-							<TextBlock Text="Отступ слева" 
-									   Grid.Column="0" 
-									   Grid.Row="48" 
-									   HorizontalAlignment="Center" 
-									   VerticalAlignment="Center"/>
-							
-							<TextBox Grid.Column="1" 
-									 Grid.Row="48" 
-									 Width="240" 
-									 Height="30" 
-									 MaxLength="5"
-									 HorizontalAlignment="Center" 
-									 VerticalAlignment="Center" 
-									 Watermark="Отступ слева" 
-									 Text="{Binding CurrentGost.ListLevel8BulletIndentLeft, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}" 
-									 TextInput="OnTextInput_NumberOnly" 
-									 LostFocus="OnLineSpacingGenericLostFocus"/>
-							
-							<TextBlock Text="Отступ справа" 
-									   Grid.Column="0" 
-									   Grid.Row="49" 
-									   HorizontalAlignment="Center"
-									   VerticalAlignment="Center"/>
-							
-							<TextBox Grid.Column="1" 
-									 Grid.Row="49" 
-									 Width="240" 
-									 Height="30" 
-									 MaxLength="5" 
-									 HorizontalAlignment="Center" 
-									 VerticalAlignment="Center"
-									 Watermark="Отступ справа" 
-									 Text="{Binding CurrentGost.ListLevel8BulletIndentRight, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
-									 TextInput="OnTextInput_NumberOnly"
-									 LostFocus="OnLineSpacingGenericLostFocus"/>
-
-							<!-- Отступы 9-го уровня -->
-							
-							<TextBlock Text="Отступы 9-го уровня" 
-									   FontSize="16" 
-									   FontWeight="Bold"
-									   Grid.Column="0" 
-									   Grid.Row="50"
-									   Grid.ColumnSpan="2" 
-									   HorizontalAlignment="Center"
-									   VerticalAlignment="Center"/>
-							
-							<TextBlock Text="Тип отступа первой строки" 
-									   Grid.Column="0" 
-									   Grid.Row="51" 
-									   HorizontalAlignment="Center" 
-									   VerticalAlignment="Center"/>
-							
-							<ComboBox Grid.Column="1" 
-									  Grid.Row="51" 
-									  Width="240" 
-									  Height="30" 
-									  HorizontalAlignment="Center" 
-									  VerticalAlignment="Center" 
-									  SelectedItem="{Binding CurrentGost.ListLevel9IndentOrOutdent, Mode=TwoWay}">
-								<ComboBox.Items>
-									<x:String>Отступ</x:String>
-									<x:String>Выступ</x:String>
-									<x:String>Нет</x:String>
-								</ComboBox.Items>
-							</ComboBox>
-							
-							<TextBlock Text="Отступ 9-го уровня"
-									   Grid.Column="0"
-									   Grid.Row="52" 
-									   HorizontalAlignment="Center"
-									   VerticalAlignment="Center"/>
-							
-							<TextBox Grid.Column="1" 
-									 Grid.Row="52" 
-									 Width="240" 
-									 Height="30" 
-									 MaxLength="5" 
-									 HorizontalAlignment="Center" 
-									 VerticalAlignment="Center" 
-									 Watermark="Отступ 9-го уровня" 
-									 Text="{Binding CurrentGost.ListLevel9Indent, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}" 
-									 TextInput="OnTextInput_NumberOnly"
-									 LostFocus="OnLineSpacingGenericLostFocus"/>
-
-							<TextBlock Text="Отступ слева" 
-									   Grid.Column="0" 
-									   Grid.Row="53" 
-									   HorizontalAlignment="Center" 
-									   VerticalAlignment="Center"/>
-							
-							<TextBox Grid.Column="1" 
-									 Grid.Row="53" 
-									 Width="240" 
-									 Height="30" 
-									 MaxLength="5" 
-									 HorizontalAlignment="Center" 
-									 VerticalAlignment="Center" 
-									 Watermark="Отступ слева" 
-									 Text="{Binding CurrentGost.ListLevel9BulletIndentLeft, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}" 
-									 TextInput="OnTextInput_NumberOnly" 
-									 LostFocus="OnLineSpacingGenericLostFocus"/>
-							
-							<TextBlock Text="Отступ справа"
-									   Grid.Column="0"
-									   Grid.Row="54" 
-									   HorizontalAlignment="Center" 
-									   VerticalAlignment="Center"/>
-							
-							<TextBox Grid.Column="1" 
-									 Grid.Row="54"
-									 Width="240"
-									 Height="30"
-									 MaxLength="5"
-									 HorizontalAlignment="Center" 
-									 VerticalAlignment="Center" 
-									 Watermark="Отступ справа" 
-									 Text="{Binding CurrentGost.ListLevel9BulletIndentRight, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}" 
-									 TextInput="OnTextInput_NumberOnly"
-									 LostFocus="OnLineSpacingGenericLostFocus"/>
-									 				
-							<Border BorderThickness="0 2 0 0"
-									BorderBrush="Black"
-									Grid.Column="0"
-									Grid.Row="6"
-									Grid.ColumnSpan="2"/>
-
-							<Border BorderThickness="0 2 0 0"
-									BorderBrush="Black"
-									Grid.Column="0"
-									Grid.Row="9"
-									Grid.ColumnSpan="2"/>
-
-							<Border BorderThickness="0 2 0 2"
-									BorderBrush="Black"
-									Grid.Column="0"
-									Grid.Row="12"
-									Grid.ColumnSpan="2"/>
-
-							<Border BorderThickness="0 2 0 2"
-									BorderBrush="Black"
-									Grid.Column="0"
-									Grid.Row="14"
-									Grid.ColumnSpan="2"/>
-
-							<Border BorderThickness="0 0 2 0"
-									BorderBrush="Black"
-									Grid.Column="0"
-									Grid.Row="11"
-									Grid.ColumnSpan="1"
-									Grid.RowSpan="4"/>
-
-							<Border BorderThickness="0 0 2 0"
-									BorderBrush="Black"
-									Grid.Column="0"
-									Grid.Row="5"
-									Grid.ColumnSpan="1"
-									Grid.RowSpan="2"/>
-
-							<Border BorderThickness="0 0 2 0"
-									BorderBrush="Black"
-									Grid.Column="0"
-									Grid.Row="8"
-									Grid.ColumnSpan="1"
-									Grid.RowSpan="2"/>
-
-							<Border BorderThickness="0 2 0 2"
-									BorderBrush="Black"
-									Grid.Column="0"
-									Grid.Row="16"
-									Grid.ColumnSpan="2"
-									Grid.RowSpan="1"/>
-
-							<Border BorderThickness="2 0 0 0"
-									BorderBrush="Black"
-									Grid.Column="1"
-									Grid.Row="16"
-									Grid.ColumnSpan="1"
-									Grid.RowSpan="4"/>
-							
-							<Border BorderThickness="0 2 0 2"
-									BorderBrush="Black"
-									Grid.Column="0"
-									Grid.Row="18"
-									Grid.ColumnSpan="2"
-									Grid.RowSpan="1"/>
-
-							<Border BorderThickness="0 2 0 2"
-									BorderBrush="Black"
-									Grid.Column="0"
-									Grid.Row="20"
-									Grid.ColumnSpan="2"
-									Grid.RowSpan="1"/>
-
-							<Border BorderThickness="2 0 0 0"
-									BorderBrush="Black"
-									Grid.Column="1"
-									Grid.Row="21"
-									Grid.ColumnSpan="1"
-									Grid.RowSpan="4"/>
-
-							<Border BorderThickness="0 2 0 2"
-									BorderBrush="Black"
-									Grid.Column="0"
-									Grid.Row="22"
-									Grid.ColumnSpan="2"
-									Grid.RowSpan="1"/>
-
-							<Border BorderThickness="0 2 0 2"
-									BorderBrush="Black"
-									Grid.Column="0"
-									Grid.Row="24"
-									Grid.ColumnSpan="2"
-									Grid.RowSpan="1"/>
-
-
-
-
-
-							<Border BorderThickness="0 2 0 2"
-									BorderBrush="Black"
-									Grid.Column="0"
-									Grid.Row="26"
-									Grid.ColumnSpan="2"
-									Grid.RowSpan="1"/>
-
-							<Border BorderThickness="0 2 0 2"
-									BorderBrush="Black"
-									Grid.Column="0"
-									Grid.Row="28"
-									Grid.ColumnSpan="2"
-									Grid.RowSpan="1"/>
-
-							<Border BorderThickness="0 2 0 2"
-									BorderBrush="Black"
-									Grid.Column="0"
-									Grid.Row="30"
-									Grid.ColumnSpan="2"
-									Grid.RowSpan="1"/>
-
-							<Border BorderThickness="2 0 0 0"
-									BorderBrush="Black"
-									Grid.Column="1"
-									Grid.Row="26"
-									Grid.ColumnSpan="1"
-									Grid.RowSpan="4"/>
-							
-							<Border BorderThickness="0 2 0 2"
-									BorderBrush="Black"
-									Grid.Column="0"
-									Grid.Row="32"
-									Grid.ColumnSpan="2"
-									Grid.RowSpan="1"/>
-
-							<Border BorderThickness="0 2 0 2"
-									BorderBrush="Black"
-									Grid.Column="0"
-									Grid.Row="34"
-									Grid.ColumnSpan="2"
-									Grid.RowSpan="1"/>
-
-							<Border BorderThickness="0 2 0 2"
-									BorderBrush="Black"
-									Grid.Column="0"
-									Grid.Row="36"
-									Grid.ColumnSpan="2"
-									Grid.RowSpan="1"/>
-
-							<Border BorderThickness="2 0 0 0"
-									BorderBrush="Black"
-									Grid.Column="1"
-									Grid.Row="31"
-									Grid.ColumnSpan="1"
-									Grid.RowSpan="4"/>
-
-
-
-
-
-
-
-
-
-
-
-
-							<Border BorderThickness="0 2 0 2"
-									BorderBrush="Black"
-									Grid.Column="0"
-									Grid.Row="38"
-									Grid.ColumnSpan="2"
-									Grid.RowSpan="1"/>
-
-							<Border BorderThickness="0 2 0 2"
-									BorderBrush="Black"
-									Grid.Column="0"
-									Grid.Row="40"
-									Grid.ColumnSpan="2"
-									Grid.RowSpan="1"/>
-
-							<Border BorderThickness="2 0 0 0"
-									BorderBrush="Black"
-									Grid.Column="1"
-									Grid.Row="36"
-									Grid.ColumnSpan="1"
-									Grid.RowSpan="4"/>
-
-							<Border BorderThickness="0 2 0 2"
-									BorderBrush="Black"
-									Grid.Column="0"
-									Grid.Row="44"
-									Grid.ColumnSpan="2"
-									Grid.RowSpan="1"/>
-
-							<Border BorderThickness="0 2 0 2"
-									BorderBrush="Black"
-									Grid.Column="0"
-									Grid.Row="42"
-									Grid.ColumnSpan="2"
-									Grid.RowSpan="1"/>
-
-							<Border BorderThickness="2 0 0 0"
-									BorderBrush="Black"
-									Grid.Column="1"
-									Grid.Row="41"
-									Grid.ColumnSpan="1"
-									Grid.RowSpan="4"/>
-
-							<Border BorderThickness="0 2 0 2"
-									BorderBrush="Black"
-									Grid.Column="0"
-									Grid.Row="46"
-									Grid.ColumnSpan="2"
-									Grid.RowSpan="1"/>
-
-							<Border BorderThickness="0 2 0 2"
-									BorderBrush="Black"
-									Grid.Column="0"
-									Grid.Row="48"
-									Grid.ColumnSpan="2"
-									Grid.RowSpan="1"/>
-
-							<Border BorderThickness="2 0 0 0"
-									BorderBrush="Black"
-									Grid.Column="1"
-									Grid.Row="46"
-									Grid.ColumnSpan="1"
-									Grid.RowSpan="4"/>
-
-							<Border BorderThickness="0 2 0 2"
-									BorderBrush="Black"
-									Grid.Column="0"
-									Grid.Row="52"
-									Grid.ColumnSpan="2"
-									Grid.RowSpan="1"/>
-
-							<Border BorderThickness="0 2 0 2"
-									BorderBrush="Black"
-									Grid.Column="0"
-									Grid.Row="50"
-									Grid.ColumnSpan="2"
-									Grid.RowSpan="1"/>
-							
-							<Border BorderThickness="0 2 0 2"
-									BorderBrush="Black"
-									Grid.Column="0"
-									Grid.Row="54"
-									Grid.ColumnSpan="2"
-									Grid.RowSpan="1"/>
-
-							<Border BorderThickness="2 0 0 0"
-									BorderBrush="Black"
-									Grid.Column="1"
-									Grid.Row="51"
-									Grid.ColumnSpan="1"
-									Grid.RowSpan="4"/>
-							
-						</Grid>
-					</Border>
+
+								<TextBlock Text="Отступ 1-го уровня"
+										   Grid.Column="0"
+										   Grid.Row="12"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<TextBox Grid.Column="1"
+										 Grid.Row="12"
+										 Watermark="Отступ 1-го уровня"
+										 Width="240"
+										 Height="30"
+										 MaxLength="6"
+										 HorizontalAlignment="Center"
+										 VerticalAlignment="Center"
+										 Text="{Binding CurrentGost.ListLevel1Indent, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+										 TextInput="OnTextInput_NumberOnly"
+										 LostFocus="OnBulletFirstLineIndentLostFocus" 
+										 Name="ListLevel1IndentTextBox"
+										 TextChanged="OnBulletFirstLineIndentChanged"/>
+
+								<TextBlock Text="Отступ слева"
+										   Grid.Column="0"
+										   Grid.Row="13"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+								
+								<TextBox Grid.Column="1"
+										 Grid.Row="13"
+										 Watermark="Отступ слева"
+										 Width="240"
+										 Height="30"
+										 MaxLength="6"
+										 HorizontalAlignment="Center"
+										 VerticalAlignment="Center"
+										 Text="{Binding CurrentGost.ListLevel1BulletIndentLeft, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+										 TextInput="OnTextInput_NumberOnly"
+										 LostFocus="OnBulletMarginLeftRightLostFocus"
+										 Name="ListLevel1BulletIndentLeftTextBox"/>
+
+								<TextBlock Text="Отступ справа"
+										   Grid.Column="0"
+										   Grid.Row="14"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<TextBox Grid.Column="1"
+										 Grid.Row="14"
+										 Watermark="Отступ справа"
+										 Width="240"
+										 Height="30"
+										 MaxLength="6"
+										 HorizontalAlignment="Center"
+										 VerticalAlignment="Center"
+										 Text="{Binding CurrentGost.ListLevel1BulletIndentRight, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+										 TextInput="OnTextInput_NumberOnly"
+										 LostFocus="OnBulletMarginLeftRightLostFocus" 
+										 Name="ListLevel1BulletIndentRightTextBox"/>
+
+								<TextBlock Text="Отступы 2-го уровня"
+										   FontSize="16"
+										   FontWeight="Bold"
+										   Grid.Column="0"
+										   Grid.Row="15"
+										   Grid.ColumnSpan="2"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<TextBlock Text="Тип отступа первой строки"
+										   Grid.Column="0"
+										   Grid.Row="16"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<ComboBox Grid.Column="1"
+										  Grid.Row="16"
+										  Width="240"
+										  Height="30"
+										  HorizontalAlignment="Center"
+										  VerticalAlignment="Center"
+										  SelectedItem="{Binding CurrentGost.ListLevel2IndentOrOutdent, Mode=TwoWay}"
+										  SelectionChanged="OnBulletIndentTypeChanged"
+										  Name="ListLevel2IndentOrOutdent">
+									<ComboBox.Items>
+										<x:String>Отступ</x:String>
+										<x:String>Выступ</x:String>
+										<x:String>Нет</x:String>
+									</ComboBox.Items>
+								</ComboBox>
+
+								<TextBlock Text="Отступ 2-го уровня"
+										   Grid.Column="0"
+										   Grid.Row="17"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<TextBox Grid.Column="1"
+										 Grid.Row="17"
+										 Width="240"
+										 Height="30"
+										 MaxLength="6"
+										 HorizontalAlignment="Center"
+										 VerticalAlignment="Center"
+										 Watermark="Отступ 2-го уровня"
+										 Text="{Binding CurrentGost.ListLevel2Indent, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+										 TextInput="OnTextInput_NumberOnly"
+										 LostFocus="OnBulletFirstLineIndentLostFocus"
+										 Name="ListLevel2IndentTextBox" 
+										 TextChanged="OnBulletFirstLineIndentChanged"/>
+
+								<TextBlock Text="Отступ слева"
+										   Grid.Column="0"
+										   Grid.Row="18"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<TextBox Grid.Column="1"
+										 Grid.Row="18"
+										 Width="240"
+										 Height="30"
+										 MaxLength="6"
+										 HorizontalAlignment="Center"
+										 VerticalAlignment="Center"
+										 Watermark="Отступ слева"
+										 Text="{Binding CurrentGost.ListLevel2BulletIndentLeft, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+										 TextInput="OnTextInput_NumberOnly"
+										 LostFocus="OnBulletMarginLeftRightLostFocus"
+										 Name="ListLevel2BulletIndentLeftTextBox"/>
+
+								<TextBlock Text="Отступ справа"
+										   Grid.Column="0"
+										   Grid.Row="19"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<TextBox Grid.Column="1"
+										 Grid.Row="19"
+										 Width="240"
+										 Height="30"
+										 MaxLength="6"
+										 HorizontalAlignment="Center"
+										 VerticalAlignment="Center"
+										 Watermark="Отступ справа"
+										 Text="{Binding CurrentGost.ListLevel2BulletIndentRight, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+										 TextInput="OnTextInput_NumberOnly"
+										 LostFocus="OnBulletMarginLeftRightLostFocus"
+										 Name="ListLevel2BulletIndentRightTextBox"/>
+
+								<!-- Отступы 3-го уровня -->
+								<TextBlock Text="Отступы 3-го уровня"
+										   FontSize="16"
+										   FontWeight="Bold"
+										   Grid.Column="0"
+										   Grid.Row="20"
+										   Grid.ColumnSpan="2"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<TextBlock Text="Тип отступа первой строки"
+										   Grid.Column="0" Grid.Row="21"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<ComboBox Grid.Column="1" 
+										  Grid.Row="21"
+										  Width="240" 
+										  Height="30"
+										  HorizontalAlignment="Center"
+										  VerticalAlignment="Center"
+										  SelectedItem="{Binding CurrentGost.ListLevel3IndentOrOutdent, Mode=TwoWay}"
+										  SelectionChanged="OnBulletIndentTypeChanged"
+										  Name="ListLevel3IndentOrOutdent"> 
+									<ComboBox.Items>
+										<x:String>Отступ</x:String>
+										<x:String>Выступ</x:String>
+										<x:String>Нет</x:String>
+									</ComboBox.Items>
+								</ComboBox>
+
+								<TextBlock Text="Отступ 3-го уровня"
+										   Grid.Column="0"
+										   Grid.Row="22"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<TextBox Grid.Column="1"
+										 Grid.Row="22"
+										 Width="240"
+										 Height="30"
+										 MaxLength="6"
+										 HorizontalAlignment="Center"
+										 VerticalAlignment="Center"
+										 Watermark="Отступ 3-го уровня"
+										 Text="{Binding CurrentGost.ListLevel3Indent, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+										 TextInput="OnTextInput_NumberOnly"
+										 LostFocus="OnBulletFirstLineIndentLostFocus" 
+										 Name="ListLevel3IndentTextBox" 
+										 TextChanged="OnBulletFirstLineIndentChanged"/>
+
+								<TextBlock Text="Отступ слева"
+										   Grid.Column="0"
+										   Grid.Row="23"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<TextBox Grid.Column="1"
+										 Grid.Row="23"
+										 Width="240"
+										 Height="30"
+										 MaxLength="6"
+										 HorizontalAlignment="Center"
+										 VerticalAlignment="Center"
+										 Watermark="Отступ слева"
+										 Text="{Binding CurrentGost.ListLevel3BulletIndentLeft, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+										 TextInput="OnTextInput_NumberOnly"
+										 LostFocus="OnBulletMarginLeftRightLostFocus"
+										 Name="ListLevel3BulletIndentLeftTextBox"/>
+
+								<TextBlock Text="Отступ справа"
+										   Grid.Column="0"
+										   Grid.Row="24"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<TextBox Grid.Column="1"
+										 Grid.Row="24"
+										 Width="240"
+										 Height="30"
+										 MaxLength="6"
+										 HorizontalAlignment="Center"
+										 VerticalAlignment="Center"
+										 Watermark="Отступ справа"
+										 Text="{Binding CurrentGost.ListLevel3BulletIndentRight, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+										 TextInput="OnTextInput_NumberOnly"
+										 LostFocus="OnBulletMarginLeftRightLostFocus" 
+										 Name="ListLevel3BulletIndentRightTextBox"/>
+
+								<!-- Отступы 4-го уровня -->
+
+								<TextBlock Text="Отступы 4-го уровня"
+										   FontSize="16"
+										   FontWeight="Bold"
+										   Grid.Column="0"
+										   Grid.Row="25"
+										   Grid.ColumnSpan="2"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<TextBlock Text="Тип отступа первой строки"
+										   Grid.Column="0"
+										   Grid.Row="26"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<ComboBox Grid.Column="1"
+										  Grid.Row="26"
+										  Width="240"
+										  Height="30"
+										  HorizontalAlignment="Center"
+										  VerticalAlignment="Center"
+										  SelectedItem="{Binding CurrentGost.ListLevel4IndentOrOutdent, Mode=TwoWay}"
+										  SelectionChanged="OnBulletIndentTypeChanged"
+										  Name="ListLevel4IndentOrOutdent"> 
+									<ComboBox.Items>
+										<x:String>Отступ</x:String>
+										<x:String>Выступ</x:String>
+										<x:String>Нет</x:String>
+									</ComboBox.Items>
+								</ComboBox>
+
+								<TextBlock Text="Отступ 4-го уровня"
+										   Grid.Column="0"
+										   Grid.Row="27"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<TextBox Grid.Column="1"
+										 Grid.Row="27"
+										 Width="240"
+										 Height="30"
+										 MaxLength="6"
+										 HorizontalAlignment="Center"
+										 VerticalAlignment="Center"
+										 Watermark="Отступ 4-го уровня"
+										 Text="{Binding CurrentGost.ListLevel4Indent, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+										 TextInput="OnTextInput_NumberOnly"
+										 LostFocus="OnBulletFirstLineIndentLostFocus"
+										 Name="ListLevel4IndentTextBox" 
+										 TextChanged="OnBulletFirstLineIndentChanged"/>
+
+								<TextBlock Text="Отступ слева"
+										   Grid.Column="0"
+										   Grid.Row="28"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<TextBox Grid.Column="1"
+										 Grid.Row="28"
+										 Width="240"
+										 Height="30"
+										 MaxLength="6"
+										 HorizontalAlignment="Center"
+										 VerticalAlignment="Center"
+										 Watermark="Отступ слева"
+										 Text="{Binding CurrentGost.ListLevel4BulletIndentLeft, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+										 TextInput="OnTextInput_NumberOnly"
+										 LostFocus="OnBulletMarginLeftRightLostFocus"
+										 Name="ListLevel4BulletIndentLeftTextBox"/>
+
+								<TextBlock Text="Отступ справа"
+										   Grid.Column="0"
+										   Grid.Row="29"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<TextBox Grid.Column="1"
+										 Grid.Row="29"
+										 Width="240"
+										 Height="30"
+										 MaxLength="6"
+										 HorizontalAlignment="Center"
+										 VerticalAlignment="Center"
+										 Watermark="Отступ справа"
+										 Text="{Binding CurrentGost.ListLevel4BulletIndentRight, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+										 TextInput="OnTextInput_NumberOnly"
+										 LostFocus="OnBulletMarginLeftRightLostFocus"
+										 Name="ListLevel4BulletIndentRightTextBox"/>
+
+								<!-- Отступы 5-го уровня -->
+								<TextBlock Text="Отступы 5-го уровня"
+										   FontSize="16"
+										   FontWeight="Bold"
+										   Grid.Column="0"
+										   Grid.Row="30"
+										   Grid.ColumnSpan="2"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<TextBlock Text="Тип отступа первой строки"
+										   Grid.Column="0"
+										   Grid.Row="31"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<ComboBox Grid.Column="1"
+										  Grid.Row="31"
+										  Width="240"
+										  Height="30"
+										  HorizontalAlignment="Center"
+										  VerticalAlignment="Center"
+										  SelectedItem="{Binding CurrentGost.ListLevel5IndentOrOutdent, Mode=TwoWay}"
+										  SelectionChanged="OnBulletIndentTypeChanged"
+										  Name="ListLevel5IndentOrOutdent"> 
+									<ComboBox.Items>
+										<x:String>Отступ</x:String>
+										<x:String>Выступ</x:String>
+										<x:String>Нет</x:String>
+									</ComboBox.Items>
+								</ComboBox>
+
+								<TextBlock Text="Отступ 5-го уровня"
+										   Grid.Column="0"
+										   Grid.Row="32"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<TextBox Grid.Column="1"
+										 Grid.Row="32"
+										 Width="240"
+										 Height="30"
+										 MaxLength="6"
+										 HorizontalAlignment="Center"
+										 VerticalAlignment="Center"
+										 Watermark="Отступ 5-го уровня"
+										 Text="{Binding CurrentGost.ListLevel5Indent, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+										 TextInput="OnTextInput_NumberOnly"
+										 LostFocus="OnBulletFirstLineIndentLostFocus" 
+										 Name="ListLevel5IndentTextBox" 
+										 TextChanged="OnBulletFirstLineIndentChanged"/>
+
+								<TextBlock Text="Отступ слева"
+										   Grid.Column="0"
+										   Grid.Row="33"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<TextBox Grid.Column="1"
+										 Grid.Row="33"
+										 Width="240"
+										 Height="30"
+										 MaxLength="6"
+										 HorizontalAlignment="Center"
+										 VerticalAlignment="Center"
+										 Watermark="Отступ слева"
+										 Text="{Binding CurrentGost.ListLevel5BulletIndentLeft, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+										 TextInput="OnTextInput_NumberOnly"
+										 LostFocus="OnBulletMarginLeftRightLostFocus" 
+										 Name="ListLevel5BulletIndentLeftTextBox"/>
+
+								<TextBlock Text="Отступ справа"
+										   Grid.Column="0"
+										   Grid.Row="34"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<TextBox Grid.Column="1"
+										 Grid.Row="34"
+										 Width="240"
+										 Height="30"
+										 MaxLength="6"
+										 HorizontalAlignment="Center"
+										 VerticalAlignment="Center"
+										 Watermark="Отступ справа"
+										 Text="{Binding CurrentGost.ListLevel5BulletIndentRight, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+										 TextInput="OnTextInput_NumberOnly"
+										 LostFocus="OnBulletMarginLeftRightLostFocus"
+										 Name="ListLevel5BulletIndentRightTextBox"/>
+
+								<!-- Отступы 6-го уровня -->
+								<TextBlock Text="Отступы 6-го уровня"
+										   FontSize="16"
+										   FontWeight="Bold"
+										   Grid.Column="0"
+										   Grid.Row="35"
+										   Grid.ColumnSpan="2"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<TextBlock Text="Тип отступа первой строки"
+										   Grid.Column="0"
+										   Grid.Row="36"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<ComboBox Grid.Column="1"
+										  Grid.Row="36"
+										  Width="240"
+										  Height="30"
+										  HorizontalAlignment="Center"
+										  VerticalAlignment="Center"
+										  SelectedItem="{Binding CurrentGost.ListLevel6IndentOrOutdent, Mode=TwoWay}"
+										  SelectionChanged="OnBulletIndentTypeChanged"
+										  Name="ListLevel6IndentOrOutdent"> 
+									<ComboBox.Items>
+										<x:String>Отступ</x:String>
+										<x:String>Выступ</x:String>
+										<x:String>Нет</x:String>
+									</ComboBox.Items>
+								</ComboBox>
+
+								<TextBlock Text="Отступ 6-го уровня"
+										   Grid.Column="0"
+										   Grid.Row="37"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<TextBox Grid.Column="1"
+										 Grid.Row="37"
+										 Width="240"
+										 Height="30"
+										 MaxLength="6"
+										 HorizontalAlignment="Center"
+										 VerticalAlignment="Center"
+										 Watermark="Отступ 6-го уровня"
+										 Text="{Binding CurrentGost.ListLevel6Indent, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+										 TextInput="OnTextInput_NumberOnly"
+										 LostFocus="OnBulletFirstLineIndentLostFocus" 
+										 Name="ListLevel6IndentTextBox"
+										 TextChanged="OnBulletFirstLineIndentChanged"/>
+
+								<TextBlock Text="Отступ слева"
+										   Grid.Column="0"
+										   Grid.Row="38"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<TextBox Grid.Column="1"
+										 Grid.Row="38"
+										 Width="240"
+										 Height="30"
+										 MaxLength="6"
+										 HorizontalAlignment="Center"
+										 VerticalAlignment="Center"
+										 Watermark="Отступ слева"
+										 Text="{Binding CurrentGost.ListLevel6BulletIndentLeft, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+										 TextInput="OnTextInput_NumberOnly"
+										 LostFocus="OnBulletMarginLeftRightLostFocus" 
+										 Name="ListLevel6BulletIndentLeftTextBox"/>
+
+								<TextBlock Text="Отступ справа"
+										   Grid.Column="0"
+										   Grid.Row="39"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+								
+								<TextBox Grid.Column="1"
+										 Grid.Row="39"
+										 Width="240"
+										 Height="30"
+										 MaxLength="6"
+										 HorizontalAlignment="Center"
+										 VerticalAlignment="Center"
+										 Watermark="Отступ справа"
+										 Text="{Binding CurrentGost.ListLevel6BulletIndentRight, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+										 TextInput="OnTextInput_NumberOnly"
+										 LostFocus="OnBulletMarginLeftRightLostFocus"
+										 Name="ListLevel6BulletIndentRightTextBox"/>
+								
+								<TextBlock Text="Отступы 7-го уровня"
+										   FontSize="16"
+										   FontWeight="Bold"
+										   Grid.Column="0"
+										   Grid.Row="40"
+										   Grid.ColumnSpan="2"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<TextBlock Text="Тип отступа первой строки"
+										   Grid.Column="0"
+										   Grid.Row="41"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<ComboBox Grid.Column="1"
+										  Grid.Row="41"
+										  Width="240"
+										  Height="30"
+										  HorizontalAlignment="Center"
+										  VerticalAlignment="Center"
+										  SelectedItem="{Binding CurrentGost.ListLevel7IndentOrOutdent, Mode=TwoWay}"
+										  SelectionChanged="OnBulletIndentTypeChanged"
+										  Name="ListLevel7IndentOrOutdent"> 
+									<ComboBox.Items>
+										<x:String>Отступ</x:String>
+										<x:String>Выступ</x:String>
+										<x:String>Нет</x:String>
+									</ComboBox.Items>
+								</ComboBox>
+
+								<TextBlock Text="Отступ 7-го уровня"
+										   Grid.Column="0"
+										   Grid.Row="42"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<TextBox Grid.Column="1"
+										 Grid.Row="42"
+										 Width="240"
+										 Height="30"
+										 MaxLength="6"
+										 HorizontalAlignment="Center"
+										 VerticalAlignment="Center"
+										 Watermark="Отступ 7-го уровня"
+										 Text="{Binding CurrentGost.ListLevel7Indent, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+										 TextInput="OnTextInput_NumberOnly"
+										 LostFocus="OnBulletFirstLineIndentLostFocus"
+										 Name="ListLevel7IndentTextBox" 
+										 TextChanged="OnBulletFirstLineIndentChanged"/>
+
+								<TextBlock Text="Отступ слева"
+										   Grid.Column="0"
+										   Grid.Row="43"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<TextBox Grid.Column="1"
+										 Grid.Row="43"
+										 Width="240"
+										 Height="30"
+										 MaxLength="6"
+										 HorizontalAlignment="Center"
+										 VerticalAlignment="Center"
+										 Watermark="Отступ слева"
+										 Text="{Binding CurrentGost.ListLevel7BulletIndentLeft, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+										 TextInput="OnTextInput_NumberOnly"
+										 LostFocus="OnBulletMarginLeftRightLostFocus" 
+										 Name="ListLevel7BulletIndentLeftTextBox"/>
+
+								<TextBlock Text="Отступ справа"
+										   Grid.Column="0"
+										   Grid.Row="44"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<TextBox Grid.Column="1"
+										 Grid.Row="44"
+										 Width="240"
+										 Height="30"
+										 MaxLength="6"
+										 HorizontalAlignment="Center"
+										 VerticalAlignment="Center"
+										 Watermark="Отступ справа"
+										 Text="{Binding CurrentGost.ListLevel7BulletIndentRight, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+										 TextInput="OnTextInput_NumberOnly"
+										 LostFocus="OnBulletMarginLeftRightLostFocus"
+										 Name="ListLevel7BulletIndentRightTextBox"/>
+
+								<!-- Отступы 8-го уровня -->
+								<TextBlock Text="Отступы 8-го уровня"
+										   FontSize="16"
+										   FontWeight="Bold"
+										   Grid.Column="0"
+										   Grid.Row="45"
+										   Grid.ColumnSpan="2"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<TextBlock Text="Тип отступа первой строки"
+										   Grid.Column="0"
+										   Grid.Row="46"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<ComboBox Grid.Column="1"
+										  Grid.Row="46"
+										  Width="240"
+										  Height="30"
+										  HorizontalAlignment="Center"
+										  VerticalAlignment="Center"
+										  SelectedItem="{Binding CurrentGost.ListLevel8IndentOrOutdent, Mode=TwoWay}"
+										  SelectionChanged="OnBulletIndentTypeChanged"
+										  Name="ListLevel8IndentOrOutdent"> 
+									<ComboBox.Items>
+										<x:String>Отступ</x:String>
+										<x:String>Выступ</x:String>
+										<x:String>Нет</x:String>
+									</ComboBox.Items>
+								</ComboBox>
+
+								<TextBlock Text="Отступ 8-го уровня"
+										   Grid.Column="0"
+										   Grid.Row="47"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<TextBox Grid.Column="1"
+										 Grid.Row="47"
+										 Width="240"
+										 Height="30"
+										 MaxLength="6"
+										 HorizontalAlignment="Center"
+										 VerticalAlignment="Center"
+										 Watermark="Отступ 8-го уровня"
+										 Text="{Binding CurrentGost.ListLevel8Indent, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+										 TextInput="OnTextInput_NumberOnly"
+										 LostFocus="OnBulletFirstLineIndentLostFocus" 
+										 Name="ListLevel8IndentTextBox"
+										 TextChanged="OnBulletFirstLineIndentChanged"/>
+
+								<TextBlock Text="Отступ слева"
+										   Grid.Column="0"
+										   Grid.Row="48"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<TextBox Grid.Column="1"
+										 Grid.Row="48"
+										 Width="240"
+										 Height="30"
+										 MaxLength="6"
+										 HorizontalAlignment="Center"
+										 VerticalAlignment="Center"
+										 Watermark="Отступ слева"
+										 Text="{Binding CurrentGost.ListLevel8BulletIndentLeft, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+										 TextInput="OnTextInput_NumberOnly"
+										 LostFocus="OnBulletMarginLeftRightLostFocus"
+										 Name="ListLevel8BulletIndentLeftTextBox"/>
+
+								<TextBlock Text="Отступ справа"
+										   Grid.Column="0"
+										   Grid.Row="49"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<TextBox Grid.Column="1"
+										 Grid.Row="49"
+										 Width="240"
+										 Height="30"
+										 MaxLength="6"
+										 HorizontalAlignment="Center"
+										 VerticalAlignment="Center"
+										 Watermark="Отступ справа"
+										 Text="{Binding CurrentGost.ListLevel8BulletIndentRight, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+										 TextInput="OnTextInput_NumberOnly"
+										 LostFocus="OnBulletMarginLeftRightLostFocus" 
+										 Name="ListLevel8BulletIndentRightTextBox"/>
+
+								<!-- Отступы 9-го уровня -->
+
+								<TextBlock Text="Отступы 9-го уровня"
+										   FontSize="16"
+										   FontWeight="Bold"
+										   Grid.Column="0"
+										   Grid.Row="50"
+										   Grid.ColumnSpan="2"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<TextBlock Text="Тип отступа первой строки"
+										   Grid.Column="0"
+										   Grid.Row="51"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<ComboBox Grid.Column="1"
+										  Grid.Row="51"
+										  Width="240"
+										  Height="30"
+										  HorizontalAlignment="Center"
+										  VerticalAlignment="Center"
+										  SelectedItem="{Binding CurrentGost.ListLevel9IndentOrOutdent, Mode=TwoWay}"
+										  SelectionChanged="OnBulletIndentTypeChanged"
+										  Name="ListLevel9IndentOrOutdent"> 
+									<ComboBox.Items>
+										<x:String>Отступ</x:String>
+										<x:String>Выступ</x:String>
+										<x:String>Нет</x:String>
+									</ComboBox.Items>
+								</ComboBox>
+
+								<TextBlock Text="Отступ 9-го уровня"
+										   Grid.Column="0"
+										   Grid.Row="52"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<TextBox Grid.Column="1"
+										 Grid.Row="52"
+										 Width="240"
+										 Height="30"
+										 MaxLength="6"
+										 HorizontalAlignment="Center"
+										 VerticalAlignment="Center"
+										 Watermark="Отступ 9-го уровня"
+										 Text="{Binding CurrentGost.ListLevel9Indent, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+										 TextInput="OnTextInput_NumberOnly"
+										 LostFocus="OnBulletFirstLineIndentLostFocus" 
+										 Name="ListLevel9IndentTextBox" 
+										 TextChanged="OnBulletFirstLineIndentChanged"/>
+
+								<TextBlock Text="Отступ слева"
+										   Grid.Column="0"
+										   Grid.Row="53"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+
+								<TextBox Grid.Column="1"
+										 Grid.Row="53"
+										 Width="240"
+										 Height="30"
+										 MaxLength="6"
+										 HorizontalAlignment="Center"
+										 VerticalAlignment="Center"
+										 Watermark="Отступ слева"
+										 Text="{Binding CurrentGost.ListLevel9BulletIndentLeft, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+										 TextInput="OnTextInput_NumberOnly"
+										 LostFocus="OnBulletMarginLeftRightLostFocus"
+										 Name="ListLevel9BulletIndentLeftTextBox"/>
+
+								<TextBlock Text="Отступ справа"
+										   Grid.Column="0"
+										   Grid.Row="54"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"/>
+								
+								<TextBox Grid.Column="1"
+										 Grid.Row="54"
+										 Width="240"
+										 Height="30"
+										 MaxLength="6"
+										 HorizontalAlignment="Center"
+										 VerticalAlignment="Center"
+										 Watermark="Отступ справа"
+										 Text="{Binding CurrentGost.ListLevel9BulletIndentRight, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+										 TextInput="OnTextInput_NumberOnly"
+										 LostFocus="OnBulletMarginLeftRightLostFocus" 
+										 Name="ListLevel9BulletIndentRightTextBox"/>
+
+								<Border BorderThickness="0 2 0 0"
+										BorderBrush="Black"
+										Grid.Column="0"
+										Grid.Row="6"
+										Grid.ColumnSpan="2"/>
+
+								<Border BorderThickness="0 2 0 0"
+										BorderBrush="Black"
+										Grid.Column="0"
+										Grid.Row="9"
+										Grid.ColumnSpan="2"/>
+
+								<Border BorderThickness="0 2 0 2"
+										BorderBrush="Black"
+										Grid.Column="0"
+										Grid.Row="12"
+										Grid.ColumnSpan="2"/>
+
+								<Border BorderThickness="0 2 0 2"
+										BorderBrush="Black"
+										Grid.Column="0"
+										Grid.Row="14"
+										Grid.ColumnSpan="2"/>
+
+								<Border BorderThickness="0 0 2 0"
+										BorderBrush="Black"
+										Grid.Column="0"
+										Grid.Row="11"
+										Grid.ColumnSpan="1"
+										Grid.RowSpan="4"/>
+
+								<Border BorderThickness="0 0 2 0"
+										BorderBrush="Black"
+										Grid.Column="0"
+										Grid.Row="5"
+										Grid.ColumnSpan="1"
+										Grid.RowSpan="2"/>
+
+								<Border BorderThickness="0 0 2 0"
+										BorderBrush="Black"
+										Grid.Column="0"
+										Grid.Row="8"
+										Grid.ColumnSpan="1"
+										Grid.RowSpan="2"/>
+
+								<Border BorderThickness="0 2 0 2"
+										BorderBrush="Black"
+										Grid.Column="0"
+										Grid.Row="16"
+										Grid.ColumnSpan="2"
+										Grid.RowSpan="1"/>
+
+								<Border BorderThickness="2 0 0 0"
+										BorderBrush="Black"
+										Grid.Column="1"
+										Grid.Row="16"
+										Grid.ColumnSpan="1"
+										Grid.RowSpan="4"/>
+
+								<Border BorderThickness="0 2 0 2"
+										BorderBrush="Black"
+										Grid.Column="0"
+										Grid.Row="18"
+										Grid.ColumnSpan="2"
+										Grid.RowSpan="1"/>
+
+								<Border BorderThickness="0 2 0 2"
+										BorderBrush="Black"
+										Grid.Column="0"
+										Grid.Row="20"
+										Grid.ColumnSpan="2"
+										Grid.RowSpan="1"/>
+
+								<Border BorderThickness="2 0 0 0"
+										BorderBrush="Black"
+										Grid.Column="1"
+										Grid.Row="21"
+										Grid.ColumnSpan="1"
+										Grid.RowSpan="4"/>
+
+								<Border BorderThickness="0 2 0 2"
+										BorderBrush="Black"
+										Grid.Column="0"
+										Grid.Row="22"
+										Grid.ColumnSpan="2"
+										Grid.RowSpan="1"/>
+
+								<Border BorderThickness="0 2 0 2"
+										BorderBrush="Black"
+										Grid.Column="0"
+										Grid.Row="24"
+										Grid.ColumnSpan="2"
+										Grid.RowSpan="1"/>
+
+								<Border BorderThickness="0 2 0 2"
+										BorderBrush="Black"
+										Grid.Column="0"
+										Grid.Row="26"
+										Grid.ColumnSpan="2"
+										Grid.RowSpan="1"/>
+
+								<Border BorderThickness="0 2 0 2"
+										BorderBrush="Black"
+										Grid.Column="0"
+										Grid.Row="28"
+										Grid.ColumnSpan="2"
+										Grid.RowSpan="1"/>
+
+								<Border BorderThickness="0 2 0 2"
+										BorderBrush="Black"
+										Grid.Column="0"
+										Grid.Row="30"
+										Grid.ColumnSpan="2"
+										Grid.RowSpan="1"/>
+
+								<Border BorderThickness="2 0 0 0"
+										BorderBrush="Black"
+										Grid.Column="1"
+										Grid.Row="26"
+										Grid.ColumnSpan="1"
+										Grid.RowSpan="4"/>
+
+								<Border BorderThickness="0 2 0 2"
+										BorderBrush="Black"
+										Grid.Column="0"
+										Grid.Row="32"
+										Grid.ColumnSpan="2"
+										Grid.RowSpan="1"/>
+
+								<Border BorderThickness="0 2 0 2"
+										BorderBrush="Black"
+										Grid.Column="0"
+										Grid.Row="34"
+										Grid.ColumnSpan="2"
+										Grid.RowSpan="1"/>
+
+								<Border BorderThickness="0 2 0 2"
+										BorderBrush="Black"
+										Grid.Column="0"
+										Grid.Row="36"
+										Grid.ColumnSpan="2"
+										Grid.RowSpan="1"/>
+
+								<Border BorderThickness="2 0 0 0"
+										BorderBrush="Black"
+										Grid.Column="1"
+										Grid.Row="31"
+										Grid.ColumnSpan="1"
+										Grid.RowSpan="4"/>
+
+								<Border BorderThickness="0 2 0 2"
+										BorderBrush="Black"
+										Grid.Column="0"
+										Grid.Row="38"
+										Grid.ColumnSpan="2"
+										Grid.RowSpan="1"/>
+
+								<Border BorderThickness="0 2 0 2"
+										BorderBrush="Black"
+										Grid.Column="0"
+										Grid.Row="40"
+										Grid.ColumnSpan="2"
+										Grid.RowSpan="1"/>
+
+								<Border BorderThickness="2 0 0 0"
+										BorderBrush="Black"
+										Grid.Column="1"
+										Grid.Row="36"
+										Grid.ColumnSpan="1"
+										Grid.RowSpan="4"/>
+
+								<Border BorderThickness="0 2 0 2"
+										BorderBrush="Black"
+										Grid.Column="0"
+										Grid.Row="44"
+										Grid.ColumnSpan="2"
+										Grid.RowSpan="1"/>
+
+								<Border BorderThickness="0 2 0 2"
+										BorderBrush="Black"
+										Grid.Column="0"
+										Grid.Row="42"
+										Grid.ColumnSpan="2"
+										Grid.RowSpan="1"/>
+
+								<Border BorderThickness="2 0 0 0"
+										BorderBrush="Black"
+										Grid.Column="1"
+										Grid.Row="41"
+										Grid.ColumnSpan="1"
+										Grid.RowSpan="4"/>
+
+								<Border BorderThickness="0 2 0 2"
+										BorderBrush="Black"
+										Grid.Column="0"
+										Grid.Row="46"
+										Grid.ColumnSpan="2"
+										Grid.RowSpan="1"/>
+
+								<Border BorderThickness="0 2 0 2"
+										BorderBrush="Black"
+										Grid.Column="0"
+										Grid.Row="48"
+										Grid.ColumnSpan="2"
+										Grid.RowSpan="1"/>
+
+								<Border BorderThickness="2 0 0 0"
+										BorderBrush="Black"
+										Grid.Column="1"
+										Grid.Row="46"
+										Grid.ColumnSpan="1"
+										Grid.RowSpan="4"/>
+
+								<Border BorderThickness="0 2 0 2"
+										BorderBrush="Black"
+										Grid.Column="0"
+										Grid.Row="52"
+										Grid.ColumnSpan="2"
+										Grid.RowSpan="1"/>
+
+								<Border BorderThickness="0 2 0 2"
+										BorderBrush="Black"
+										Grid.Column="0"
+										Grid.Row="50"
+										Grid.ColumnSpan="2"
+										Grid.RowSpan="1"/>
+
+								<Border BorderThickness="0 2 0 2"
+										BorderBrush="Black"
+										Grid.Column="0"
+										Grid.Row="54"
+										Grid.ColumnSpan="2"
+										Grid.RowSpan="1"/>
+
+								<Border BorderThickness="2 0 0 0"
+										BorderBrush="Black"
+										Grid.Column="1"
+										Grid.Row="51"
+										Grid.ColumnSpan="1"
+										Grid.RowSpan="4"/>
+
+							</Grid>
+						</Border>
 
 					</ScrollViewer>
 				</Grid>
 
 			</Border>
-
+								
 			<Border BorderThickness="2"
 					BorderBrush="Black"
 					Grid.Column="1"
@@ -1505,9 +1548,9 @@
 									 Height="30"
 									 HorizontalAlignment="Center"
 									 VerticalAlignment="Center"
-									 Text="{Binding CurrentGost.TableLineSpacingValue, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}}"
+									 Text="{Binding CurrentGost.TableLineSpacingValue, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter='132|0.03'}"
 									 TextInput="OnTextInput_NumberOnly"
-									 LostFocus="OnLineSpacingBoxLostFocus"/>
+									 LostFocus="OnTableLineSpacingLostFocus"/>
 
 							<Border BorderThickness="0 2 0 2"
 									BorderBrush="Black"
@@ -1535,7 +1578,7 @@
 									 Watermark="Перед"
 									 Width="240"
 									 Height="30"
-									 MaxLength="5"
+									 MaxLength="6"
 									 HorizontalAlignment="Center"
 									 VerticalAlignment="Center"
 									 Text="{Binding CurrentGost.TableLineSpacingBefore, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
@@ -1553,7 +1596,7 @@
 									 Watermark="После"
 									 Width="240"
 									 Height="30"
-									 MaxLength="5"
+									 MaxLength="6"
 									 HorizontalAlignment="Center"
 									 VerticalAlignment="Center"
 									 Text="{Binding CurrentGost.TableLineSpacingAfter, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
@@ -1587,7 +1630,8 @@
 									  VerticalAlignment="Center"
 									  Width="240"
 									  Height="30"
-									  SelectedItem="{Binding CurrentGost.TableIndentOrOutdent, Mode=TwoWay}">
+									  SelectedItem="{Binding CurrentGost.TableIndentOrOutdent, Mode=TwoWay}"
+									  SelectionChanged="OnTableIndentTypeChanged">
 								<ComboBox.Items>
 									<x:String>Отступ</x:String>
 									<x:String>Выступ</x:String>
@@ -1606,12 +1650,13 @@
 									 Watermark="Отступ первой строки"
 									 Width="240"
 									 Height="30"
-									 MaxLength="5"
+									 MaxLength="6"
 									 HorizontalAlignment="Center"
 									 VerticalAlignment="Center"
-									 Text="{Binding CurrentGost.TableFirstLineIndent, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+									 Text="{Binding CurrentGost.TableFirstLineIndent, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter='55.68|0'}"
 									 TextInput="OnTextInput_NumberOnly"
-									 LostFocus="OnLineSpacingGenericLostFocus"/>
+									 LostFocus="OnTableFirstLineIndentLostFocus"
+									 TextChanged="OnTableFirstLineIndentChanged"/>
 
 							<TextBlock Text="Отступ слева"
 									   Grid.Column="0"
@@ -1624,12 +1669,13 @@
 									 Watermark="Отступ слева"
 									 Width="240"
 									 Height="30"
-									 MaxLength="5"
+									 MaxLength="6"
 									 HorizontalAlignment="Center"
 									 VerticalAlignment="Center"
-									 Text="{Binding CurrentGost.TableIndentLeft, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+									 Text="{Binding CurrentGost.TableIndentLeft, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource DoubleClampConverter}, ConverterParameter='55.68|-55.68'}"
 									 TextInput="OnTextInput_NumberOnly"
-									 LostFocus="OnLineSpacingGenericLostFocus"/>
+									 LostFocus="OnTableMarginLeftRightLostFocus"
+									 Name="TableIndentLeftTextBox"/>
 
 							<TextBlock Text="Отступ справа"
 									   Grid.Column="0"
@@ -1642,12 +1688,13 @@
 									 Watermark="Отступ справа"
 									 Width="240"
 									 Height="30"
-									 MaxLength="5"
+									 MaxLength="6"
 									 HorizontalAlignment="Center"
 									 VerticalAlignment="Center"
-									 Text="{Binding CurrentGost.TableIndentRight, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+									 Text="{Binding CurrentGost.TableIndentRight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource DoubleClampConverter}, ConverterParameter='55.68|-55.68'}"
 									 TextInput="OnTextInput_NumberOnly"
-									 LostFocus="OnLineSpacingGenericLostFocus"/>
+									 LostFocus="OnTableMarginLeftRightLostFocus"
+									 Name="TableIndentRightTextBox"/>
 
 							<Border BorderThickness="0 2 0 0"
 									BorderBrush="Black"
@@ -1696,9 +1743,9 @@
 						</Grid>
 					</Border>
 				</Grid>
-			
-			</Border>
 
+			</Border>				
+			
 			<Border BorderThickness="2"
 					BorderBrush="Black"
 					Grid.Column="1"
@@ -1947,9 +1994,9 @@
 										 Height="30"
 										 HorizontalAlignment="Center"
 										 VerticalAlignment="Center"
-										 Text="{Binding CurrentGost.TableCaptionLineSpacingValue, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}}"
+										 Text="{Binding CurrentGost.TableCaptionLineSpacingValue, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter='132|0.03'}"
 										 TextInput="OnTextInput_NumberOnly"
-										 LostFocus="OnLineSpacingBoxLostFocus"/>
+										 LostFocus="OnTableCaptionLineSpacingLostFocus"/>
 
 								<Border BorderThickness="0 2 0 2"
 										BorderBrush="Black"
@@ -2023,13 +2070,14 @@
 										   HorizontalAlignment="Center"
 										   VerticalAlignment="Center"/>
 
-								<ComboBox Grid.Column="1"
-										  Grid.Row="11"
-										  HorizontalAlignment="Center"
+								<ComboBox HorizontalAlignment="Center"
 										  VerticalAlignment="Center"
 										  Width="240"
 										  Height="30"
-										  SelectedItem="{Binding CurrentGost.TableCaptionIndentOrOutdent, Mode=TwoWay}">
+										  Grid.Column="1"
+										  Grid.Row="11"
+										  SelectedItem="{Binding CurrentGost.TableCaptionIndentOrOutdent, Mode=TwoWay}"
+										  SelectionChanged="OnTableCaptionIndentTypeChanged">
 									<ComboBox.Items>
 										<x:String>Отступ</x:String>
 										<x:String>Выступ</x:String>
@@ -2048,30 +2096,32 @@
 										 Watermark="Отступ первой строки"
 										 Width="240"
 										 Height="30"
-										 MaxLength="5"
+										 MaxLength="6"
 										 HorizontalAlignment="Center"
 										 VerticalAlignment="Center"
-										 Text="{Binding CurrentGost.TableCaptionFirstLineIndent, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+										 Text="{Binding CurrentGost.TableCaptionFirstLineIndent, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter='55.68|0'}"
 										 TextInput="OnTextInput_NumberOnly"
-										 LostFocus="OnLineSpacingGenericLostFocus"/>
+										 LostFocus="OnTableCaptionFirstLineIndentLostFocus"
+										 TextChanged="OnTableCaptionFirstLineIndentChanged"/>
 
 								<TextBlock Text="Отступ слева"
 										   Grid.Column="0"
 										   Grid.Row="13"
 										   HorizontalAlignment="Center"
 										   VerticalAlignment="Center"/>
-
+								
 								<TextBox Grid.Column="1"
 										 Grid.Row="13"
 										 Watermark="Отступ слева"
 										 Width="240"
 										 Height="30"
-										 MaxLength="5"
+										 MaxLength="6"
 										 HorizontalAlignment="Center"
 										 VerticalAlignment="Center"
-										 Text="{Binding CurrentGost.TableCaptionIndentLeft, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+										 Text="{Binding CurrentGost.TableCaptionIndentLeft, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource DoubleClampConverter}, ConverterParameter='55.68|-55.68'}"
 										 TextInput="OnTextInput_NumberOnly"
-										 LostFocus="OnLineSpacingGenericLostFocus"/>
+										 LostFocus="OnTableCaptionMarginLeftRightLostFocus"
+										 Name="TableCaptionIndentLeftTextBox"/>
 
 								<TextBlock Text="Отступ справа"
 										   Grid.Column="0"
@@ -2084,12 +2134,13 @@
 										 Watermark="Отступ справа"
 										 Width="240"
 										 Height="30"
-										 MaxLength="5"
+										 MaxLength="6"
 										 HorizontalAlignment="Center"
 										 VerticalAlignment="Center"
-										 Text="{Binding CurrentGost.TableCaptionIndentRight, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+										 Text="{Binding CurrentGost.TableCaptionIndentRight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource DoubleClampConverter}, ConverterParameter='55.68|-55.68'}"
 										 TextInput="OnTextInput_NumberOnly"
-										 LostFocus="OnLineSpacingGenericLostFocus"/>
+										 LostFocus="OnTableCaptionMarginLeftRightLostFocus"
+										 Name="TableCaptionIndentRightTextBox"/>
 
 								<Border BorderThickness="0 2 0 0"
 										BorderBrush="Black"
@@ -2140,7 +2191,7 @@
 					</Border>
 				</Grid>
 			</Border>
-
+			
 			<Border BorderThickness="2"
 					BorderBrush="Black"
 					Grid.Column="1"
@@ -2369,9 +2420,9 @@
 										  Height="30"
 										  SelectedItem="{Binding CurrentGost.ImageCaptionLineSpacingType, Mode=TwoWay}">
 									<ComboBox.Items>
-											<x:String>Множитель</x:String>
-											<x:String>Минимум</x:String>
-											<x:String>Точно</x:String>
+										<x:String>Множитель</x:String>
+										<x:String>Минимум</x:String>
+										<x:String>Точно</x:String>
 									</ComboBox.Items>
 								</ComboBox>
 
@@ -2389,9 +2440,9 @@
 										 Height="30"
 										 HorizontalAlignment="Center"
 										 VerticalAlignment="Center"
-										 Text="{Binding CurrentGost.ImageCaptionLineSpacingValue, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}}"
+										 Text="{Binding CurrentGost.ImageCaptionLineSpacingValue, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter='132|0.03'}"
 										 TextInput="OnTextInput_NumberOnly"
-										 LostFocus="OnLineSpacingBoxLostFocus"/>
+										 LostFocus="OnImageCaptionLineSpacingLostFocus"/>
 
 								<Border BorderThickness="0 2 0 2"
 										BorderBrush="Black"
@@ -2419,7 +2470,7 @@
 										 Watermark="Перед"
 										 Width="240"
 										 Height="30"
-										 MaxLength="5"
+										 MaxLength="6"
 										 HorizontalAlignment="Center"
 										 VerticalAlignment="Center"
 										 Text="{Binding CurrentGost.ImageCaptionLineSpacingBefore, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
@@ -2437,7 +2488,7 @@
 										 Watermark="После"
 										 Width="240"
 										 Height="30"
-										 MaxLength="5"
+										 MaxLength="6"
 										 HorizontalAlignment="Center"
 										 VerticalAlignment="Center"
 										 Text="{Binding CurrentGost.ImageCaptionLineSpacingAfter, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
@@ -2465,17 +2516,18 @@
 										   HorizontalAlignment="Center"
 										   VerticalAlignment="Center"/>
 
-								<ComboBox Grid.Column="1"
-										  Grid.Row="11"
-										  HorizontalAlignment="Center"
+								<ComboBox HorizontalAlignment="Center"
 										  VerticalAlignment="Center"
 										  Width="240"
 										  Height="30"
-										  SelectedItem="{Binding CurrentGost.ImageCaptionIndentOrOutdent, Mode=TwoWay}">
+										  Grid.Column="1"
+										  Grid.Row="11"
+										  SelectedItem="{Binding CurrentGost.ImageCaptionIndentOrOutdent, Mode=TwoWay}"
+										  SelectionChanged="OnImageCaptionIndentTypeChanged">
 									<ComboBox.Items>
-											<x:String>Отступ</x:String>
-											<x:String>Выступ</x:String>
-											<x:String>Нет</x:String>
+										<x:String>Отступ</x:String>
+										<x:String>Выступ</x:String>
+										<x:String>Нет</x:String>
 									</ComboBox.Items>
 								</ComboBox>
 
@@ -2490,12 +2542,13 @@
 										 Watermark="Отступ первой строки"
 										 Width="240"
 										 Height="30"
-										 MaxLength="5"
+										 MaxLength="6"
 										 HorizontalAlignment="Center"
 										 VerticalAlignment="Center"
-										 Text="{Binding CurrentGost.ImageCaptionFirstLineIndent, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+										 Text="{Binding CurrentGost.ImageCaptionFirstLineIndent, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter='55.68|0'}"
 										 TextInput="OnTextInput_NumberOnly"
-										 LostFocus="OnLineSpacingGenericLostFocus"/>
+										 LostFocus="OnImageCaptionFirstLineIndentLostFocus"
+										 TextChanged="OnImageCaptionFirstLineIndentChanged"/>
 
 								<TextBlock Text="Отступ слева"
 										   Grid.Column="0"
@@ -2508,12 +2561,13 @@
 										 Watermark="Отступ слева"
 										 Width="240"
 										 Height="30"
-										 MaxLength="5"
+										 MaxLength="6"
 										 HorizontalAlignment="Center"
 										 VerticalAlignment="Center"
-										 Text="{Binding CurrentGost.ImageCaptionIndentLeft, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+										 Text="{Binding CurrentGost.ImageCaptionIndentLeft, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource DoubleClampConverter}, ConverterParameter='55.68|-55.68'}"
 										 TextInput="OnTextInput_NumberOnly"
-										 LostFocus="OnLineSpacingGenericLostFocus"/>
+										 LostFocus="OnImageCaptionMarginLeftRightLostFocus"
+										 Name="ImageCaptionIndentLeftTextBox"/>
 
 								<TextBlock Text="Отступ справа"
 										   Grid.Column="0"
@@ -2526,12 +2580,13 @@
 										 Watermark="Отступ справа"
 										 Width="240"
 										 Height="30"
-										 MaxLength="5"
+										 MaxLength="6"
 										 HorizontalAlignment="Center"
 										 VerticalAlignment="Center"
-										 Text="{Binding CurrentGost.ImageCaptionIndentRight, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+										 Text="{Binding CurrentGost.ImageCaptionIndentRight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource DoubleClampConverter}, ConverterParameter='55.68|-55.68'}"
 										 TextInput="OnTextInput_NumberOnly"
-										 LostFocus="OnLineSpacingGenericLostFocus"/>
+										 LostFocus="OnImageCaptionMarginLeftRightLostFocus"
+										 Name="ImageCaptionIndentRightTextBox"/>
 
 								<Border BorderThickness="0 2 0 0"
 										BorderBrush="Black"
@@ -2583,7 +2638,7 @@
 					</Border>
 				</Grid>
 			</Border>
-
+						
 			<Border BorderThickness="2"
 					BorderBrush="Black"
 					Grid.Column="1"
@@ -2851,9 +2906,9 @@
 										 VerticalAlignment="Center"
 										 Grid.Column="1"
 										 Grid.Row="6"
-										 Text="{Binding CurrentGost.TocLineSpacing, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}}"
+										 Text="{Binding CurrentGost.TocLineSpacing, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter='132|0.03'}"
 										 TextInput="OnTextInput_NumberOnly"
-										 LostFocus="OnLineSpacingBoxLostFocus"/>
+										 LostFocus="OnTocLineSpacingLostFocus"/>
 
 								<Border BorderThickness="0 2 0 2"
 										BorderBrush="Black"
@@ -2880,7 +2935,7 @@
 								<TextBox Watermark="Перед"
 										 Width="240"
 										 Height="30"
-										 MaxLength="5"
+										 MaxLength="6"
 										 HorizontalAlignment="Center"
 										 VerticalAlignment="Center"
 										 Grid.Column="1"
@@ -2898,7 +2953,7 @@
 								<TextBox Watermark="После"
 										 Width="240"
 										 Height="30"
-										 MaxLength="5"
+										 MaxLength="6"
 										 HorizontalAlignment="Center"
 										 VerticalAlignment="Center"
 										 Grid.Column="1"
@@ -2935,7 +2990,8 @@
 										  Height="30"
 										  Grid.Column="1"
 										  Grid.Row="11"
-										  SelectedItem="{Binding CurrentGost.TocIndentOrOutdent, Mode=TwoWay}">
+										  SelectedItem="{Binding CurrentGost.TocIndentOrOutdent, Mode=TwoWay}"
+										  SelectionChanged="OnTocIndentTypeChanged">
 									<ComboBox.Items>
 										<x:String>Отступ</x:String>
 										<x:String>Выступ</x:String>
@@ -2948,36 +3004,38 @@
 										   VerticalAlignment="Center"
 										   Grid.Column="0"
 										   Grid.Row="12"/>
-
+								
 								<TextBox Watermark="Отступ первой строки"
 										 Width="240"
 										 Height="30"
-										 MaxLength="5"
+										 MaxLength="6"
 										 HorizontalAlignment="Center"
 										 VerticalAlignment="Center"
 										 Grid.Column="1"
 										 Grid.Row="12"
-										 Text="{Binding CurrentGost.TocFirstLineIndent, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+										 Text="{Binding CurrentGost.TocFirstLineIndent, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter='55.68|0'}"
 										 TextInput="OnTextInput_NumberOnly"
-										 LostFocus="OnLineSpacingGenericLostFocus"/>
+										 LostFocus="OnTocFirstLineIndentLostFocus"
+										 TextChanged="OnTocFirstLineIndentChanged"/>
 
 								<TextBlock Text="Отступ слева"
 										   HorizontalAlignment="Center"
 										   VerticalAlignment="Center"
 										   Grid.Column="0"
 										   Grid.Row="13"/>
-
+								
 								<TextBox Watermark="Отступ слева"
 										 Width="240"
 										 Height="30"
-										 MaxLength="5"
+										 MaxLength="6"
 										 HorizontalAlignment="Center"
 										 VerticalAlignment="Center"
 										 Grid.Column="1"
 										 Grid.Row="13"
-										 Text="{Binding CurrentGost.TocIndentLeft, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+										 Text="{Binding CurrentGost.TocIndentLeft, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource DoubleClampConverter}, ConverterParameter='55.68|-55.68'}"
 										 TextInput="OnTextInput_NumberOnly"
-										 LostFocus="OnLineSpacingGenericLostFocus"/>
+										 LostFocus="OnTocMarginLeftRightLostFocus"
+										 Name="TocIndentLeftTextBox"/>
 
 								<TextBlock Text="Отступ справа"
 										   HorizontalAlignment="Center"
@@ -2988,14 +3046,15 @@
 								<TextBox Watermark="Отступ справа"
 										 Width="240"
 										 Height="30"
-										 MaxLength="5"
+										 MaxLength="6"
 										 HorizontalAlignment="Center"
 										 VerticalAlignment="Center"
 										 Grid.Column="1"
 										 Grid.Row="14"
-										 Text="{Binding CurrentGost.TocIndentRight, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+										 Text="{Binding CurrentGost.TocIndentRight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource DoubleClampConverter}, ConverterParameter='55.68|-55.68'}"
 										 TextInput="OnTextInput_NumberOnly"
-										 LostFocus="OnLineSpacingGenericLostFocus"/>
+										 LostFocus="OnTocMarginLeftRightLostFocus"
+										 Name="TocIndentRightTextBox"/>
 
 								<Border BorderThickness="0 2 0 0"
 										BorderBrush="Black"
@@ -3046,11 +3105,11 @@
 										Grid.ColumnSpan="1"
 										Grid.RowSpan="2"/>
 							</Grid>
-						</Border>						
+						</Border>
 					</Border>
 				</Grid>
 			</Border>
-
+							
 			<Border BorderThickness="2"
 					BorderBrush="Black"
 					Grid.Column="1"
@@ -3318,9 +3377,9 @@
 										 VerticalAlignment="Center"
 										 Grid.Column="1"
 										 Grid.Row="6"
-										 Text="{Binding CurrentGost.AdditionalHeaderLineSpacingValue, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}}"
+										 Text="{Binding CurrentGost.AdditionalHeaderLineSpacingValue, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter='132|0.03'}"
 										 TextInput="OnTextInput_NumberOnly"
-										 LostFocus="OnLineSpacingBoxLostFocus"/>
+										 LostFocus="OnAdditionalHeaderLineSpacingLostFocus"/>
 
 								<Border BorderThickness="0 2 0 2"
 										BorderBrush="Black"
@@ -3347,7 +3406,7 @@
 								<TextBox Watermark="Перед"
 										 Width="240"
 										 Height="30"
-										 MaxLength="5"
+										 MaxLength="6"
 										 HorizontalAlignment="Center"
 										 VerticalAlignment="Center"
 										 Grid.Column="1"
@@ -3365,7 +3424,7 @@
 								<TextBox Watermark="После"
 										 Width="240"
 										 Height="30"
-										 MaxLength="5"
+										 MaxLength="6"
 										 HorizontalAlignment="Center"
 										 VerticalAlignment="Center"
 										 Grid.Column="1"
@@ -3402,7 +3461,8 @@
 										  Height="30"
 										  Grid.Column="1"
 										  Grid.Row="11"
-										  SelectedItem="{Binding CurrentGost.AdditionalHeaderIndentOrOutdent, Mode=TwoWay}">
+										  SelectedItem="{Binding CurrentGost.AdditionalHeaderIndentOrOutdent, Mode=TwoWay}"
+										  SelectionChanged="OnAdditionalHeaderIndentTypeChanged">
 									<ComboBox.Items>
 										<x:String>Отступ</x:String>
 										<x:String>Выступ</x:String>
@@ -3419,14 +3479,15 @@
 								<TextBox Watermark="Отступ первой строки"
 										 Width="240"
 										 Height="30"
-										 MaxLength="5"
+										 MaxLength="6"
 										 HorizontalAlignment="Center"
 										 VerticalAlignment="Center"
 										 Grid.Column="1"
 										 Grid.Row="12"
-										 Text="{Binding CurrentGost.AdditionalHeaderFirstLineIndent, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+										 Text="{Binding CurrentGost.AdditionalHeaderFirstLineIndent, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter='55.68|0'}"
 										 TextInput="OnTextInput_NumberOnly"
-										 LostFocus="OnLineSpacingGenericLostFocus"/>
+										 LostFocus="OnAdditionalHeaderFirstLineIndentLostFocus"
+										 TextChanged="OnAdditionalHeaderFirstLineIndentChanged"/>
 
 								<TextBlock Text="Отступ слева"
 										   HorizontalAlignment="Center"
@@ -3437,14 +3498,15 @@
 								<TextBox Watermark="Отступ слева"
 										 Width="240"
 										 Height="30"
-										 MaxLength="5"
+										 MaxLength="6"
 										 HorizontalAlignment="Center"
 										 VerticalAlignment="Center"
 										 Grid.Column="1"
 										 Grid.Row="13"
-										 Text="{Binding CurrentGost.AdditionalHeaderIndentLeft, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+										 Text="{Binding CurrentGost.AdditionalHeaderIndentLeft, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource DoubleClampConverter}, ConverterParameter='55.68|-55.68'}"
 										 TextInput="OnTextInput_NumberOnly"
-										 LostFocus="OnLineSpacingGenericLostFocus"/>
+										 LostFocus="OnAdditionalHeaderMarginLeftRightLostFocus"
+										 Name="AdditionalHeaderIndentLeftTextBox"/>
 
 								<TextBlock Text="Отступ справа"
 										   HorizontalAlignment="Center"
@@ -3455,14 +3517,15 @@
 								<TextBox Watermark="Отступ справа"
 										 Width="240"
 										 Height="30"
-										 MaxLength="5"
+										 MaxLength="6"
 										 HorizontalAlignment="Center"
 										 VerticalAlignment="Center"
 										 Grid.Column="1"
 										 Grid.Row="14"
-										 Text="{Binding CurrentGost.AdditionalHeaderIndentRight, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+										 Text="{Binding CurrentGost.AdditionalHeaderIndentRight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource DoubleClampConverter}, ConverterParameter='55.68|-55.68'}"
 										 TextInput="OnTextInput_NumberOnly"
-										 LostFocus="OnLineSpacingGenericLostFocus"/>
+										 LostFocus="OnAdditionalHeaderMarginLeftRightLostFocus"
+										 Name="AdditionalHeaderIndentRightTextBox"/>
 
 								<Border BorderThickness="0 2 0 0"
 										BorderBrush="Black"
@@ -3514,11 +3577,11 @@
 										Grid.RowSpan="2"/>
 							</Grid>
 						</Border>
-						
+
 					</Border>
 				</Grid>
 			</Border>
-
+					
 			<Border BorderThickness="2"
 					BorderBrush="Black"
 					Grid.Column="1"
@@ -3539,7 +3602,6 @@
 						Grid.Column="1"
 						Grid.Row="0"
 						Grid.RowSpan="3">
-
 
 						<Border BorderThickness="0 0 0 0"
 								BorderBrush="Black"
@@ -3787,9 +3849,9 @@
 										 VerticalAlignment="Center"
 										 Grid.Column="1"
 										 Grid.Row="6"
-										 Text="{Binding CurrentGost.HeaderLineSpacingValue, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}}"
+										 Text="{Binding CurrentGost.HeaderLineSpacingValue, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter='132|0.03'}"
 										 TextInput="OnTextInput_NumberOnly"
-										 LostFocus="OnLineSpacingBoxLostFocus"/>
+										 LostFocus="OnHeaderLineSpacingLostFocus"/>
 
 								<Border BorderThickness="0 2 0 2"
 										BorderBrush="Black"
@@ -3816,7 +3878,7 @@
 								<TextBox Watermark="Перед"
 										 Width="240"
 										 Height="30"
-										 MaxLength="5"
+										 MaxLength="6"
 										 HorizontalAlignment="Center"
 										 VerticalAlignment="Center"
 										 Grid.Column="1"
@@ -3834,7 +3896,7 @@
 								<TextBox Watermark="После"
 										 Width="240"
 										 Height="30"
-										 MaxLength="5"
+										 MaxLength="6"
 										 HorizontalAlignment="Center"
 										 VerticalAlignment="Center"
 										 Grid.Column="1"
@@ -3864,14 +3926,15 @@
 										   VerticalAlignment="Center"
 										   Grid.Column="0"
 										   Grid.Row="11"/>
-
+								
 								<ComboBox HorizontalAlignment="Center"
 										  VerticalAlignment="Center"
 										  Width="240"
 										  Height="30"
 										  Grid.Column="1"
 										  Grid.Row="11"
-										  SelectedItem="{Binding CurrentGost.HeaderIndentOrOutdent, Mode=TwoWay}">
+										  SelectedItem="{Binding CurrentGost.HeaderIndentOrOutdent, Mode=TwoWay}"
+										  SelectionChanged="OnHeaderIndentTypeChanged">
 									<ComboBox.Items>
 										<x:String>Отступ</x:String>
 										<x:String>Выступ</x:String>
@@ -3893,9 +3956,10 @@
 										 VerticalAlignment="Center"
 										 Grid.Column="1"
 										 Grid.Row="12"
-										 Text="{Binding CurrentGost.HeaderFirstLineIndent, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+										 Text="{Binding CurrentGost.HeaderFirstLineIndent, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter='55.68|0'}"
 										 TextInput="OnTextInput_NumberOnly"
-										 LostFocus="OnLineSpacingGenericLostFocus"/>
+										 LostFocus="OnHeaderFirstLineIndentLostFocus"
+										 TextChanged="OnHeaderFirstLineIndentChanged"/>
 
 								<TextBlock Text="Отступ слева"
 										   HorizontalAlignment="Center"
@@ -3906,14 +3970,14 @@
 								<TextBox Watermark="Отступ слева"
 										 Width="240"
 										 Height="30"
-										 MaxLength="5"
+										 MaxLength="6"
 										 HorizontalAlignment="Center"
 										 VerticalAlignment="Center"
 										 Grid.Column="1"
 										 Grid.Row="13"
-										 Text="{Binding CurrentGost.HeaderIndentLeft, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+										 Text="{Binding CurrentGost.HeaderIndentLeft, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource DoubleClampConverter}, ConverterParameter='55.68|-55.68'}"
 										 TextInput="OnTextInput_NumberOnly"
-										 LostFocus="OnLineSpacingGenericLostFocus"/>
+										 LostFocus="OnMarginLeftRightLostFocus"/>
 
 								<TextBlock Text="Отступ справа"
 										   HorizontalAlignment="Center"
@@ -3924,14 +3988,14 @@
 								<TextBox Watermark="Отступ справа"
 										 Width="240"
 										 Height="30"
-										 MaxLength="5"
+										 MaxLength="6"
 										 HorizontalAlignment="Center"
 										 VerticalAlignment="Center"
 										 Grid.Column="1"
 										 Grid.Row="14"
-										 Text="{Binding CurrentGost.HeaderIndentRight, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
+										 Text="{Binding CurrentGost.HeaderIndentRight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource DoubleClampConverter}, ConverterParameter='55.68|-55.68'}"
 										 TextInput="OnTextInput_NumberOnly"
-										 LostFocus="OnLineSpacingGenericLostFocus"/>
+										 LostFocus="OnMarginLeftRightLostFocus"/>
 
 								<DockPanel Grid.Column="0"
 										   Grid.Row="15"
@@ -3948,15 +4012,14 @@
 												   FontSize="11"/>
 
 									</StackPanel>
-									
-								<TextBox Watermark="Заголовки... (СОДЕРЖАНИЕ, ВВЕДЕНИЕ...)"
-										 TextWrapping="Wrap"
-										 Text="{Binding CurrentGost.RequiredSections, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-										 TextInput="OnTextInput_NumberOnly"
-										 LostFocus="OnRequiredSectionsLostFocus"/>
+
+									<TextBox Watermark="Заголовки... (СОДЕРЖАНИЕ, ВВЕДЕНИЕ...)"
+											 TextWrapping="Wrap"
+											 Text="{Binding CurrentGost.RequiredSections, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+											 TextInput="OnTextInput_NumberOnly"
+											 LostFocus="OnRequiredSectionsLostFocus"/>
 
 								</DockPanel>
-
 
 								<Border BorderThickness="0 2 0 0"
 										BorderBrush="Black"
@@ -4007,12 +4070,468 @@
 										Grid.ColumnSpan="1"
 										Grid.RowSpan="2"/>
 							</Grid>
-						</Border>				
-						
+						</Border>
 					</Border>
 				</Grid>
 			</Border>
+			
+			<Border BorderThickness="2"
+					BorderBrush="Black"
+					Grid.Column="1"
+					Grid.Row="1"
+					Grid.ColumnSpan="3"
+					Grid.RowSpan="3"
+					Name="IsVisTextDoc"
+					IsVisible="True">
 
+				<Grid Grid.ColumnSpan="3"
+					  Grid.RowSpan="3"
+					  ColumnDefinitions="*"
+					  RowDefinitions="*"
+					  ShowGridLines="True">
+
+					<Grid Grid.RowSpan="3"
+						  Grid.Column="0"
+						  Grid.Row="0"
+						  ColumnDefinitions="*,*"
+						  RowDefinitions="*,*,*,*,*,*,*,*,*,*,*,*,*,*,*,*,*,*"
+						  ShowGridLines="False">
+
+						<Border BorderThickness="2 0 0 0"
+								BorderBrush="Black"
+								Grid.Column="1"
+								Grid.Row="1"
+								Grid.RowSpan="3"/>
+
+						<Border Grid.Column="0"
+								Grid.Row="0"
+								Grid.ColumnSpan="2"
+								BorderThickness="0 0 0 2"
+								BorderBrush="Black">
+
+							<TextBlock Text="Настройки простого текста"
+									   FontWeight="Bold"
+									   FontSize="16"
+									   HorizontalAlignment="Center"
+									   VerticalAlignment="Center"/>
+
+						</Border>
+
+						<Border Grid.Column="0"
+								Grid.Row="1"
+								Grid.ColumnSpan="1"
+								BorderThickness="0 0 0 2"
+								BorderBrush="Black">
+
+							<TextBlock Text="Тип Шрифта"
+								   HorizontalAlignment="Center"
+								   VerticalAlignment="Center"/>
+
+						</Border>
+
+						<Border Grid.Column="1"
+								Grid.Row="1"
+								Grid.ColumnSpan="1"
+								BorderThickness="0 0 0 2"
+								BorderBrush="Black">
+
+							<ComboBox HorizontalAlignment="Center"
+									  VerticalAlignment="Center"
+									  Width="240"
+									  Height="30"
+									  Grid.Column="1"
+									  Grid.Row="1"
+									  SelectedItem="{Binding CurrentGost.FontName, Mode=TwoWay}">
+								<ComboBox.Items>
+									<x:String>Arial</x:String>
+									<x:String>Arial Black</x:String>
+									<x:String>Bahnschrift</x:String>
+									<x:String>Caladea</x:String>
+									<x:String>Calibri</x:String>
+									<x:String>Calibri Light</x:String>
+									<x:String>Cambria</x:String>
+									<x:String>Cambria Math</x:String>
+									<x:String>Candara</x:String>
+									<x:String>Comic Sans MS</x:String>
+									<x:String>Consolas</x:String>
+									<x:String>Constantia</x:String>
+									<x:String>Corbel</x:String>
+									<x:String>Courier New</x:String>
+									<x:String>Ebrima</x:String>
+									<x:String>Franklin Gothic Medium</x:String>
+									<x:String>Gabriola</x:String>
+									<x:String>Gadugi</x:String>
+									<x:String>Georgia</x:String>
+									<x:String>Impact</x:String>
+									<x:String>Ink Free</x:String>
+									<x:String>Javanese Text</x:String>
+									<x:String>Leelawadee UI</x:String>
+									<x:String>Lucida Console</x:String>
+									<x:String>Lucida Sans Unicode</x:String>
+									<x:String>Malgun Gothic</x:String>
+									<x:String>Microsoft Himalaya</x:String>
+									<x:String>Microsoft JhengHei</x:String>
+									<x:String>Microsoft New Tai Lue</x:String>
+									<x:String>Microsoft PhagsPa</x:String>
+									<x:String>Microsoft Sans Serif</x:String>
+									<x:String>Microsoft Tai Le</x:String>
+									<x:String>Microsoft YaHei</x:String>
+									<x:String>Microsoft Yi Baiti</x:String>
+									<x:String>MS Gothic</x:String>
+									<x:String>MV Boli</x:String>
+									<x:String>Myanmar Text</x:String>
+									<x:String>Nirmala UI</x:String>
+									<x:String>Palatino Linotype</x:String>
+									<x:String>Segoe MDL2 Assets</x:String>
+									<x:String>Segoe Print</x:String>
+									<x:String>Segoe Script</x:String>
+									<x:String>Segoe UI</x:String>
+									<x:String>Segoe UI Historic</x:String>
+									<x:String>Segoe UI Emoji</x:String>
+									<x:String>Segoe UI Symbol</x:String>
+									<x:String>SimSun</x:String>
+									<x:String>Sitka</x:String>
+									<x:String>Sylfaen</x:String>
+									<x:String>Symbol</x:String>
+									<x:String>Tahoma</x:String>
+									<x:String>Times New Roman</x:String>
+									<x:String>Trebuchet MS</x:String>
+									<x:String>Verdana</x:String>
+									<x:String>Webdings</x:String>
+									<x:String>Wingdings</x:String>
+									<x:String>Yu Gothic</x:String>
+									<x:String>Yu Gothic UI Semilight</x:String>
+									<x:String>Yu Gothic</x:String>
+								</ComboBox.Items>
+							</ComboBox>
+
+						</Border>
+
+						<Border Grid.Column="0"
+								Grid.Row="2"
+								Grid.ColumnSpan="1"
+								BorderThickness="0 0 0 2"
+								BorderBrush="Black">
+
+							<TextBlock Text="Размер Шрифта"
+									   HorizontalAlignment="Center"
+									   VerticalAlignment="Center"/>
+
+						</Border>
+
+						<Border Grid.Column="1"
+								Grid.Row="2"
+								Grid.ColumnSpan="1"
+								BorderThickness="0 0 0 2"
+								BorderBrush="Black">
+
+							<ComboBox HorizontalAlignment="Center"
+									  VerticalAlignment="Center"
+									  Width="240"
+									  Height="30"
+									  Grid.Column="1"
+									  Grid.Row="2"
+									  SelectedItem="{Binding CurrentGost.FontSize, Mode=TwoWay}">
+								<ComboBox.Items>
+									<x:Double>8</x:Double>
+									<x:Double>9</x:Double>
+									<x:Double>10</x:Double>
+									<x:Double>11</x:Double>
+									<x:Double>12</x:Double>
+									<x:Double>14</x:Double>
+									<x:Double>16</x:Double>
+									<x:Double>18</x:Double>
+									<x:Double>20</x:Double>
+									<x:Double>22</x:Double>
+									<x:Double>24</x:Double>
+									<x:Double>26</x:Double>
+									<x:Double>28</x:Double>
+									<x:Double>36</x:Double>
+									<x:Double>48</x:Double>
+									<x:Double>72</x:Double>
+								</ComboBox.Items>
+							</ComboBox>
+
+						</Border>
+
+						<TextBlock Text="Выравнивание текста"
+								   HorizontalAlignment="Center"
+								   VerticalAlignment="Center"
+								   Grid.Column="0"
+								   Grid.Row="3"/>
+
+						<ComboBox HorizontalAlignment="Center"
+								  VerticalAlignment="Center"
+								  Width="240"
+								  Height="30"
+								  Grid.Column="1"
+								  Grid.Row="3"
+								  SelectedItem="{Binding CurrentGost.TextAlignment, Mode=TwoWay}">
+							<ComboBox.Items>
+								<x:String>Left</x:String>
+								<x:String>Center</x:String>
+								<x:String>Right</x:String>
+								<x:String>Both</x:String>
+							</ComboBox.Items>
+							<ComboBox.ItemTemplate>
+								<DataTemplate>
+									<TextBlock Text="{Binding Converter={StaticResource TextOrPageOrientationToRussianConverter}, ConverterParameter=Alignment}"/>
+								</DataTemplate>
+							</ComboBox.ItemTemplate>
+						</ComboBox>
+
+						<Border BorderThickness="0 2 0 2"
+								BorderBrush="Black"
+								Grid.Column="0"
+								Grid.Row="4"
+								Grid.ColumnSpan="2"
+								Grid.RowSpan="0"/>
+
+						<TextBlock Text="Интервалы"
+								   FontSize="16"
+								   FontWeight="Bold"
+								   HorizontalAlignment="Center"
+								   VerticalAlignment="Center"
+								   Grid.Column="0"
+								   Grid.Row="4"
+								   Grid.ColumnSpan="2"/>
+
+						<TextBlock Text="Междустрочный интервал 'Тип'"
+								   HorizontalAlignment="Center"
+								   VerticalAlignment="Center"
+								   Grid.Column="0"
+								   Grid.Row="5"/>
+
+						<ComboBox x:Name="LineSpacingTypeComboBox"
+								  HorizontalAlignment="Center"
+								  VerticalAlignment="Center"
+								  Width="240"
+								  Height="30"
+								  Grid.Column="1"
+								  Grid.Row="5"
+								  SelectedItem="{Binding CurrentGost.LineSpacingType, Mode=TwoWay}">
+							<ComboBox.Items>
+								<x:String>Множитель</x:String>
+								<x:String>Минимум</x:String>
+								<x:String>Точно</x:String>
+							</ComboBox.Items>
+						</ComboBox>
+
+						<TextBlock Text="Междустрочный интервал"
+								   HorizontalAlignment="Center"
+								   VerticalAlignment="Center"
+								   Grid.Column="0"
+								   Grid.Row="6"/>
+
+						<TextBox x:Name="LineSpacingTextBox"
+								 Watermark="Междустрочный интервал"
+								 MaxLength="6"
+								 Width="240"
+								 Height="30"
+								 HorizontalAlignment="Center"
+								 VerticalAlignment="Center"
+								 Grid.Column="1"
+								 Grid.Row="6"
+								 Text="{Binding CurrentGost.LineSpacingValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource DoubleClampConverter}, ConverterParameter='132|0.03'}"
+								 TextInput="OnTextInput_NumberOnly"
+								 LostFocus="OnLineSpacingLostFocus"/>
+						
+						<Border BorderThickness="0 2 0 2"
+								BorderBrush="Black"
+								Grid.Column="0"
+								Grid.Row="7"
+								Grid.ColumnSpan="2"
+								Grid.RowSpan="0"/>
+
+						<TextBlock Text="Интервалы между абзацами"
+								   FontSize="16"
+								   FontWeight="Bold"
+								   HorizontalAlignment="Center"
+								   VerticalAlignment="Center"
+								   Grid.Column="0"
+								   Grid.Row="7"
+								   Grid.ColumnSpan="2"/>
+
+						<TextBlock Text="Перед"
+								   HorizontalAlignment="Center"
+								   VerticalAlignment="Center"
+								   Grid.Column="0"
+								   Grid.Row="8"/>
+
+						<TextBox Watermark="Перед"
+								 Width="240"
+								 Height="30"
+								 MaxLength="6"
+								 HorizontalAlignment="Center"
+								 VerticalAlignment="Center"
+								 Grid.Column="1"
+								 Grid.Row="8"
+								 Text="{Binding CurrentGost.LineSpacingBefore, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource DoubleClampConverter}, ConverterParameter='55.68|0'}"
+								 TextInput="OnTextInput_NumberOnly"
+								 LostFocus="OnLineSpacingGenericLostFocus"/>
+
+						<TextBlock Text="После"
+								   HorizontalAlignment="Center"
+								   VerticalAlignment="Center"
+								   Grid.Column="0"
+								   Grid.Row="9"/>
+
+						<TextBox Watermark="После"
+								 Width="240"
+								 Height="30"
+								 MaxLength="6"
+								 HorizontalAlignment="Center"
+								 VerticalAlignment="Center"
+								 Grid.Column="1"
+								 Grid.Row="9"
+								 Text="{Binding CurrentGost.LineSpacingAfter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource DoubleClampConverter}, ConverterParameter='55.68|0'}"
+								 TextInput="OnTextInput_NumberOnly"
+								 LostFocus="OnLineSpacingGenericLostFocus"/>
+
+						<Border BorderThickness="0 2 0 2"
+								BorderBrush="Black"
+								Grid.Column="0"
+								Grid.Row="10"
+								Grid.ColumnSpan="2"
+								Grid.RowSpan="0"/>
+
+						<TextBlock Text="Первая строка"
+								   FontSize="16"
+								   FontWeight="Bold"
+								   HorizontalAlignment="Center"
+								   VerticalAlignment="Center"
+								   Grid.Column="0"
+								   Grid.Row="10"
+								   Grid.ColumnSpan="2"/>
+
+						<TextBlock Text="Отступ первой строки 'Тип'"
+								   HorizontalAlignment="Center"
+								   VerticalAlignment="Center"
+								   Grid.Column="0"
+								   Grid.Row="11"/>
+
+						<ComboBox HorizontalAlignment="Center"
+								  VerticalAlignment="Center"
+								  Width="240"
+								  Height="30"
+								  Grid.Column="1"
+								  Grid.Row="11"
+								  SelectedItem="{Binding CurrentGost.TextIndentOrOutdent, Mode=TwoWay}"
+								  SelectionChanged="OnIndentTypeChanged">
+							<ComboBox.Items>
+								<x:String>Отступ</x:String>
+								<x:String>Выступ</x:String>
+								<x:String>Нет</x:String>
+							</ComboBox.Items>
+						</ComboBox>
+
+						<TextBlock Text="Отступ первой строки"
+								   HorizontalAlignment="Center"
+								   VerticalAlignment="Center"
+								   Grid.Column="0"
+								   Grid.Row="12"/>
+						
+						<TextBox Watermark="Отступ первой строки"
+								 Width="240"
+								 Height="30"
+								 MaxLength="5"
+								 HorizontalAlignment="Center"
+								 VerticalAlignment="Center"
+								 Grid.Column="1"
+								 Grid.Row="12"
+								 Text="{Binding CurrentGost.FirstLineIndent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource DoubleClampConverter}, ConverterParameter='55.68|0'}"
+								 TextInput="OnTextInput_NumberOnly"
+								 LostFocus="OnFirstLineIndentLostFocus"
+								 TextChanged="OnFirstLineIndentChanged"/>
+
+						<TextBlock Text="Отступ слева"
+								   HorizontalAlignment="Center"
+								   VerticalAlignment="Center"
+								   Grid.Column="0"
+								   Grid.Row="13"/>
+
+						<TextBox Watermark="Отступ слева"
+								 Width="240"
+								 Height="30"
+								 MaxLength="6"
+								 HorizontalAlignment="Center"
+								 VerticalAlignment="Center"
+								 Grid.Column="1"
+								 Grid.Row="13"
+								 Text="{Binding CurrentGost.IndentLeftText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource DoubleClampConverter}, ConverterParameter='55.68|-55.68'}"
+								 TextInput="OnTextInput_NumberOnly"
+								 LostFocus="OnMarginLeftRightLostFocus"/>
+
+						<TextBlock Text="Отступ справа"
+								   HorizontalAlignment="Center"
+								   VerticalAlignment="Center"
+								   Grid.Column="0"
+								   Grid.Row="14"/>
+
+						<TextBox Watermark="Отступ справа"
+								 Width="240"
+								 Height="30"
+								 MaxLength="6"
+								 HorizontalAlignment="Center"
+								 VerticalAlignment="Center"
+								 Grid.Column="1"
+								 Grid.Row="14"
+								 Text="{Binding CurrentGost.IndentRightText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource DoubleClampConverter}, ConverterParameter='55.68|-55.68'}"
+								 TextInput="OnTextInput_NumberOnly"
+								 LostFocus="OnMarginLeftRightLostFocus"/>
+
+						<Border BorderThickness="0 2 0 0"
+								BorderBrush="Black"
+								Grid.Column="0"
+								Grid.Row="6"
+								Grid.ColumnSpan="2"
+								Grid.RowSpan="0"/>
+
+						<Border BorderThickness="0 2 0 0"
+								BorderBrush="Black"
+								Grid.Column="0"
+								Grid.Row="9"
+								Grid.ColumnSpan="2"
+								Grid.RowSpan="0"/>
+
+						<Border BorderThickness="0 2 0 2"
+								BorderBrush="Black"
+								Grid.Column="0"
+								Grid.Row="12"
+								Grid.ColumnSpan="2"
+								Grid.RowSpan="0"/>
+
+						<Border BorderThickness="0 2 0 2"
+								BorderBrush="Black"
+								Grid.Column="0"
+								Grid.Row="14"
+								Grid.ColumnSpan="2"
+								Grid.RowSpan="0"/>
+
+						<Border BorderThickness="0 0 2 0"
+								BorderBrush="Black"
+								Grid.Column="0"
+								Grid.Row="11"
+								Grid.ColumnSpan="1"
+								Grid.RowSpan="7"/>
+
+						<Border BorderThickness="0 0 2 0"
+								BorderBrush="Black"
+								Grid.Column="0"
+								Grid.Row="5"
+								Grid.ColumnSpan="1"
+								Grid.RowSpan="2"/>
+
+						<Border BorderThickness="0 0 2 0"
+								BorderBrush="Black"
+								Grid.Column="0"
+								Grid.Row="8"
+								Grid.ColumnSpan="1"
+								Grid.RowSpan="2"/>
+					</Grid>
+				</Grid>
+			</Border>
+		
 			<Border BorderThickness="2"
 					BorderBrush="Black"
 					Grid.Column="1"
@@ -4021,7 +4540,7 @@
 					Grid.RowSpan="3"
 					Name="IsVisMaketDoc"
 					IsVisible="False">
-				
+
 				<Grid Grid.ColumnSpan="3"
 					  Grid.RowSpan="3"
 					  ColumnDefinitions="*"
@@ -4432,463 +4951,8 @@
 								</ComboBox>
 							</Border>
 						</Grid>
-					
+
 					</Border>
-				</Grid>
-			</Border>
-
-			<Border BorderThickness="2"
-					BorderBrush="Black"
-					Grid.Column="1"
-					Grid.Row="1"
-					Grid.ColumnSpan="3"
-					Grid.RowSpan="3"
-					Name="IsVisTextDoc"
-					IsVisible="True">
-
-				<Grid Grid.ColumnSpan="3"
-					  Grid.RowSpan="3"
-					  ColumnDefinitions="*"
-					  RowDefinitions="*"
-					  ShowGridLines="True">
-					
-					<Grid Grid.RowSpan="3"
-						  Grid.Column="0"
-						  Grid.Row="0"
-						  ColumnDefinitions="*,*"
-						  RowDefinitions="*,*,*,*,*,*,*,*,*,*,*,*,*,*,*,*,*,*"
-						  ShowGridLines="False">
-
-						<Border BorderThickness="2 0 0 0"
-								BorderBrush="Black"
-								Grid.Column="1"
-								Grid.Row="1"
-								Grid.RowSpan="3"/>
-
-						<Border Grid.Column="0"
-								Grid.Row="0"
-								Grid.ColumnSpan="2"
-								BorderThickness="0 0 0 2"
-								BorderBrush="Black">
-
-							<TextBlock Text="Настройки простого текста"
-									   FontWeight="Bold"
-									   FontSize="16"
-									   HorizontalAlignment="Center"
-									   VerticalAlignment="Center"/>
-
-						</Border>
-
-						<Border Grid.Column="0"
-								Grid.Row="1"
-								Grid.ColumnSpan="1"
-								BorderThickness="0 0 0 2"
-								BorderBrush="Black">
-
-							<TextBlock Text="Тип Шрифта"
-								   HorizontalAlignment="Center"
-								   VerticalAlignment="Center"/>
-
-						</Border>
-
-						<Border Grid.Column="1"
-								Grid.Row="1"
-								Grid.ColumnSpan="1"
-								BorderThickness="0 0 0 2"
-								BorderBrush="Black">
-
-							<ComboBox HorizontalAlignment="Center"
-									  VerticalAlignment="Center"
-									  Width="240"
-									  Height="30"
-									  Grid.Column="1"
-									  Grid.Row="1"
-									  SelectedItem="{Binding CurrentGost.FontName, Mode=TwoWay}">
-								<ComboBox.Items>
-									<x:String>Arial</x:String>
-									<x:String>Arial Black</x:String>
-									<x:String>Bahnschrift</x:String>
-									<x:String>Caladea</x:String>
-									<x:String>Calibri</x:String>
-									<x:String>Calibri Light</x:String>
-									<x:String>Cambria</x:String>
-									<x:String>Cambria Math</x:String>
-									<x:String>Candara</x:String>
-									<x:String>Comic Sans MS</x:String>
-									<x:String>Consolas</x:String>
-									<x:String>Constantia</x:String>
-									<x:String>Corbel</x:String>
-									<x:String>Courier New</x:String>
-									<x:String>Ebrima</x:String>
-									<x:String>Franklin Gothic Medium</x:String>
-									<x:String>Gabriola</x:String>
-									<x:String>Gadugi</x:String>
-									<x:String>Georgia</x:String>
-									<x:String>Impact</x:String>
-									<x:String>Ink Free</x:String>
-									<x:String>Javanese Text</x:String>
-									<x:String>Leelawadee UI</x:String>
-									<x:String>Lucida Console</x:String>
-									<x:String>Lucida Sans Unicode</x:String>
-									<x:String>Malgun Gothic</x:String>
-									<x:String>Microsoft Himalaya</x:String>
-									<x:String>Microsoft JhengHei</x:String>
-									<x:String>Microsoft New Tai Lue</x:String>
-									<x:String>Microsoft PhagsPa</x:String>
-									<x:String>Microsoft Sans Serif</x:String>
-									<x:String>Microsoft Tai Le</x:String>
-									<x:String>Microsoft YaHei</x:String>
-									<x:String>Microsoft Yi Baiti</x:String>
-									<x:String>MS Gothic</x:String>
-									<x:String>MV Boli</x:String>
-									<x:String>Myanmar Text</x:String>
-									<x:String>Nirmala UI</x:String>
-									<x:String>Palatino Linotype</x:String>
-									<x:String>Segoe MDL2 Assets</x:String>
-									<x:String>Segoe Print</x:String>
-									<x:String>Segoe Script</x:String>
-									<x:String>Segoe UI</x:String>
-									<x:String>Segoe UI Historic</x:String>
-									<x:String>Segoe UI Emoji</x:String>
-									<x:String>Segoe UI Symbol</x:String>
-									<x:String>SimSun</x:String>
-									<x:String>Sitka</x:String>
-									<x:String>Sylfaen</x:String>
-									<x:String>Symbol</x:String>
-									<x:String>Tahoma</x:String>
-									<x:String>Times New Roman</x:String>
-									<x:String>Trebuchet MS</x:String>
-									<x:String>Verdana</x:String>
-									<x:String>Webdings</x:String>
-									<x:String>Wingdings</x:String>
-									<x:String>Yu Gothic</x:String>
-									<x:String>Yu Gothic UI Semilight</x:String>
-									<x:String>Yu Gothic</x:String>
-								</ComboBox.Items>
-							</ComboBox>
-
-						</Border>
-
-						<Border Grid.Column="0"
-								Grid.Row="2"
-								Grid.ColumnSpan="1"
-								BorderThickness="0 0 0 2"
-								BorderBrush="Black">
-
-							<TextBlock Text="Размер Шрифта"
-									   HorizontalAlignment="Center"
-									   VerticalAlignment="Center"/>
-
-						</Border>
-
-						<Border Grid.Column="1"
-								Grid.Row="2"
-								Grid.ColumnSpan="1"
-								BorderThickness="0 0 0 2"
-								BorderBrush="Black">
-
-							<ComboBox HorizontalAlignment="Center"
-									  VerticalAlignment="Center"
-									  Width="240"
-									  Height="30"
-									  Grid.Column="1"
-									  Grid.Row="2"
-									  SelectedItem="{Binding CurrentGost.FontSize, Mode=TwoWay}">
-								<ComboBox.Items>
-									<x:Double>8</x:Double>
-									<x:Double>9</x:Double>
-									<x:Double>10</x:Double>
-									<x:Double>11</x:Double>
-									<x:Double>12</x:Double>
-									<x:Double>14</x:Double>
-									<x:Double>16</x:Double>
-									<x:Double>18</x:Double>
-									<x:Double>20</x:Double>
-									<x:Double>22</x:Double>
-									<x:Double>24</x:Double>
-									<x:Double>26</x:Double>
-									<x:Double>28</x:Double>
-									<x:Double>36</x:Double>
-									<x:Double>48</x:Double>
-									<x:Double>72</x:Double>
-								</ComboBox.Items>
-							</ComboBox>
-
-
-						</Border>
-
-						<TextBlock Text="Выравнивание текста"
-								   HorizontalAlignment="Center"
-								   VerticalAlignment="Center"
-								   Grid.Column="0"
-								   Grid.Row="3"/>
-
-						<ComboBox HorizontalAlignment="Center"
-								  VerticalAlignment="Center"
-								  Width="240"
-								  Height="30"
-								  Grid.Column="1"
-								  Grid.Row="3"
-								  SelectedItem="{Binding CurrentGost.TextAlignment, Mode=TwoWay}">
-							<ComboBox.Items>
-								<x:String>Left</x:String>
-								<x:String>Center</x:String>
-								<x:String>Right</x:String>
-								<x:String>Both</x:String>
-							</ComboBox.Items>
-							<ComboBox.ItemTemplate>
-								<DataTemplate>
-									<TextBlock Text="{Binding Converter={StaticResource TextOrPageOrientationToRussianConverter}, ConverterParameter=Alignment}"/>
-								</DataTemplate>
-							</ComboBox.ItemTemplate>
-						</ComboBox>
-
-						<Border BorderThickness="0 2 0 2"
-								BorderBrush="Black"
-								Grid.Column="0"
-								Grid.Row="4"
-								Grid.ColumnSpan="2"
-								Grid.RowSpan="0"/>
-
-						<TextBlock Text="Интервалы"
-								   FontSize="16"
-								   FontWeight="Bold"
-								   HorizontalAlignment="Center"
-								   VerticalAlignment="Center"
-								   Grid.Column="0"
-								   Grid.Row="4"
-								   Grid.ColumnSpan="2"/>
-
-						<TextBlock Text="Междустрочный интервал 'Тип'"
-								   HorizontalAlignment="Center"
-								   VerticalAlignment="Center"
-								   Grid.Column="0"
-								   Grid.Row="5"/>
-
-						<ComboBox HorizontalAlignment="Center"
-								  VerticalAlignment="Center"
-								  Width="240"
-								  Height="30"
-								  Grid.Column="1"
-								  Grid.Row="5"
-								  SelectedItem="{Binding CurrentGost.LineSpacingType, Mode=TwoWay}">
-							<ComboBox.Items>
-								<x:String>Множитель</x:String>
-								<x:String>Минимум</x:String>
-								<x:String>Точно</x:String>
-							</ComboBox.Items>
-						</ComboBox>
-
-						<TextBlock Text="Междустрочный интервал"
-								   HorizontalAlignment="Center"
-								   VerticalAlignment="Center"
-								   Grid.Column="0"
-								   Grid.Row="6"/>
-
-						<TextBox Watermark="Междустрочный интервал"
-								 MaxLength="6"
-								 Width="240"
-								 Height="30"
-								 HorizontalAlignment="Center"
-								 VerticalAlignment="Center"
-								 Grid.Column="1"
-								 Grid.Row="6"
-								 Text="{Binding CurrentGost.LineSpacingValue, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}}"
-								 TextInput="OnTextInput_NumberOnly"
-								 LostFocus="OnLineSpacingBoxLostFocus"/>
-
-						<Border BorderThickness="0 2 0 2"
-								BorderBrush="Black"
-								Grid.Column="0"
-								Grid.Row="7"
-								Grid.ColumnSpan="2"
-								Grid.RowSpan="0"/>
-
-						<TextBlock Text="Интервалы между абзацами"
-								   FontSize="16"
-								   FontWeight="Bold"
-								   HorizontalAlignment="Center"
-								   VerticalAlignment="Center"
-								   Grid.Column="0"
-								   Grid.Row="7"
-								   Grid.ColumnSpan="2"/>
-
-						<TextBlock Text="Перед"
-								   HorizontalAlignment="Center"
-								   VerticalAlignment="Center"
-								   Grid.Column="0"
-								   Grid.Row="8"/>
-
-						<TextBox Watermark="Перед"
-								 Width="240"
-								 Height="30"
-								 MaxLength="5"
-								 HorizontalAlignment="Center"
-								 VerticalAlignment="Center"
-								 Grid.Column="1"
-								 Grid.Row="8"
-								 Text="{Binding CurrentGost.LineSpacingBefore, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
-								 TextInput="OnTextInput_NumberOnly"
-								 LostFocus="OnLineSpacingGenericLostFocus"/>
-
-						<TextBlock Text="После"
-								   HorizontalAlignment="Center"
-								   VerticalAlignment="Center"
-								   Grid.Column="0"
-								   Grid.Row="9"/>
-
-						<TextBox Watermark="После"
-								 Width="240"
-								 Height="30"
-								 MaxLength="5"
-								 HorizontalAlignment="Center"
-								 VerticalAlignment="Center"
-								 Grid.Column="1"
-								 Grid.Row="9"
-								 Text="{Binding CurrentGost.LineSpacingAfter, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
-								 TextInput="OnTextInput_NumberOnly"
-								 LostFocus="OnLineSpacingGenericLostFocus"/>
-
-						<Border BorderThickness="0 2 0 2"
-								BorderBrush="Black"
-								Grid.Column="0"
-								Grid.Row="10"
-								Grid.ColumnSpan="2"
-								Grid.RowSpan="0"/>
-
-						<TextBlock Text="Первая строка"
-								   FontSize="16"
-								   FontWeight="Bold"
-								   HorizontalAlignment="Center"
-								   VerticalAlignment="Center"
-								   Grid.Column="0"
-								   Grid.Row="10"
-								   Grid.ColumnSpan="2"/>
-
-						<TextBlock Text="Отступ первой строки 'Тип'"
-								   HorizontalAlignment="Center"
-								   VerticalAlignment="Center"
-								   Grid.Column="0"
-								   Grid.Row="11"/>
-
-						<ComboBox HorizontalAlignment="Center"
-								  VerticalAlignment="Center"
-								  Width="240"
-								  Height="30"
-								  Grid.Column="1"
-								  Grid.Row="11"
-								  SelectedItem="{Binding CurrentGost.TextIndentOrOutdent, Mode=TwoWay}">
-							<ComboBox.Items>
-								<x:String>Отступ</x:String>
-								<x:String>Выступ</x:String>
-								<x:String>Нет</x:String>
-							</ComboBox.Items>
-						</ComboBox>
-
-						<TextBlock Text="Отступ первой строки"
-								   HorizontalAlignment="Center"
-								   VerticalAlignment="Center"
-								   Grid.Column="0"
-								   Grid.Row="12"/>
-
-						<TextBox Watermark="Отступ первой строки"
-								 Width="240"
-								 Height="30"
-								 MaxLength="5"
-								 HorizontalAlignment="Center"
-								 VerticalAlignment="Center"
-								 Grid.Column="1"
-								 Grid.Row="12"
-								 Text="{Binding CurrentGost.FirstLineIndent, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
-								 TextInput="OnTextInput_NumberOnly"
-								 LostFocus="OnLineSpacingGenericLostFocus"/>
-
-						<TextBlock Text="Отступ слева"
-								   HorizontalAlignment="Center"
-								   VerticalAlignment="Center"
-								   Grid.Column="0"
-								   Grid.Row="13"/>
-
-						<TextBox Watermark="Отступ слева"
-								 Width="240"
-								 Height="30"
-								 MaxLength="5"
-								 HorizontalAlignment="Center"
-								 VerticalAlignment="Center"
-								 Grid.Column="1"
-								 Grid.Row="13"
-								 Text="{Binding CurrentGost.IndentLeftText, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
-								 TextInput="OnTextInput_NumberOnly"
-								 LostFocus="OnLineSpacingGenericLostFocus"/>
-
-						<TextBlock Text="Отступ справа"
-								   HorizontalAlignment="Center"
-								   VerticalAlignment="Center"
-								   Grid.Column="0"
-								   Grid.Row="14"/>
-
-						<TextBox Watermark="Отступ справа"
-								 Width="240"
-								 Height="30"
-								 MaxLength="5"
-								 HorizontalAlignment="Center"
-								 VerticalAlignment="Center"
-								 Grid.Column="1"
-								 Grid.Row="14"
-								 Text="{Binding CurrentGost.IndentRightText, Mode=TwoWay, Converter={StaticResource DoubleClampConverter}, ConverterParameter=55.68}"
-								 TextInput="OnTextInput_NumberOnly"
-								 LostFocus="OnLineSpacingGenericLostFocus"/>
-
-						<Border BorderThickness="0 2 0 0"
-								BorderBrush="Black"
-								Grid.Column="0"
-								Grid.Row="6"
-								Grid.ColumnSpan="2"
-								Grid.RowSpan="0"/>
-
-						<Border BorderThickness="0 2 0 0"
-								BorderBrush="Black"
-								Grid.Column="0"
-								Grid.Row="9"
-								Grid.ColumnSpan="2"
-								Grid.RowSpan="0"/>
-
-						<Border BorderThickness="0 2 0 2"
-								BorderBrush="Black"
-								Grid.Column="0"
-								Grid.Row="12"
-								Grid.ColumnSpan="2"
-								Grid.RowSpan="0"/>
-
-						<Border BorderThickness="0 2 0 2"
-								BorderBrush="Black"
-								Grid.Column="0"
-								Grid.Row="14"
-								Grid.ColumnSpan="2"
-								Grid.RowSpan="0"/>
-
-						<Border BorderThickness="0 0 2 0"
-								BorderBrush="Black"
-								Grid.Column="0"
-								Grid.Row="11"
-								Grid.ColumnSpan="1"
-								Grid.RowSpan="7"/>
-
-						<Border BorderThickness="0 0 2 0"
-								BorderBrush="Black"
-								Grid.Column="0"
-								Grid.Row="5"
-								Grid.ColumnSpan="1"
-								Grid.RowSpan="2"/>
-
-						<Border BorderThickness="0 0 2 0"
-								BorderBrush="Black"
-								Grid.Column="0"
-								Grid.Row="8"
-								Grid.ColumnSpan="1"
-								Grid.RowSpan="2"/>
-					</Grid>
-				
 				</Grid>
 			</Border>
 
@@ -4962,7 +5026,7 @@
 						Click="Button_Click_TablePodCheckDoc">
 					<TextBlock Text="Подписи таблиц"/>
 				</Button>
-				
+
 				<Button CornerRadius="0"
 						BorderThickness="2 0 0 2"
 						BorderBrush="Black"
@@ -4970,7 +5034,7 @@
 						Click="Button_Click_TextInTableCheckDoc">
 					<TextBlock Text="Текс в таблицах"/>
 				</Button>
-				
+
 				<Button CornerRadius="0"
 						BorderThickness="2 0 2 2"
 						BorderBrush="Black"
@@ -4978,7 +5042,7 @@
 						Click="Button_Click_TextInBulletCheckDoc">
 					<TextBlock Text="Списки"/>
 				</Button>
-				
+
 			</DockPanel>
 
 			<DockPanel VerticalAlignment="Top"

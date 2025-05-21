@@ -154,8 +154,8 @@ namespace GOST_Control
         public double? ListLevel9Indent { get; set; } // Отступ 9-го уровня +
 
         // левый отступ
-        private double ListLevel2BulletIndentLeft { get; set; }// +
-        private double ListLevel3BulletIndentLeft { get; set; }// +
+        public double? ListLevel2BulletIndentLeft { get; set; }// +
+        public double? ListLevel3BulletIndentLeft { get; set; }// +
         public double? ListLevel4BulletIndentLeft { get; set; }// +
         public double? ListLevel5BulletIndentLeft { get; set; }// +
         public double? ListLevel6BulletIndentLeft { get; set; }// +
@@ -164,8 +164,8 @@ namespace GOST_Control
         public double? ListLevel9BulletIndentLeft { get; set; }// +
 
         // правый отступ
-        private double ListLevel2BulletIndentRight { get; set; }// +
-        private double ListLevel3BulletIndentRight { get; set; }// +
+        public double? ListLevel2BulletIndentRight { get; set; }// +
+        public double? ListLevel3BulletIndentRight { get; set; }// +
         public double? ListLevel4BulletIndentRight { get; set; }// +
         public double? ListLevel5BulletIndentRight { get; set; }// +
         public double? ListLevel6BulletIndentRight { get; set; }// +

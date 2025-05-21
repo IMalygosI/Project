@@ -238,13 +238,16 @@
 								   Foreground="Gray"/>
 
 					</StackPanel>
+				
 				</ScrollViewer>
 			</Border>
 
-			<TextBlock Grid.ColumnSpan="3"
+			<TextBlock Grid.ColumnSpan="1"
+					   Grid.Column="1"
 					   Grid.Row="1"
 					   Name="FilePathTextBlock"
 					   Text="Путь к выбранному файлу"
+					   TextWrapping="Wrap"
 					   FontWeight="Bold"
 					   FontSize="14"
 					   HorizontalAlignment="Center"

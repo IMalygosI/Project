@@ -1,53 +1,36 @@
 ﻿using Avalonia.Data.Converters;
 using System;
 using System.Globalization;
+using System.Linq;
 
 namespace GOST_Control
 {
     public class DoubleClampConverter : IValueConverter
     {
-        private const double DefaultMaxValue = 132;
-
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return value?.ToString() ?? string.Empty;
+            return value?.ToString() ?? "0";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            string input = value?.ToString()?.Replace(',', '.') ?? string.Empty;
+            string input = value?.ToString()?.Replace('.', ',') ?? "0";
 
             if (string.IsNullOrWhiteSpace(input))
-                return null;
+                return 0.0;
 
-            // Убираем лишние точки
-            int firstDotIndex = input.IndexOf('.');
-            if (firstDotIndex != -1)
+            var parts = input.Split(',');
+            if (parts.Length > 2)
             {
-                string beforeDot = input.Substring(0, firstDotIndex + 1);
-                string afterDot = input.Substring(firstDotIndex + 1).Replace(".", string.Empty);
-                input = beforeDot + afterDot;
+                input = parts[0] + "," + string.Join("", parts.Skip(1));
             }
 
-            if (double.TryParse(input, NumberStyles.Any, CultureInfo.InvariantCulture, out double result))
+            if (double.TryParse(input, NumberStyles.Any, CultureInfo.GetCultureInfo("ru-RU"), out double result))
             {
-                result = Math.Round(result, 2);
-
-                // Получаем максимальное значение из параметра
-                double max = DefaultMaxValue;
-                if (parameter != null)
-                {
-                    if (double.TryParse(parameter.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out double parsedMax))
-                    {
-                        max = parsedMax;
-                    }
-                }
-
-                // Ограничиваем значение максимальным значением
-                return result > max ? max : result;
+                return result;
             }
 
-            return null;
+            return 0.0;
         }
     }
 }
