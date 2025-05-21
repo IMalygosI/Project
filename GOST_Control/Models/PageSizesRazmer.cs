@@ -9,10 +9,13 @@ namespace GOST_Control
     public struct PageSizesRazmer2
     {
         public string Name { get; set; }
-        public double Width { get; set; } 
-        public double Height { get; set; } 
+        public double Width { get; set; }
+        public double Height { get; set; }
     }
 
+    /// <summary>
+    /// Модель данных формата страниц
+    /// </summary>
     public static class PageSizesRazmer
     {
         public static readonly PageSizesRazmer2[] AllSizes = new PageSizesRazmer2[]

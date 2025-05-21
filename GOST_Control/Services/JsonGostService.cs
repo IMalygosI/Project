@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace GOST_Control
 {
     /// <summary>
-    /// Класс работы с Json
+    /// Сервисный класс для работы с Json
     /// </summary>
     internal class JsonGostService
     {

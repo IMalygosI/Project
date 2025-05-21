@@ -11,7 +11,6 @@ using Avalonia.Threading;
 using DocumentFormat.OpenXml.Drawing.Charts;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
-using GOST_Control;
 using Xceed.Words.NET;
 using Avalonia.Layout;
 using Style = DocumentFormat.OpenXml.Wordprocessing.Style;
@@ -27,7 +26,7 @@ using Color = DocumentFormat.OpenXml.Wordprocessing.Color;
 namespace GOST_Control
 {
     /// <summary>
-    /// Класс для проверок ГОСТа на соответствие заданным требованиям
+    /// Класс провероки документа на соответствие ГОСТу
     /// </summary>
     public partial class GOST_Сheck : Window
     {

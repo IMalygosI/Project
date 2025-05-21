@@ -10,6 +10,9 @@ using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace GOST_Control
 {
+    /// <summary>
+    /// Класс проверок оглавления
+    /// </summary>
     public class CheckOglavleniya
     {
         // ======================= СТАНДАРТНЫЕ ЗНАЧЕНИЯ ДЛЯ ОГЛАВЛЕНИЯ =======================
@@ -339,7 +342,7 @@ namespace GOST_Control
                     }
                 }
 
-                updateUI?.Invoke(!isValid ? "Ошибки в оглавлении:" + string.Join("\n", tempErrors.Select(e => e.ErrorMessage).Take(30)): "Оглавление полностью соответствует ГОСТу", 
+                updateUI?.Invoke(!isValid ? "Ошибки в оглавлении:" + string.Join("\n", tempErrors.Select(e => e.ErrorMessage).Take(30)) : "Оглавление полностью соответствует ГОСТу",
                                  !isValid ? Brushes.Red : Brushes.Green);
 
                 return (isValid, tempErrors);

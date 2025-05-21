@@ -11,6 +11,9 @@ using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace GOST_Control
 {
+    /// <summary>
+    /// Класс проверок заголовков
+    /// </summary>
     public class CheckingeContents
     {
 
@@ -271,7 +274,7 @@ namespace GOST_Control
                     }
 
                     // Интервалы "Перед" и "После"
-                    double actualBefore = styleSpacing?.Before?.Value != null  ? ConvertTwipsToPoints(styleSpacing.Before.Value) : DefaultHeaderSpacingBefore;
+                    double actualBefore = styleSpacing?.Before?.Value != null ? ConvertTwipsToPoints(styleSpacing.Before.Value) : DefaultHeaderSpacingBefore;
                     if (explicitSpacing?.Before?.Value != null)
                         actualBefore = ConvertTwipsToPoints(explicitSpacing.Before.Value);
 

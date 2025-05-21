@@ -32,11 +32,11 @@ build_property.EnableCodeStyleSeverity =
 [C:/Users/dimau/Desktop/Диплом/Project/GOST_Control/App.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
-[C:/Users/dimau/Desktop/Диплом/Project/GOST_Control/GOST_Сheck.axaml]
+[C:/Users/dimau/Desktop/Диплом/Project/GOST_Control/Views/GOST_Сheck.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
-[C:/Users/dimau/Desktop/Диплом/Project/GOST_Control/MainWindow.axaml]
+[C:/Users/dimau/Desktop/Диплом/Project/GOST_Control/Views/MainWindow.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
-[C:/Users/dimau/Desktop/Диплом/Project/GOST_Control/SettingGost.axaml]
+[C:/Users/dimau/Desktop/Диплом/Project/GOST_Control/Views/SettingGost.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml

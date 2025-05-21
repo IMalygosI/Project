@@ -9,7 +9,7 @@ using DocumentFormat.OpenXml.Packaging;
 namespace GOST_Control
 {
     /// <summary>
-    /// Класс сбора и передачи ошибок
+    /// Модель данных сбора и передачи ошибок
     /// </summary>
     public class TextErrorInfo
     {

@@ -12,6 +12,9 @@ using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace GOST_Control
 {
+    /// <summary>
+    /// Класс проверок списков
+    /// </summary>
     public class CheckListDocText
     {
 
@@ -29,7 +32,7 @@ namespace GOST_Control
         private const double DefaultListLeftIndent = 0.62;
         private const double DefaultListRightIndent = 0.0;
         private const string BulletAlignment = "Left";
-        
+
         // для многоуровневых
         private const double DefaultListLevel1BulletIndentLeft = 1.87;
         private const double DefaultListLevel2BulletIndentLeft = 2.5;
@@ -459,12 +462,12 @@ namespace GOST_Control
                 bool hasIndentRequirements = gost.ListLevel1Indent.HasValue || gost.ListLevel2Indent.HasValue || gost.ListLevel3Indent.HasValue || gost.ListLevel4Indent.HasValue ||
                 gost.ListLevel5Indent.HasValue || gost.ListLevel6Indent.HasValue || gost.ListLevel7Indent.HasValue || gost.ListLevel8Indent.HasValue || gost.ListLevel9Indent.HasValue;
 
-                bool hasLeftIndentRequirements = gost.ListLevel1BulletIndentLeft.HasValue || gost.ListLevel2BulletIndentLeft.HasValue || gost.ListLevel3BulletIndentLeft.HasValue || 
+                bool hasLeftIndentRequirements = gost.ListLevel1BulletIndentLeft.HasValue || gost.ListLevel2BulletIndentLeft.HasValue || gost.ListLevel3BulletIndentLeft.HasValue ||
                 gost.ListLevel4BulletIndentLeft.HasValue || gost.ListLevel5BulletIndentLeft.HasValue || gost.ListLevel6BulletIndentLeft.HasValue || gost.ListLevel7BulletIndentLeft.HasValue ||
                 gost.ListLevel8BulletIndentLeft.HasValue || gost.ListLevel9BulletIndentLeft.HasValue;
 
-                bool hasRightIndentRequirements = gost.ListLevel1BulletIndentRight.HasValue || gost.ListLevel2BulletIndentRight.HasValue || gost.ListLevel3BulletIndentRight.HasValue || 
-                gost.ListLevel4BulletIndentRight.HasValue || gost.ListLevel5BulletIndentRight.HasValue || gost.ListLevel6BulletIndentRight.HasValue ||gost.ListLevel7BulletIndentRight.HasValue || 
+                bool hasRightIndentRequirements = gost.ListLevel1BulletIndentRight.HasValue || gost.ListLevel2BulletIndentRight.HasValue || gost.ListLevel3BulletIndentRight.HasValue ||
+                gost.ListLevel4BulletIndentRight.HasValue || gost.ListLevel5BulletIndentRight.HasValue || gost.ListLevel6BulletIndentRight.HasValue || gost.ListLevel7BulletIndentRight.HasValue ||
                 gost.ListLevel8BulletIndentRight.HasValue || gost.ListLevel9BulletIndentRight.HasValue;
 
                 if (!hasIndentRequirements && !hasLeftIndentRequirements && !hasRightIndentRequirements)

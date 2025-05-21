@@ -10,6 +10,9 @@ using System.Threading.Tasks;
 
 namespace GOST_Control
 {
+    /// <summary>
+    /// Класс проверок текста подписи картинок
+    /// </summary>
     public class CheckingImageDoc
     {
         // ======================= СТАНДАРТНЫЕ ЗНАЧЕНИЯ ДЛЯ ПОДПИСЕЙ К КАРТИНКАМ =======================

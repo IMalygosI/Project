@@ -11,6 +11,9 @@ using System.Text.RegularExpressions;
 
 namespace GOST_Control
 {
+    /// <summary>
+    /// Класс проверок подписей к таблицами и текста в таблице
+    /// </summary>
     public class CheckingTableDoc
     {
         // ======================= СТАНДАРТНЫЕ ЗНАЧЕНИЯ ДЛЯ ПОДПИСЕЙ К ТАБЛИЦАМ =======================

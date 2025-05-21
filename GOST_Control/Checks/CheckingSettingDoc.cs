@@ -124,15 +124,15 @@ namespace GOST_Control
                 else if (hasCorrectNumbering && !hasExtraNumbering)
                 {
                     // Нумерация присутствует и соответствует ГОСТу
-                    string message = string.IsNullOrEmpty(requiredAlignment) && string.IsNullOrEmpty(requiredPosition) ? "Нумерация страниц присутствует и соответствует ГОСТу." : 
+                    string message = string.IsNullOrEmpty(requiredAlignment) && string.IsNullOrEmpty(requiredPosition) ? "Нумерация страниц присутствует и соответствует ГОСТу." :
                                                                                              $"Нумерация соответствует ГОСТу ({actualCorrectPosition}, {actualCorrectAlignment})";
                     updateUI?.Invoke(message, Brushes.Green);
                 }
                 else
                 {
                     // Есть ошибка, если есть лишняя нумерация
-                    string message = $"Нумерация не соответствует ГОСТу. Требуется: " + 
-                                     $"Положение: {requiredPosition ?? "не указано"}, " + 
+                    string message = $"Нумерация не соответствует ГОСТу. Требуется: " +
+                                     $"Положение: {requiredPosition ?? "не указано"}, " +
                                      $"Выравнивание: {requiredAlignment ?? "не указано"}. \n" +
                                      $"Найдена неверная нумерация: {string.Join("; ", extraNumberings.Select(e => $"Положение: {e.Split(',')[0]}, Выравнивание: {e.Split(',')[1]}"))}";
 
@@ -175,14 +175,14 @@ namespace GOST_Control
                     return (false, tempErrors);
                 }
 
-                double widthMm = (pgSz.Width.Value / 1440.0) * 25.4;
-                double heightMm = (pgSz.Height.Value / 1440.0) * 25.4;
+                double widthMm = pgSz.Width.Value / 1440.0 * 25.4;
+                double heightMm = pgSz.Height.Value / 1440.0 * 25.4;
 
                 double docWidth = Math.Min(widthMm, heightMm);
                 double docHeight = Math.Max(widthMm, heightMm);
 
-                double gostWidthMm = ((gost.PaperWidthMm ?? 0) * 10);
-                double gostHeightMm = ((gost.PaperHeightMm ?? 0) * 10);
+                double gostWidthMm = (gost.PaperWidthMm ?? 0) * 10;
+                double gostHeightMm = (gost.PaperHeightMm ?? 0) * 10;
 
                 double gostWidth = Math.Min(gostWidthMm, gostHeightMm);
                 double gostHeight = Math.Max(gostWidthMm, gostHeightMm);

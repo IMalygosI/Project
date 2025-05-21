@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace GOST_Control
 {
     /// <summary>
-    /// Класс для проверки чистого текста
+    /// Класс проверки чистого текста
     /// </summary>
     public class CheckingPlainText
     {
