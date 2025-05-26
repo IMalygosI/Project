@@ -328,7 +328,7 @@ namespace GOST_Control
             // Проверка типа межстрочного интервала 
             if (!string.IsNullOrEmpty(_gost.TableCaptionLineSpacingType))
             {
-                string currentSpacingType = ConvertSpacingRuleToName(spacing?.LineRule);
+                string currentSpacingType = spacing != null ? ConvertSpacingRuleToName(spacing.LineRule) : DefaultTableCaptionLineSpacingType;
 
                 if (currentSpacingType != _gost.TableCaptionLineSpacingType)
                 {
@@ -422,8 +422,8 @@ namespace GOST_Control
                                     errors.Add(new TextErrorInfo
                                     {
                                         ErrorMessage = $"Шрифт в таблице должен быть: {_gost.FontName}, а не {font}",
-                                        ProblemRun = run,          // Указываем проблемный Run
-                                        ProblemParagraph = paragraph // И абзац, в котором найдена ошибка
+                                        ProblemRun = run,         
+                                        ProblemParagraph = paragraph 
                                     });
                                     isValid = false;
                                 }

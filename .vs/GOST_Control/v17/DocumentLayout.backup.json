@@ -3,6 +3,14 @@
   "WorkspaceRootPath": "C:\\Users\\dimau\\Desktop\\\u0414\u0438\u043F\u043B\u043E\u043C \u0418\u0442\u043E\u0433\\Project\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{38027419-4475-4D13-8781-7F0DF1472C39}|GOST_Control\\GOST_Control.csproj|c:\\users\\dimau\\desktop\\\u0434\u0438\u043F\u043B\u043E\u043C \u0438\u0442\u043E\u0433\\project\\gost_control\\checks\\checkingecontents.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{38027419-4475-4D13-8781-7F0DF1472C39}|GOST_Control\\GOST_Control.csproj|solutionrelative:gost_control\\checks\\checkingecontents.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{38027419-4475-4D13-8781-7F0DF1472C39}|GOST_Control\\GOST_Control.csproj|c:\\users\\dimau\\desktop\\\u0434\u0438\u043F\u043B\u043E\u043C \u0438\u0442\u043E\u0433\\project\\gost_control\\checks\\checkingtabledoc.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{38027419-4475-4D13-8781-7F0DF1472C39}|GOST_Control\\GOST_Control.csproj|solutionrelative:gost_control\\checks\\checkingtabledoc.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{38027419-4475-4D13-8781-7F0DF1472C39}|GOST_Control\\GOST_Control.csproj|c:\\users\\dimau\\desktop\\\u0434\u0438\u043F\u043B\u043E\u043C \u0438\u0442\u043E\u0433\\project\\gost_control\\views\\gost_\u0441heck.axaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{38027419-4475-4D13-8781-7F0DF1472C39}|GOST_Control\\GOST_Control.csproj|solutionrelative:gost_control\\views\\gost_\u0441heck.axaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
@@ -14,7 +22,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 334,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 4,
           "Children": [
             {
               "$type": "Bookmark",
@@ -26,15 +34,41 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 2,
               "Title": "GOST_\u0421heck.axaml.cs",
               "DocumentMoniker": "C:\\Users\\dimau\\Desktop\\\u0414\u0438\u043F\u043B\u043E\u043C \u0418\u0442\u043E\u0433\\Project\\GOST_Control\\Views\\GOST_\u0421heck.axaml.cs",
               "RelativeDocumentMoniker": "GOST_Control\\Views\\GOST_\u0421heck.axaml.cs",
               "ToolTip": "C:\\Users\\dimau\\Desktop\\\u0414\u0438\u043F\u043B\u043E\u043C \u0418\u0442\u043E\u0433\\Project\\GOST_Control\\Views\\GOST_\u0421heck.axaml.cs",
               "RelativeToolTip": "GOST_Control\\Views\\GOST_\u0421heck.axaml.cs",
-              "ViewState": "AgIAAGcAAAAAAAAAAAAMwGsAAAA2AAAAAAAAAA==",
+              "ViewState": "AgIAAAcDAAAAAAAAAAAAABkDAAA2AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-24T18:39:50.464Z",
+              "WhenOpened": "2025-05-26T19:52:01.657Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "CheckingTableDoc.cs",
+              "DocumentMoniker": "C:\\Users\\dimau\\Desktop\\\u0414\u0438\u043F\u043B\u043E\u043C \u0418\u0442\u043E\u0433\\Project\\GOST_Control\\Checks\\CheckingTableDoc.cs",
+              "RelativeDocumentMoniker": "GOST_Control\\Checks\\CheckingTableDoc.cs",
+              "ToolTip": "C:\\Users\\dimau\\Desktop\\\u0414\u0438\u043F\u043B\u043E\u043C \u0418\u0442\u043E\u0433\\Project\\GOST_Control\\Checks\\CheckingTableDoc.cs*",
+              "RelativeToolTip": "GOST_Control\\Checks\\CheckingTableDoc.cs*",
+              "ViewState": "AgIAABkBAAAAAAAAAAAIwBUAAAA/AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-26T14:11:17.927Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "CheckingeContents.cs",
+              "DocumentMoniker": "C:\\Users\\dimau\\Desktop\\\u0414\u0438\u043F\u043B\u043E\u043C \u0418\u0442\u043E\u0433\\Project\\GOST_Control\\Checks\\CheckingeContents.cs",
+              "RelativeDocumentMoniker": "GOST_Control\\Checks\\CheckingeContents.cs",
+              "ToolTip": "C:\\Users\\dimau\\Desktop\\\u0414\u0438\u043F\u043B\u043E\u043C \u0418\u0442\u043E\u0433\\Project\\GOST_Control\\Checks\\CheckingeContents.cs*",
+              "RelativeToolTip": "GOST_Control\\Checks\\CheckingeContents.cs*",
+              "ViewState": "AgIAABcDAAAAAAAAAAAewMoCAAA2AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-26T14:11:15.698Z",
               "EditorCaption": ""
             }
           ]

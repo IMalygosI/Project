@@ -297,7 +297,7 @@ namespace GOST_Control
                     // Выравнивание
                     if (!string.IsNullOrEmpty(_gost.HeaderAlignment))
                     {
-                        var currentAlignment = GetAlignmentString(paragraph.ParagraphProperties?.Justification);
+                        var currentAlignment = GetAlignmentString(paragraph.ParagraphProperties?.Justification) ?? DefaultHeaderAlignment;
                         if (currentAlignment != _gost.HeaderAlignment)
                         {
                             paraErrors.Add($"выравнивание: {currentAlignment} (требуется {_gost.HeaderAlignment})");

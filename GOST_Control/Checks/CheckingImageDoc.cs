@@ -56,8 +56,7 @@ namespace GOST_Control
                 // Проверка наличия изображений
                 foreach (var paragraph in paragraphs)
                 {
-                    var hasImage = paragraph.Descendants<DocumentFormat.OpenXml.Office.Drawing.Drawing>().Any() ||
-                                  paragraph.Descendants<Picture>().Any();
+                    var hasImage = paragraph.Descendants<DocumentFormat.OpenXml.Office.Drawing.Drawing>().Any() || paragraph.Descendants<Picture>().Any();
 
                     if (hasImage)
                     {
@@ -118,8 +117,7 @@ namespace GOST_Control
 
                     allImagesValid &= fontNameValid;
                     Dispatcher.UIThread.Post(() => {
-                        updateUI?.Invoke(fontNameValid ? "Шрифт подписей соответствует ГОСТу." : "Ошибки в шрифте подписей.",
-                                          fontNameValid ? Brushes.Green : Brushes.Red);
+                        updateUI?.Invoke(fontNameValid ? "Шрифт подписей соответствует ГОСТу." : "Ошибки в шрифте подписей.", fontNameValid ? Brushes.Green : Brushes.Red);
                     });
                 }
 
@@ -176,7 +174,7 @@ namespace GOST_Control
                     foreach (var paragraph in paragraphs)
                     {
                         var hasImage = paragraph.Descendants<DocumentFormat.OpenXml.Office.Drawing.Drawing>().Any() ||
-                                      paragraph.Descendants<Picture>().Any();
+                                       paragraph.Descendants<Picture>().Any();
 
                         if (hasImage)
                         {
@@ -185,7 +183,7 @@ namespace GOST_Control
                             if (captionParagraph != null && captionParagraph.InnerText.Trim().StartsWith("Рисунок", StringComparison.OrdinalIgnoreCase))
                             {
                                 string currentAlignment = GetAlignmentString(captionParagraph.ParagraphProperties?.Justification)?.ToLowerInvariant() ??
-                                                        DefaultImageCaptionAlignment.ToLowerInvariant();
+                                                          DefaultImageCaptionAlignment.ToLowerInvariant();
 
                                 if (currentAlignment != requiredAlignment)
                                 {
