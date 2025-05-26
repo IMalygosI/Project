@@ -187,6 +187,10 @@ namespace GOST_Control
                 {
                     if (!IsListItem(paragraph)) continue;
 
+                    // ============ ПРОПУСКАЕМ ПУСТЫЕ АБЗАЦЫ ============
+                    if (string.IsNullOrWhiteSpace(paragraph.InnerText?.Trim()))
+                        continue;
+
                     var errorDetails = new List<string>();
                     bool paragraphHasError = false;
                     var runsWithText = paragraph.Elements<Run>().Where(r => !string.IsNullOrWhiteSpace(r.InnerText)).ToList();
@@ -339,6 +343,10 @@ namespace GOST_Control
                 {
                     if (!IsListItem(paragraph)) continue;
 
+                    // ============ ПРОПУСКАЕМ ПУСТЫЕ АБЗАЦЫ ============
+                    if (string.IsNullOrWhiteSpace(paragraph.InnerText?.Trim()))
+                        continue;
+
                     var spacing = paragraph.ParagraphProperties?.SpacingBetweenLines;
                     bool paragraphHasError = false;
                     var errorDetails = new List<string>();
@@ -485,6 +493,10 @@ namespace GOST_Control
                 foreach (var paragraph in paragraphs)
                 {
                     if (!IsStrictListItem(paragraph)) continue;
+
+                    // ============ ПРОПУСКАЕМ ПУСТЫЕ АБЗАЦЫ ============
+                    if (string.IsNullOrWhiteSpace(paragraph.InnerText?.Trim()))
+                        continue;
 
                     int level = GetListLevel(paragraph, gost);
                     var indent = paragraph.ParagraphProperties?.Indentation;

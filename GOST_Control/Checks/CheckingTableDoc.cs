@@ -577,7 +577,9 @@ namespace GOST_Control
                         // 5.1 Проверка типа межстрочного интервала
                         if (!string.IsNullOrEmpty(_gost.TableSpacingType))
                         {
-                            string currentSpacingType = ConvertSpacingRuleToName(spacing?.LineRule);
+                            //string currentSpacingType = ConvertSpacingRuleToName(spacing?.LineRule);
+
+                            string currentSpacingType = spacing?.LineRule != null ? ConvertSpacingRuleToName(spacing.LineRule) : DefaultTableLineSpacingType;
 
                             if (currentSpacingType != _gost.TableSpacingType)
                             {

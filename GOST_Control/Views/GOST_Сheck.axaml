@@ -240,6 +240,7 @@
 					</StackPanel>
 				
 				</ScrollViewer>
+			
 			</Border>
 
 			<TextBlock Grid.ColumnSpan="1"

@@ -97,17 +97,20 @@ namespace GOST_Control
         /// <returns></returns>
         private bool IsTitleParagraph(Paragraph paragraph)
         {
-            if (paragraph?.InnerText == null) return false;
+            try
+            {
+                if (paragraph?.InnerText == null)
+                    return false;
 
-            string text = paragraph.InnerText.Trim().ToUpper();
-            if (string.IsNullOrEmpty(text)) return false;
+                // Безопасное удаление переносов
+                string text = Regex.Replace(paragraph.InnerText, @"[\r\n]+", " ").Trim();
 
-            // Ключевые слова для титульного листа
-            string[] titleKeywords = { "МИНИСТЕРСТВО", "УНИВЕРСИТЕТ", "ИНСТИТУТ", "ФАКУЛЬТЕТ", "КАФЕДРА", "ДИСЦИПЛИНА", "КУРСОВАЯ", 
-                                       "ДИПЛОМНАЯ", "РАБОТА", "ПРОЕКТ", "РЕФЕРАТ", "ОТЧЕТ", "ВЫПОЛНИЛ", "ПРОВЕРИЛ", "Г.", "ГОД" };
-
-            // Проверка, если в тексте содержатся ключевые слова
-            return titleKeywords.Any(k => text.Contains(k));
+                return !string.IsNullOrEmpty(text) && Regex.IsMatch(text, @"(^|\s)20\d{2}(\s*г\.)?($|\s)");
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -120,24 +123,58 @@ namespace GOST_Control
         private void ExtractTitleAndBody(Body body, out List<Paragraph> titlePageParagraphs, out List<Paragraph> bodyParagraphsAfterTitle, out List<Paragraph> allParagraphs)
         {
             titlePageParagraphs = new List<Paragraph>();
-            allParagraphs = body.Elements<Paragraph>().ToList();
-            int startIndex = 0;
+            bodyParagraphsAfterTitle = new List<Paragraph>();
+            allParagraphs = new List<Paragraph>();
 
-            for (int i = 0; i < allParagraphs.Count; i++)
+            try
             {
-                var paragraph = allParagraphs[i];
-                if (IsTitleParagraph(paragraph))
-                {
-                    titlePageParagraphs.Add(paragraph);
-                }
-                else if (paragraph.Descendants<Break>().Any(b => b.Type == BreakValues.Page))
-                {
-                    startIndex = i + 1;
-                    break;
-                }
+                // Получение всех параграфов
+                allParagraphs = body?.Elements<Paragraph>()?.ToList() ?? new List<Paragraph>();
+            }
+            catch
+            {
+                allParagraphs = new List<Paragraph>();
             }
 
-            bodyParagraphsAfterTitle = allParagraphs.Skip(startIndex).ToList();
+            bool isTitlePage = true;
+
+            foreach (var paragraph in allParagraphs)
+            {
+                try
+                {
+                    if (isTitlePage)
+                    {
+                        titlePageParagraphs.Add(paragraph);
+
+                        // 1. Проверка разрыва страницы
+                        bool hasPageBreak = false;
+                        try
+                        {
+                            hasPageBreak = paragraph.Descendants<Break>()?.Any(b => b.Type == BreakValues.Page) ?? false;
+                        }
+                        catch { }
+
+                        // 2. Проверка года
+                        bool hasYear = IsTitleParagraph(paragraph);
+
+                        // Критерии завершения титульника:
+                        if (hasPageBreak || hasYear)
+                        {
+                            isTitlePage = false;
+                        }
+                    }
+                    else
+                    {
+                        bodyParagraphsAfterTitle.Add(paragraph);
+                    }
+                }
+                catch
+                {
+                    // Если ошибка в параграфе - продолжаем обработку
+                    bodyParagraphsAfterTitle.Add(paragraph);
+                    isTitlePage = false;
+                }
+            }
         }
 
         /// <summary>
@@ -588,7 +625,7 @@ namespace GOST_Control
 
                         checkTasks.Add(Task.Run(async () =>
                         {
-                            var (isValid, imageErrors) = await checkingImages.CheckImagesAsync((text, brush) =>
+                            var (isValid, imageErrors) = await checkingImages.CheckImagesAsync(bodyParagraphsAfterTitle, (text, brush) =>
                             {
                                 Dispatcher.UIThread.Post(() =>
                                 {
@@ -879,13 +916,13 @@ namespace GOST_Control
             if (string.IsNullOrWhiteSpace(text))
                 return false;
 
-            // Проверяем: начинается ли текст с шаблона типа "1.1", "2.3.4", "1." и т.д.
-            bool startsWithNumbering = Regex.IsMatch(text, @"^\d+(\.\d+)*\s*[\.\-–]?\s+");
+            // Шаблон: начинается с нумерации, за которой идёт текст (не цифры/формулы)
+            bool startsWithNumberingAndText = Regex.IsMatch(text, @"^\d+(\.\d+)*\s+[А-Яа-яA-Za-z]");
 
-            // Также проверим на "Глава 1", "Глава 2" и т.п.
+            // Также допускаем "Глава 1", "Глава 2" и т.п.
             bool isChapter = Regex.IsMatch(text, @"^Глава\s+\d+", RegexOptions.IgnoreCase);
 
-            return startsWithNumbering || isChapter;
+            return startsWithNumberingAndText || isChapter;
         }
 
         /// <summary>

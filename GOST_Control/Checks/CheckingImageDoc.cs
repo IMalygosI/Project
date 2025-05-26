@@ -44,12 +44,11 @@ namespace GOST_Control
         /// </summary>
         /// <param name="updateUI"></param>
         /// <returns></returns>
-        public async Task<(bool IsValid, List<TextErrorInfo> Errors)> CheckImagesAsync(Action<string, IBrush> updateUI)
+        public async Task<(bool IsValid, List<TextErrorInfo> Errors)> CheckImagesAsync(List<Paragraph> paragraphs, Action<string, IBrush> updateUI)
         {
             return await Task.Run(() =>
             {
                 var body = _wordDoc.MainDocumentPart.Document.Body;
-                var paragraphs = body.Elements<Paragraph>().ToList();
                 var errors = new List<TextErrorInfo>();
                 bool allImagesValid = true;
                 bool hasAtLeastOneImage = false;
@@ -58,7 +57,7 @@ namespace GOST_Control
                 foreach (var paragraph in paragraphs)
                 {
                     var hasImage = paragraph.Descendants<DocumentFormat.OpenXml.Office.Drawing.Drawing>().Any() ||
-                                 paragraph.Descendants<Picture>().Any();
+                                  paragraph.Descendants<Picture>().Any();
 
                     if (hasImage)
                     {
@@ -84,28 +83,34 @@ namespace GOST_Control
                         var hasImage = paragraph.Descendants<DocumentFormat.OpenXml.Office.Drawing.Drawing>().Any() ||
                                       paragraph.Descendants<Picture>().Any();
 
-                        if (hasImage && paragraph.NextSibling() is Paragraph captionParagraph)
+                        if (hasImage)
                         {
-                            // Проверка формата подписи
-                            if (!CheckImageCaptionFormat(captionParagraph, errors))
-                            {
-                                allImagesValid = false;
-                            }
+                            // Ищем следующий непустой параграф с текстом
+                            Paragraph captionParagraph = FindNextNonEmptyParagraph(paragraph);
 
-                            foreach (var run in captionParagraph.Elements<Run>())
+                            if (captionParagraph != null && captionParagraph.InnerText.Trim().StartsWith("Рисунок", StringComparison.OrdinalIgnoreCase))
                             {
-                                if (_shouldSkipRun(run)) continue;
-
-                                var font = run.RunProperties?.RunFonts?.Ascii?.Value;
-                                if (font != null && font != _gost.ImageCaptionFontName)
+                                // Проверка формата подписи
+                                if (!CheckImageCaptionFormat(captionParagraph, errors))
                                 {
-                                    fontNameValid = false;
-                                    errors.Add(new TextErrorInfo
+                                    allImagesValid = false;
+                                }
+
+                                foreach (var run in captionParagraph.Elements<Run>())
+                                {
+                                    if (_shouldSkipRun(run)) continue;
+
+                                    var font = run.RunProperties?.RunFonts?.Ascii?.Value;
+                                    if (font != null && font != _gost.ImageCaptionFontName)
                                     {
-                                        ErrorMessage = $"Шрифт подписи под рисунком должен быть: {_gost.ImageCaptionFontName}, а не {font}",
-                                        ProblemRun = run,
-                                        ProblemParagraph = captionParagraph
-                                    });
+                                        fontNameValid = false;
+                                        errors.Add(new TextErrorInfo
+                                        {
+                                            ErrorMessage = $"Шрифт подписи под рисунком должен быть: {_gost.ImageCaptionFontName}, а не {font}",
+                                            ProblemRun = run,
+                                            ProblemParagraph = captionParagraph
+                                        });
+                                    }
                                 }
                             }
                         }
@@ -127,24 +132,29 @@ namespace GOST_Control
                         var hasImage = paragraph.Descendants<DocumentFormat.OpenXml.Office.Drawing.Drawing>().Any() ||
                                       paragraph.Descendants<Picture>().Any();
 
-                        if (hasImage && paragraph.NextSibling() is Paragraph captionParagraph)
+                        if (hasImage)
                         {
-                            foreach (var run in captionParagraph.Elements<Run>())
+                            Paragraph captionParagraph = FindNextNonEmptyParagraph(paragraph);
+
+                            if (captionParagraph != null && captionParagraph.InnerText.Trim().StartsWith("Рисунок", StringComparison.OrdinalIgnoreCase))
                             {
-                                if (_shouldSkipRun(run)) continue;
-
-                                var fontSizeVal = run.RunProperties?.FontSize?.Val?.Value;
-                                double actualFontSize = fontSizeVal != null ? double.Parse(fontSizeVal) / 2 : DefaultImageCaptionFontSize;
-
-                                if (Math.Abs(actualFontSize - _gost.ImageCaptionFontSize.Value) > 0.1)
+                                foreach (var run in captionParagraph.Elements<Run>())
                                 {
-                                    fontSizeValid = false;
-                                    errors.Add(new TextErrorInfo
+                                    if (_shouldSkipRun(run)) continue;
+
+                                    var fontSizeVal = run.RunProperties?.FontSize?.Val?.Value;
+                                    double actualFontSize = fontSizeVal != null ? double.Parse(fontSizeVal) / 2 : DefaultImageCaptionFontSize;
+
+                                    if (Math.Abs(actualFontSize - _gost.ImageCaptionFontSize.Value) > 0.1)
                                     {
-                                        ErrorMessage = $"Размер шрифта подписи должен быть {_gost.ImageCaptionFontSize.Value}, а не {actualFontSize}",
-                                        ProblemRun = run,
-                                        ProblemParagraph = captionParagraph
-                                    });
+                                        fontSizeValid = false;
+                                        errors.Add(new TextErrorInfo
+                                        {
+                                            ErrorMessage = $"Размер шрифта подписи должен быть {_gost.ImageCaptionFontSize.Value}, а не {actualFontSize}",
+                                            ProblemRun = run,
+                                            ProblemParagraph = captionParagraph
+                                        });
+                                    }
                                 }
                             }
                         }
@@ -167,20 +177,26 @@ namespace GOST_Control
                     {
                         var hasImage = paragraph.Descendants<DocumentFormat.OpenXml.Office.Drawing.Drawing>().Any() ||
                                       paragraph.Descendants<Picture>().Any();
-                        if (hasImage && paragraph.NextSibling() is Paragraph captionParagraph)
-                        {
-                            string currentAlignment = GetAlignmentString(captionParagraph.ParagraphProperties?.Justification)?.ToLowerInvariant() ??
-                                                    DefaultImageCaptionAlignment.ToLowerInvariant();
 
-                            if (currentAlignment != requiredAlignment)
+                        if (hasImage)
+                        {
+                            Paragraph captionParagraph = FindNextNonEmptyParagraph(paragraph);
+
+                            if (captionParagraph != null && captionParagraph.InnerText.Trim().StartsWith("Рисунок", StringComparison.OrdinalIgnoreCase))
                             {
-                                alignmentValid = false;
-                                errors.Add(new TextErrorInfo
+                                string currentAlignment = GetAlignmentString(captionParagraph.ParagraphProperties?.Justification)?.ToLowerInvariant() ??
+                                                        DefaultImageCaptionAlignment.ToLowerInvariant();
+
+                                if (currentAlignment != requiredAlignment)
                                 {
-                                    ErrorMessage = $"Подпись под рисунком должна быть выровнена: {requiredAlignment}, а не {currentAlignment}",
-                                    ProblemRun = null,
-                                    ProblemParagraph = captionParagraph
-                                });
+                                    alignmentValid = false;
+                                    errors.Add(new TextErrorInfo
+                                    {
+                                        ErrorMessage = $"Подпись под рисунком должна быть выровнена: {requiredAlignment}, а не {currentAlignment}",
+                                        ProblemRun = null,
+                                        ProblemParagraph = captionParagraph
+                                    });
+                                }
                             }
                         }
                     }
@@ -201,189 +217,222 @@ namespace GOST_Control
                         var hasImage = paragraph.Descendants<DocumentFormat.OpenXml.Office.Drawing.Drawing>().Any() ||
                                       paragraph.Descendants<Picture>().Any();
 
-                        if (hasImage && paragraph.NextSibling() is Paragraph captionParagraph)
+                        if (hasImage)
                         {
-                            var indent = captionParagraph.ParagraphProperties?.Indentation;
-                            var errorDetails = new List<string>();
+                            Paragraph captionParagraph = FindNextNonEmptyParagraph(paragraph);
 
-                            // Преобразуем все значения в сантиметры
-                            double leftIndent = indent?.Left?.Value != null ? TwipsToCm(double.Parse(indent.Left.Value)) : 0;
-                            double firstLineIndent = indent?.FirstLine?.Value != null ? TwipsToCm(double.Parse(indent.FirstLine.Value)) : 0;
-                            double hangingIndent = indent?.Hanging?.Value != null ? TwipsToCm(double.Parse(indent.Hanging.Value)) : 0;
-
-                            // 1. Проверка визуального левого отступа подписи
-                            if (_gost.ImageCaptionIndentLeft.HasValue)
+                            if (captionParagraph != null && captionParagraph.InnerText.Trim().StartsWith("Рисунок", StringComparison.OrdinalIgnoreCase))
                             {
-                                double actualTextIndent = leftIndent; // Базовый отступ
+                                var indent = captionParagraph.ParagraphProperties?.Indentation;
+                                var errorDetails = new List<string>();
 
-                                // Корректировка если есть выступ (hanging)
-                                if (hangingIndent > 0)
+                                // Преобразуем все значения в сантиметры
+                                double leftIndent = indent?.Left?.Value != null ? TwipsToCm(double.Parse(indent.Left.Value)) : 0;
+                                double firstLineIndent = indent?.FirstLine?.Value != null ? TwipsToCm(double.Parse(indent.FirstLine.Value)) : 0;
+                                double hangingIndent = indent?.Hanging?.Value != null ? TwipsToCm(double.Parse(indent.Hanging.Value)) : 0;
+
+                                // 1. Проверка визуального левого отступа подписи
+                                if (_gost.ImageCaptionIndentLeft.HasValue)
                                 {
-                                    actualTextIndent = leftIndent - hangingIndent;
-                                }
+                                    double actualTextIndent = leftIndent;
 
-                                if (Math.Abs(actualTextIndent - _gost.ImageCaptionIndentLeft.Value) > 0.05)
-                                {
-                                    errorDetails.Add($"Левый отступ подписи: {actualTextIndent:F2} см (требуется {_gost.ImageCaptionIndentLeft.Value:F2} см)");
-                                    indentsValid = false;
-                                }
-                            }
-
-                            // 2. Проверка правого отступа подписи
-                            if (_gost.ImageCaptionIndentRight.HasValue)
-                            {
-                                double actualRight = indent?.Right?.Value != null ? TwipsToCm(double.Parse(indent.Right.Value)) : DefaultImageCaptionIndentRight;
-
-                                if (Math.Abs(actualRight - _gost.ImageCaptionIndentRight.Value) > 0.05)
-                                {
-                                    errorDetails.Add($"Правый отступ подписи: {actualRight:F2} см (требуется {_gost.ImageCaptionIndentRight.Value:F2} см)");
-                                    indentsValid = false;
-                                }
-                            }
-
-                            // 3. Проверка первой строки подписи
-                            if (_gost.ImageCaptionFirstLineIndent.HasValue)
-                            {
-                                bool isHanging = hangingIndent > 0;
-                                bool isFirstLine = firstLineIndent > 0;
-
-                                // Проверка типа (выступ/отступ)
-                                if (!string.IsNullOrEmpty(_gost.ImageCaptionIndentOrOutdent))
-                                {
-                                    bool typeError = false;
-
-                                    if (_gost.ImageCaptionIndentOrOutdent == "Выступ" && !isHanging)
-                                        typeError = true;
-                                    else if (_gost.ImageCaptionIndentOrOutdent == "Отступ" && !isFirstLine)
-                                        typeError = true;
-                                    else if (_gost.ImageCaptionIndentOrOutdent == "Нет" && (isHanging || isFirstLine))
-                                        typeError = true;
-
-                                    if (typeError)
+                                    if (hangingIndent > 0)
                                     {
-                                        errorDetails.Add($"Тип первой строки подписи: {(isHanging ? "Выступ" : isFirstLine ? "Отступ" : "Нет")} (требуется {_gost.ImageCaptionIndentOrOutdent})");
+                                        actualTextIndent = leftIndent - hangingIndent;
+                                    }
+
+                                    if (Math.Abs(actualTextIndent - _gost.ImageCaptionIndentLeft.Value) > 0.05)
+                                    {
+                                        errorDetails.Add($"Левый отступ подписи: {actualTextIndent:F2} см (требуется {_gost.ImageCaptionIndentLeft.Value:F2} см)");
                                         indentsValid = false;
                                     }
                                 }
 
-                                // Проверка значения
-                                double currentValue = isHanging ? hangingIndent : firstLineIndent;
-                                if ((isHanging || isFirstLine) && Math.Abs(currentValue - _gost.ImageCaptionFirstLineIndent.Value) > 0.05)
+                                // 2. Проверка правого отступа подписи
+                                if (_gost.ImageCaptionIndentRight.HasValue)
                                 {
-                                    errorDetails.Add($"{(isHanging ? "Выступ" : "Отступ")} первой строки подписи: {currentValue:F2} см (требуется {_gost.ImageCaptionFirstLineIndent.Value:F2} см)");
-                                    indentsValid = false;
-                                }
-                                else if (_gost.ImageCaptionIndentOrOutdent != "Нет" && !isHanging && !isFirstLine)
-                                {
-                                    errorDetails.Add($"Отсутствует {_gost.ImageCaptionIndentOrOutdent} первой строки подписи");
-                                    indentsValid = false;
-                                }
-                            }
+                                    double actualRight = indent?.Right?.Value != null ? TwipsToCm(double.Parse(indent.Right.Value)) : DefaultImageCaptionIndentRight;
 
-                            if (errorDetails.Any())
-                            {
-                                errors.Add(new TextErrorInfo
+                                    if (Math.Abs(actualRight - _gost.ImageCaptionIndentRight.Value) > 0.05)
+                                    {
+                                        errorDetails.Add($"Правый отступ подписи: {actualRight:F2} см (требуется {_gost.ImageCaptionIndentRight.Value:F2} см)");
+                                        indentsValid = false;
+                                    }
+                                }
+
+                                // 3. Проверка первой строки подписи
+                                if (_gost.ImageCaptionFirstLineIndent.HasValue)
                                 {
-                                    ErrorMessage = $"Подпись под рисунком: {string.Join(", ", errorDetails)}",
-                                    ProblemRun = null,
-                                    ProblemParagraph = captionParagraph
-                                });
+                                    bool isHanging = hangingIndent > 0;
+                                    bool isFirstLine = firstLineIndent > 0;
+
+                                    if (!string.IsNullOrEmpty(_gost.ImageCaptionIndentOrOutdent))
+                                    {
+                                        bool typeError = false;
+
+                                        if (_gost.ImageCaptionIndentOrOutdent == "Выступ" && !isHanging)
+                                            typeError = true;
+                                        else if (_gost.ImageCaptionIndentOrOutdent == "Отступ" && !isFirstLine)
+                                            typeError = true;
+                                        else if (_gost.ImageCaptionIndentOrOutdent == "Нет" && (isHanging || isFirstLine))
+                                            typeError = true;
+
+                                        if (typeError)
+                                        {
+                                            errorDetails.Add($"Тип первой строки подписи: {(isHanging ? "Выступ" : isFirstLine ? "Отступ" : "Нет")} (требуется {_gost.ImageCaptionIndentOrOutdent})");
+                                            indentsValid = false;
+                                        }
+                                    }
+
+                                    double currentValue = isHanging ? hangingIndent : firstLineIndent;
+                                    if ((isHanging || isFirstLine) && Math.Abs(currentValue - _gost.ImageCaptionFirstLineIndent.Value) > 0.05)
+                                    {
+                                        errorDetails.Add($"{(isHanging ? "Выступ" : "Отступ")} первой строки подписи: {currentValue:F2} см (требуется {_gost.ImageCaptionFirstLineIndent.Value:F2} см)");
+                                        indentsValid = false;
+                                    }
+                                    else if (_gost.ImageCaptionIndentOrOutdent != "Нет" && !isHanging && !isFirstLine)
+                                    {
+                                        errorDetails.Add($"Отсутствует {_gost.ImageCaptionIndentOrOutdent} первой строки подписи");
+                                        indentsValid = false;
+                                    }
+                                }
+
+                                if (errorDetails.Any())
+                                {
+                                    errors.Add(new TextErrorInfo
+                                    {
+                                        ErrorMessage = $"Подпись под рисунком: {string.Join(", ", errorDetails)}",
+                                        ProblemRun = null,
+                                        ProblemParagraph = captionParagraph
+                                    });
+                                }
                             }
                         }
                     }
 
                     allImagesValid &= indentsValid;
 
-                    Dispatcher.UIThread.Post(() => {updateUI?.Invoke(indentsValid ? "Отступы подписей соответствуют ГОСТу." : "Ошибки в отступах подписей.", indentsValid ? Brushes.Green : Brushes.Red); });
+                    Dispatcher.UIThread.Post(() => {
+                        updateUI?.Invoke(indentsValid ? "Отступы подписей соответствуют ГОСТу." : "Ошибки в отступах подписей.",
+                                        indentsValid ? Brushes.Green : Brushes.Red);
+                    });
                 }
 
                 // Проверка межстрочных интервалов подписей
-                if (_gost.ImageCaptionLineSpacingValue.HasValue || _gost.ImageCaptionLineSpacingBefore.HasValue || _gost.ImageCaptionLineSpacingAfter.HasValue || !string.IsNullOrEmpty(_gost.ImageCaptionLineSpacingType))
+                if (_gost.ImageCaptionLineSpacingValue.HasValue || _gost.ImageCaptionLineSpacingBefore.HasValue ||
+                    _gost.ImageCaptionLineSpacingAfter.HasValue || !string.IsNullOrEmpty(_gost.ImageCaptionLineSpacingType))
                 {
                     bool spacingValid = true;
                     foreach (var paragraph in paragraphs)
                     {
                         var hasImage = paragraph.Descendants<DocumentFormat.OpenXml.Office.Drawing.Drawing>().Any() ||
                                       paragraph.Descendants<Picture>().Any();
-                        if (hasImage && paragraph.NextSibling() is Paragraph captionParagraph)
+
+                        if (hasImage)
                         {
-                            var spacing = captionParagraph.ParagraphProperties?.SpacingBetweenLines;
-                            var errorDetails = new List<string>();
+                            Paragraph captionParagraph = FindNextNonEmptyParagraph(paragraph);
 
-                            // Проверка типа межстрочного интервала
-                            if (!string.IsNullOrEmpty(_gost.ImageCaptionLineSpacingType))
+                            if (captionParagraph != null && captionParagraph.InnerText.Trim().StartsWith("Рисунок", StringComparison.OrdinalIgnoreCase))
                             {
-                                string currentSpacingType = ConvertSpacingRuleToName(spacing?.LineRule?.Value);
+                                var spacing = captionParagraph.ParagraphProperties?.SpacingBetweenLines;
+                                var errorDetails = new List<string>();
 
-                                if (currentSpacingType != _gost.ImageCaptionLineSpacingType)
+                                if (!string.IsNullOrEmpty(_gost.ImageCaptionLineSpacingType))
                                 {
-                                    errorDetails.Add($"Тип межстрочного интервала должен быть: {_gost.ImageCaptionLineSpacingType}, а не {currentSpacingType}");
-                                    spacingValid = false;
+                                    string currentSpacingType = ConvertSpacingRuleToName(spacing?.LineRule?.Value);
+
+                                    if (currentSpacingType != _gost.ImageCaptionLineSpacingType)
+                                    {
+                                        errorDetails.Add($"Тип межстрочного интервала должен быть: {_gost.ImageCaptionLineSpacingType}, а не {currentSpacingType}");
+                                        spacingValid = false;
+                                    }
                                 }
-                            }
 
-                            if (_gost.ImageCaptionLineSpacingValue.HasValue)
-                            {
-                                double actualSpacing = spacing?.Line != null ?
-                                    CalculateActualSpacing(spacing) : DefaultImageCaptionLineSpacingValue;
-
-                                if (Math.Abs(actualSpacing - _gost.ImageCaptionLineSpacingValue.Value) > 0.1)
+                                if (_gost.ImageCaptionLineSpacingValue.HasValue)
                                 {
-                                    errorDetails.Add($"Межстрочный интервал подписи должен быть {_gost.ImageCaptionLineSpacingValue.Value}, а не {actualSpacing}");
-                                    spacingValid = false;
+                                    double actualSpacing = spacing?.Line != null ?
+                                        CalculateActualSpacing(spacing) : DefaultImageCaptionLineSpacingValue;
+
+                                    if (Math.Abs(actualSpacing - _gost.ImageCaptionLineSpacingValue.Value) > 0.1)
+                                    {
+                                        errorDetails.Add($"Межстрочный интервал подписи должен быть {_gost.ImageCaptionLineSpacingValue.Value}, а не {actualSpacing}");
+                                        spacingValid = false;
+                                    }
                                 }
-                            }
 
-                            if (_gost.ImageCaptionLineSpacingBefore.HasValue)
-                            {
-                                double actualBefore = spacing?.Before?.Value != null ?
-                                    ConvertTwipsToPoints(spacing.Before.Value) : DefaultImageCaptionLineSpacingBefore;
-                                if (Math.Abs(actualBefore - _gost.ImageCaptionLineSpacingBefore.Value) > 0.1)
+                                if (_gost.ImageCaptionLineSpacingBefore.HasValue)
                                 {
-                                    errorDetails.Add($"Интервал перед подписью должен быть {_gost.ImageCaptionLineSpacingBefore.Value}, а не {actualBefore}");
-                                    spacingValid = false;
+                                    double actualBefore = spacing?.Before?.Value != null ?
+                                        ConvertTwipsToPoints(spacing.Before.Value) : DefaultImageCaptionLineSpacingBefore;
+                                    if (Math.Abs(actualBefore - _gost.ImageCaptionLineSpacingBefore.Value) > 0.1)
+                                    {
+                                        errorDetails.Add($"Интервал перед подписью должен быть {_gost.ImageCaptionLineSpacingBefore.Value}, а не {actualBefore}");
+                                        spacingValid = false;
+                                    }
                                 }
-                            }
 
-                            if (_gost.ImageCaptionLineSpacingAfter.HasValue)
-                            {
-                                double actualAfter = spacing?.After?.Value != null ?
-                                    ConvertTwipsToPoints(spacing.After.Value) : DefaultImageCaptionLineSpacingAfter;
-                                if (Math.Abs(actualAfter - _gost.ImageCaptionLineSpacingAfter.Value) > 0.1)
+                                if (_gost.ImageCaptionLineSpacingAfter.HasValue)
                                 {
-                                    errorDetails.Add($"Интервал после подписи должен быть {_gost.ImageCaptionLineSpacingAfter.Value}, а не {actualAfter}");
-                                    spacingValid = false;
+                                    double actualAfter = spacing?.After?.Value != null ?
+                                        ConvertTwipsToPoints(spacing.After.Value) : DefaultImageCaptionLineSpacingAfter;
+                                    if (Math.Abs(actualAfter - _gost.ImageCaptionLineSpacingAfter.Value) > 0.1)
+                                    {
+                                        errorDetails.Add($"Интервал после подписи должен быть {_gost.ImageCaptionLineSpacingAfter.Value}, а не {actualAfter}");
+                                        spacingValid = false;
+                                    }
                                 }
-                            }
 
-                            if (errorDetails.Any())
-                            {
-                                errors.Add(new TextErrorInfo
+                                if (errorDetails.Any())
                                 {
-                                    ErrorMessage = $"Подпись под рисунком: {string.Join(", ", errorDetails)}",
-                                    ProblemRun = null,
-                                    ProblemParagraph = captionParagraph
-                                });
+                                    errors.Add(new TextErrorInfo
+                                    {
+                                        ErrorMessage = $"Подпись под рисунком: {string.Join(", ", errorDetails)}",
+                                        ProblemRun = null,
+                                        ProblemParagraph = captionParagraph
+                                    });
+                                }
                             }
                         }
                     }
 
                     allImagesValid &= spacingValid;
-                    Dispatcher.UIThread.Post(() => {updateUI?.Invoke(spacingValid ? "Интервалы подписей соответствуют ГОСТу." : "Ошибки в интервалах подписей.", spacingValid ? Brushes.Green : Brushes.Red);});
+                    Dispatcher.UIThread.Post(() => {
+                        updateUI?.Invoke(spacingValid ? "Интервалы подписей соответствуют ГОСТу." : "Ошибки в интервалах подписей.",
+                                        spacingValid ? Brushes.Green : Brushes.Red);
+                    });
                 }
 
                 if (!allImagesValid)
                 {
                     Dispatcher.UIThread.Post(() => {
-
                         var msg = $"Ошибки в подписях под изображениями:\n{string.Join("\n", errors.Select(e => e.ErrorMessage).Take(3))}";
                         if (errors.Count > 3) msg += $"\n...и ещё {errors.Count - 3} ошибок";
                         updateUI?.Invoke(msg, Brushes.Red);
-
                     });
                 }
                 return (allImagesValid, errors);
             });
+        }
+
+        /// <summary>
+        /// Вспомогательный метод, предназначен для поиска первого непустого параграфа. 
+        /// Этот метод используется для корректного определения подписи под изображением
+        /// </summary>
+        /// <param name="startParagraph"></param>
+        /// <returns></returns>
+        private Paragraph FindNextNonEmptyParagraph(Paragraph startParagraph)
+        {
+            var nextElement = startParagraph.NextSibling();
+            while (nextElement != null)
+            {
+                if (nextElement is Paragraph nextParagraph &&
+                    !string.IsNullOrWhiteSpace(nextParagraph.InnerText))
+                {
+                    return nextParagraph;
+                }
+                nextElement = nextElement.NextSibling();
+            }
+            return null;
         }
 
         /// <summary>
@@ -421,21 +470,31 @@ namespace GOST_Control
         /// <returns></returns>
         private bool CheckImageCaptionFormat(Paragraph captionParagraph, List<TextErrorInfo> errors)
         {
-            string pattern = @"^Рисунок\s\d+\s*[-–]\s*\D.+";
+            // Сначала проверяем, что параграф вообще содержит текст
+            if (string.IsNullOrWhiteSpace(captionParagraph.InnerText))
+            {
+                return true;
+            }
+            string pattern = @"^Рисунок\s+\d+\s*[-–—]\s*.+";
             string text = captionParagraph.InnerText.Trim();
             bool isValid = Regex.IsMatch(text, pattern, RegexOptions.IgnoreCase);
 
             if (!isValid)
             {
-                errors.Add(new TextErrorInfo
+                // Проверяем, действительно ли это подпись (может содержать слово "Рисунок")
+                if (text.StartsWith("Рисунок", StringComparison.OrdinalIgnoreCase))
                 {
-                    ErrorMessage = $"Неверный формат подписи: '{GetShortText(captionParagraph.InnerText)}' (требуется 'Рисунок X - Описание')",
-                    ProblemRun = null,
-                    ProblemParagraph = captionParagraph
-                });
+                    errors.Add(new TextErrorInfo
+                    {
+                        ErrorMessage = $"Неверный формат подписи: '{GetShortText(text)}' (требуется 'Рисунок X - Описание')",
+                        ProblemRun = null,
+                        ProblemParagraph = captionParagraph
+                    });
+                    return false;
+                }
             }
 
-            return isValid;
+            return true;
         }
 
         /// <summary>

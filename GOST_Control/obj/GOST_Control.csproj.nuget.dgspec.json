@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\dimau\\Desktop\\Диплом\\Project\\GOST_Control\\GOST_Control.csproj": {}
+    "C:\\Users\\dimau\\Desktop\\Диплом Итог\\Project\\GOST_Control\\GOST_Control.csproj": {}
   },
   "projects": {
-    "C:\\Users\\dimau\\Desktop\\Диплом\\Project\\GOST_Control\\GOST_Control.csproj": {
+    "C:\\Users\\dimau\\Desktop\\Диплом Итог\\Project\\GOST_Control\\GOST_Control.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\dimau\\Desktop\\Диплом\\Project\\GOST_Control\\GOST_Control.csproj",
+        "projectUniqueName": "C:\\Users\\dimau\\Desktop\\Диплом Итог\\Project\\GOST_Control\\GOST_Control.csproj",
         "projectName": "GOST_Control",
-        "projectPath": "C:\\Users\\dimau\\Desktop\\Диплом\\Project\\GOST_Control\\GOST_Control.csproj",
+        "projectPath": "C:\\Users\\dimau\\Desktop\\Диплом Итог\\Project\\GOST_Control\\GOST_Control.csproj",
         "packagesPath": "C:\\Users\\dimau\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\dimau\\Desktop\\Диплом\\Project\\GOST_Control\\obj\\",
+        "outputPath": "C:\\Users\\dimau\\Desktop\\Диплом Итог\\Project\\GOST_Control\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
