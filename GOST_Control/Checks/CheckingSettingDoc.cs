@@ -1,4 +1,5 @@
 ﻿using Avalonia.Media;
+using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using System;
@@ -25,56 +26,44 @@ namespace GOST_Control
         /// <summary>
         /// Проверка нумерации страниц и её расположения
         /// </summary>
-        /// <param name="wordDoc">Документ для проверки</param>
-        /// <param name="requiredNumbering">Требуется ли нумерация</param>
-        /// <param name="requiredAlignment">Требуемое выравнивание</param>
-        /// <param name="requiredPosition">Требуемое положение</param>
-        /// <param name="updateUI">Функция для обновления UI</param>
-        /// <returns>Результат проверки</returns>
-        public async Task<(bool IsValid, List<string> Errors)> CheckPageNumberingAsync(WordprocessingDocument wordDoc, bool requiredNumbering, string requiredAlignment, string requiredPosition, Action<string, IBrush> updateUI)
+        /// <param name="wordDoc"></param>
+        /// <param name="requiredNumbering"></param>
+        /// <param name="requiredAlignment"></param>
+        /// <param name="requiredPosition"></param>
+        /// <param name="updateUI"></param>
+        /// <returns></returns>
+        public async Task<(bool IsValid, List<string> Errors)> CheckPageNumberingAsync(WordprocessingDocument wordDoc, bool requiredNumbering, 
+                                                           string requiredAlignment, string requiredPosition, Action<string, IBrush> updateUI)
         {
             return await Task.Run(() =>
             {
                 var tempErrors = new List<string>();
                 bool isValid = true;
 
-                bool hasCorrectNumbering = false;
-                bool hasExtraNumbering = false;
-                string actualCorrectPosition = "";
-                string actualCorrectAlignment = "";
-                List<string> extraNumberings = new List<string>();
+                var foundNumberings = new List<(string Position, string Alignment)>();
+
+                void CheckNumberingInParagraph(Paragraph paragraph, string position)
+                {
+                    // Проверяем наличие нумерации
+                    bool hasNumbering = paragraph.Descendants<SimpleField>().Any(f => f.Instruction?.Value?.Contains("PAGE") == true) ||
+                                        paragraph.Descendants<FieldCode>().Any(f => f.Text.Contains("PAGE")) ||
+                                        paragraph.Descendants<Run>().Any(r => int.TryParse(r.InnerText?.Trim(), out _));
+
+                    if (hasNumbering)
+                    {
+                        var (alignment, isDefined) = GetActualAlignment(paragraph, null);
+                        foundNumberings.Add((position, alignment));
+                    }
+                }
 
                 // Проверка верхних колонтитулов
                 if (wordDoc.MainDocumentPart.HeaderParts != null)
                 {
                     foreach (var headerPart in wordDoc.MainDocumentPart.HeaderParts)
                     {
-                        foreach (var paragraph in headerPart.Header.Elements<Paragraph>())
+                        foreach (var paragraph in headerPart.Header.Descendants<Paragraph>())
                         {
-                            var pageField = paragraph.Descendants<SimpleField>().FirstOrDefault(f => f.Instruction?.Value?.Contains("PAGE") == true);
-
-                            if (pageField != null)
-                            {
-                                var justification = paragraph.ParagraphProperties?.Justification;
-                                string alignment = GetAlignmentString(justification);
-                                string position = "Top";
-
-                                // Проверка на соответствие требованиям
-                                bool positionMatch = string.IsNullOrEmpty(requiredPosition) || position.Equals(requiredPosition, StringComparison.OrdinalIgnoreCase);
-                                bool alignmentMatch = string.IsNullOrEmpty(requiredAlignment) || alignment.Equals(requiredAlignment, StringComparison.OrdinalIgnoreCase);
-
-                                if (positionMatch && alignmentMatch)
-                                {
-                                    hasCorrectNumbering = true;
-                                    actualCorrectPosition = position;
-                                    actualCorrectAlignment = alignment;
-                                }
-                                else
-                                {
-                                    hasExtraNumbering = true;
-                                    extraNumberings.Add($"{position}, {alignment}");
-                                }
-                            }
+                            CheckNumberingInParagraph(paragraph, "Top");
                         }
                     }
                 }
@@ -84,65 +73,106 @@ namespace GOST_Control
                 {
                     foreach (var footerPart in wordDoc.MainDocumentPart.FooterParts)
                     {
-                        foreach (var paragraph in footerPart.Footer.Elements<Paragraph>())
+                        foreach (var paragraph in footerPart.Footer.Descendants<Paragraph>())
                         {
-                            var pageField = paragraph.Descendants<SimpleField>().FirstOrDefault(f => f.Instruction?.Value?.Contains("PAGE") == true);
-
-                            if (pageField != null)
-                            {
-                                var justification = paragraph.ParagraphProperties?.Justification;
-                                string alignment = GetAlignmentString(justification);
-                                string position = "Bottom";
-
-                                // Проверка на соответствие требованиям
-                                bool positionMatch = string.IsNullOrEmpty(requiredPosition) || position.Equals(requiredPosition, StringComparison.OrdinalIgnoreCase);
-                                bool alignmentMatch = string.IsNullOrEmpty(requiredAlignment) || alignment.Equals(requiredAlignment, StringComparison.OrdinalIgnoreCase);
-
-                                if (positionMatch && alignmentMatch)
-                                {
-                                    hasCorrectNumbering = true;
-                                    actualCorrectPosition = position;
-                                    actualCorrectAlignment = alignment;
-                                }
-                                else
-                                {
-                                    hasExtraNumbering = true;
-                                    extraNumberings.Add($"{position}, {alignment}");
-                                }
-                            }
+                            CheckNumberingInParagraph(paragraph, "Bottom");
                         }
                     }
                 }
 
-                // Формируем сообщение об ошибке
-                if (!hasCorrectNumbering && !hasExtraNumbering)
+                // Анализ результатов
+                if (!requiredNumbering)
                 {
-                    updateUI?.Invoke("Нумерация страниц отсутствует", Brushes.Red);
-                    tempErrors.Add("Нумерация страниц отсутствует");
-                    isValid = false;
+                    updateUI?.Invoke(foundNumberings.Any() ? "⚠ Найдена нумерация, но не требуется" : 
+                                                             "Нумерация не требуется", foundNumberings.Any() ? Brushes.Orange : Brushes.Green);
+                    return (!foundNumberings.Any(), tempErrors);
                 }
-                else if (hasCorrectNumbering && !hasExtraNumbering)
+
+                if (!foundNumberings.Any())
                 {
-                    // Нумерация присутствует и соответствует ГОСТу
-                    string message = string.IsNullOrEmpty(requiredAlignment) && string.IsNullOrEmpty(requiredPosition) ? "Нумерация страниц присутствует и соответствует ГОСТу." :
-                                                                                             $"Нумерация соответствует ГОСТу ({actualCorrectPosition}, {actualCorrectAlignment})";
-                    updateUI?.Invoke(message, Brushes.Green);
+                    updateUI?.Invoke("❌ Нумерация не найдена", Brushes.Red);
+                    tempErrors.Add("Нумерация страниц отсутствует");
+                    return (false, tempErrors);
+                }
+
+                // Проверяем соответствие требованиям
+                var correctNumbering = foundNumberings .Where(n => (string.IsNullOrEmpty(requiredPosition) ||
+                                                              n.Position.Equals(requiredPosition, StringComparison.OrdinalIgnoreCase)) && (string.IsNullOrEmpty(requiredAlignment) ||
+                                                              n.Alignment.Equals(requiredAlignment, StringComparison.OrdinalIgnoreCase))).ToList();
+
+                if (correctNumbering.Any())
+                {
+                    var incorrectNumbering = foundNumberings.Except(correctNumbering).ToList();
+                    if (incorrectNumbering.Any())
+                    {
+                        var details = string.Join(", ", incorrectNumbering.Select(n => $"{n.Position} ({n.Alignment})"));
+                        updateUI?.Invoke($"✓ Основная нумерация правильная, но есть ошибки: {details}", Brushes.Orange);
+                    }
+                    else
+                    {
+                        updateUI?.Invoke($"✓ Нумерация правильная: {correctNumbering.First().Position} {correctNumbering.First().Alignment}", Brushes.Green);
+                    }
                 }
                 else
                 {
-                    // Есть ошибка, если есть лишняя нумерация
-                    string message = $"Нумерация не соответствует ГОСТу. Требуется: " +
-                                     $"Положение: {requiredPosition ?? "не указано"}, " +
-                                     $"Выравнивание: {requiredAlignment ?? "не указано"}. \n" +
-                                     $"Найдена неверная нумерация: {string.Join("; ", extraNumberings.Select(e => $"Положение: {e.Split(',')[0]}, Выравнивание: {e.Split(',')[1]}"))}";
-
-                    updateUI?.Invoke(message, Brushes.Red);
-                    tempErrors.Add("Лишняя нумерация страниц");
+                    var foundDetails = string.Join(", ", foundNumberings.Select(n => $"{n.Position} ({n.Alignment})"));
+                    updateUI?.Invoke($"❌ Несоответствие: требуется {requiredPosition} {requiredAlignment}, найдено {foundDetails}", Brushes.Red);
+                    tempErrors.Add($"Нумерация не соответствует: требуется {requiredPosition} {requiredAlignment}");
                     isValid = false;
                 }
 
                 return (isValid, tempErrors);
             });
+        }
+
+        /// <summary>
+        /// Метод для получения выравнивания
+        /// </summary>
+        /// <param name="paragraph"></param>
+        /// <param name="paragraphStyle"></param>
+        /// <returns></returns>
+        private (string Alignment, bool IsDefined) GetActualAlignment(Paragraph paragraph, Style paragraphStyle)
+        {
+            // 1. Проверяем явное выравнивание в параграфе
+            if (paragraph.ParagraphProperties?.Justification?.Val?.Value != null)
+            {
+                return (GetAlignmentString(paragraph.ParagraphProperties.Justification), true);
+            }
+
+            // 2. Проверяем стиль параграфа
+            var paraStyleId = paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value;
+            if (paraStyleId != null)
+            {
+                var style = GetStyleById(paraStyleId);
+                while (style != null)
+                {
+                    if (style.StyleParagraphProperties?.Justification?.Val?.Value != null)
+                    {
+                        return (GetAlignmentString(style.StyleParagraphProperties.Justification), true);
+                    }
+                    style = style.BasedOn?.Val?.Value != null ? GetStyleById(style.BasedOn.Val.Value) : null;
+                }
+            }
+
+            // 3. Проверяем стиль Normal
+            var normalStyle = GetStyleById("Normal");
+            if (normalStyle?.StyleParagraphProperties?.Justification?.Val?.Value != null)
+            {
+                return (GetAlignmentString(normalStyle.StyleParagraphProperties.Justification), true);
+            }
+
+            return ("Left", true);
+        }
+
+        /// <summary>
+        /// Вспомогательный метод для получения стиля по ID
+        /// </summary>
+        /// <param name="styleId"></param>
+        /// <returns></returns>
+        private Style GetStyleById(string styleId)
+        {
+            var stylesPart = _wordDoc.MainDocumentPart.StyleDefinitionsPart;
+            return stylesPart?.Styles?.Elements<Style>().FirstOrDefault(s => s.StyleId?.Value == styleId);
         }
 
         /// <summary>
@@ -356,6 +386,5 @@ namespace GOST_Control
 
             return alignment;
         }
-
     }
 }

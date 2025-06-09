@@ -8,7 +8,10 @@ using System.Threading.Tasks;
 using Avalonia.Media;
 using Avalonia.Threading;
 using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Wordprocessing;
+using Brushes = Avalonia.Media.Brushes;
+using Run = DocumentFormat.OpenXml.Wordprocessing.Run;
 
 namespace GOST_Control
 {
@@ -17,9 +20,6 @@ namespace GOST_Control
     /// </summary>
     public class CheckListDocText
     {
-
-        // ======================= СТАНДАРТНЫЕ ЗНАЧЕНИЯ ДЛЯ ОГЛАВЛЕНИЯ =======================
-        private const double DefaultTocSize = 11.0;
         // ======================= СТАНДАРТНЫЕ ЗНАЧЕНИЯ ДЛЯ СПИСКОВ =======================
         private const string DefaultListFont = "Arial";
         private const double DefaultListSize = 11.0;
@@ -27,10 +27,6 @@ namespace GOST_Control
         private const double DefaultListLineSpacingValue = 1.15;
         private const double DefaultListSpacingBefore = 0.0;
         private const double DefaultListSpacingAfter = 0.35;
-        private const string DefaultListFirstLineType = "Выступ";
-        private const double DefaultListHangingIndent = 0.64;
-        private const double DefaultListLeftIndent = 0.62;
-        private const double DefaultListRightIndent = 0.0;
         private const string BulletAlignment = "Left";
 
         // для многоуровневых
@@ -169,6 +165,15 @@ namespace GOST_Control
             }
         }
 
+        private readonly Func<Paragraph, Gost, bool> _isAdditionalHeader;
+        private readonly Gost _gost;
+
+        public CheckListDocText(Gost gost, Func<Paragraph, Gost, bool> isAdditionalHeader)
+        {
+            _gost = gost;
+            _isAdditionalHeader = isAdditionalHeader;
+        }
+
         /// <summary>
         /// Проверка базовых параметров списков
         /// </summary>
@@ -176,12 +181,13 @@ namespace GOST_Control
         /// <param name="gost">Объект с параметрами ГОСТ</param>
         /// <param name="updateUI">Делегат для обновления UI</param>
         /// <returns>True если проверка пройдена успешно</returns>
-        public async Task<(bool IsValid, List<TextErrorInfo> Errors)> CheckBulletedListsAsync(List<Paragraph> paragraphs, Gost gost, Action<string, IBrush> updateUI)
+        public async Task<(bool IsValid, List<TextErrorInfo> Errors)> CheckBulletedListsAsync(WordprocessingDocument doc, List<Paragraph> paragraphs, Gost gost, Action<string, IBrush> updateUI)
         {
             return await Task.Run(() =>
             {
                 var errors = new List<TextErrorInfo>();
                 bool hasErrors = false;
+                var allStyles = doc.MainDocumentPart?.StyleDefinitionsPart?.Styles?.Elements<Style>()?.ToDictionary(s => s.StyleId.Value) ?? new Dictionary<string, Style>();
 
                 foreach (var paragraph in paragraphs)
                 {
@@ -195,18 +201,24 @@ namespace GOST_Control
                     bool paragraphHasError = false;
                     var runsWithText = paragraph.Elements<Run>().Where(r => !string.IsNullOrWhiteSpace(r.InnerText)).ToList();
 
-                    // Проверка выравнивания
+                    // 1. Проверка выравнивания
                     if (!string.IsNullOrEmpty(gost.BulletAlignment))
                     {
-                        var currentAlignment = GetAlignmentString(paragraph.ParagraphProperties?.Justification) ?? BulletAlignment;
-                        if (currentAlignment != gost.BulletAlignment)
+                        var (actualAlignment, isAlignmentDefined) = GetActualAlignmentForList(paragraph, allStyles);
+
+                        if (!isAlignmentDefined)
                         {
-                            errorDetails.Add($"выравнивание: '{currentAlignment}' (требуется '{gost.BulletAlignment}')");
+                            errorDetails.Add($"\n       • не удалось определить выравнивание");
+                            paragraphHasError = true;
+                        }
+                        else if (actualAlignment != gost.BulletAlignment)
+                        {
+                            errorDetails.Add($"\n       • выравнивание: '{actualAlignment}' (требуется '{gost.BulletAlignment}')");
                             paragraphHasError = true;
                         }
                     }
 
-                    // Проверка формата нумерации
+                    // 2. Проверка формата нумерации
                     if (IsNumberedList(paragraph))
                     {
                         int level = GetListLevel(paragraph, gost);
@@ -235,52 +247,44 @@ namespace GOST_Control
                         }
                     }
 
-                    // Проверка типа шрифта
+                    // 3. Проверка типа шрифта
                     if (!string.IsNullOrEmpty(gost.BulletFontName))
                     {
                         foreach (var run in runsWithText)
                         {
-                            var font = run.RunProperties?.RunFonts?.Ascii?.Value ?? DefaultListFont;
-                            if (font != null && font != gost.BulletFontName)
+                            var (actualFont, isFontDefined) = GetActualFontForList(run, paragraph, allStyles, doc);
+
+                            if (!isFontDefined)
                             {
-                                errorDetails.Add($"Неверный шрифт списка: '{font}' (требуется '{gost.BulletFontName}')");
+                                errorDetails.Add($"\n       • не удалось определить шрифт");
+                                paragraphHasError = true;
+                                break;
+                            }
+                            else if (!string.Equals(actualFont, gost.BulletFontName, StringComparison.OrdinalIgnoreCase))
+                            {
+                                errorDetails.Add($"\n       • шрифт: '{actualFont}' (требуется '{gost.BulletFontName}')");
                                 paragraphHasError = true;
                                 break;
                             }
                         }
                     }
 
-                    // Проверка размера шрифта
+                    // 4. Проверка размера шрифта
                     if (gost.BulletFontSize.HasValue)
                     {
                         foreach (var run in runsWithText)
                         {
-                            var fontSize = run.RunProperties?.FontSize?.Val?.Value ?? DefaultListSize.ToString();
+                            var (actualSize, isSizeDefined) = GetActualFontSizeForList(run, paragraph, allStyles, doc);
 
-                            if (fontSize != null)
+                            if (!isSizeDefined)
                             {
-                                double actualSize = -1;
-                                var fontSizeVal = run.RunProperties?.FontSize?.Val?.Value;
-
-                                if (fontSizeVal != null)
-                                {
-                                    actualSize = double.Parse(fontSizeVal) / 2;
-                                }
-                                else
-                                {
-                                    actualSize = DefaultTocSize;
-                                }
-
-                                if (Math.Abs(actualSize - gost.BulletFontSize.Value) > 0.1)
-                                {
-                                    errorDetails.Add($"Неверный размер шрифта: {actualSize}pt (требуется {gost.BulletFontSize.Value}pt) в параграфе: '{GetShortText(paragraph)}'");
-                                    paragraphHasError = true;
-                                    break;
-                                }
+                                errorDetails.Add($"\n       • не удалось определить размер шрифта");
+                                paragraphHasError = true;
+                                break;
                             }
-                            else if (gost.BulletFontSize.Value != 0) // 0 - значение по умолчанию
+                            else if (Math.Abs(actualSize - gost.BulletFontSize.Value) > 0.1)
                             {
-                                errorDetails.Add("Отсутствует размер шрифта");
+                                errorDetails.Add($"\n       • размер шрифта: {actualSize:F1} pt (требуется {gost.BulletFontSize.Value:F1} pt)");
                                 paragraphHasError = true;
                                 break;
                             }
@@ -325,103 +329,84 @@ namespace GOST_Control
         /// <param name="gost">Объект с параметрами ГОСТ</param>
         /// <param name="updateUI">Делегат для обновления UI</param>
         /// <returns>Кортеж с результатом проверки и списком ошибок</returns>
-        public async Task<(bool IsValid, List<TextErrorInfo> Errors)> CheckListParagraphSpacingAsync(List<Paragraph> paragraphs, Gost gost, Action<string, IBrush> updateUI)
+        public async Task<(bool IsValid, List<TextErrorInfo> Errors)> CheckListParagraphSpacingAsync(WordprocessingDocument doc, List<Paragraph> paragraphs, Gost gost, Action<string, IBrush> updateUI)
         {
             return await Task.Run(() =>
             {
-                var lineSpacingTypeNames = new Dictionary<LineSpacingRuleValues, string>
-        {
-            { LineSpacingRuleValues.Auto, "Множитель" },
-            { LineSpacingRuleValues.AtLeast, "Минимум" },
-            { LineSpacingRuleValues.Exact, "Точно" }
-        };
-
-                bool hasErrors = false;
                 var errors = new List<TextErrorInfo>();
+                bool hasErrors = false;
+
+                // Получаем все стили документа
+                var allStyles = doc.MainDocumentPart?.StyleDefinitionsPart?.Styles?.Elements<Style>() ?.ToDictionary(s => s.StyleId.Value) ?? new Dictionary<string, Style>();
 
                 foreach (var paragraph in paragraphs)
                 {
                     if (!IsListItem(paragraph)) continue;
 
-                    // ============ ПРОПУСКАЕМ ПУСТЫЕ АБЗАЦЫ ============
                     if (string.IsNullOrWhiteSpace(paragraph.InnerText?.Trim()))
                         continue;
 
-                    var spacing = paragraph.ParagraphProperties?.SpacingBetweenLines;
+                    var styleId = paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value;
+                    var paragraphStyle = styleId != null && allStyles.TryGetValue(styleId, out var style) ? style : null;
+
                     bool paragraphHasError = false;
                     var errorDetails = new List<string>();
 
-                    // Проверка межстрочного интервала
-                    if (gost.BulletLineSpacingValue.HasValue)
+                    // 1. Проверка междустрочного интервала
+                    if (gost.BulletLineSpacingValue.HasValue || !string.IsNullOrEmpty(gost.BulletLineSpacingType))
                     {
-                        double actualSpacing = DefaultListLineSpacingValue;
-                        string actualSpacingType = DefaultListLineSpacingType;
-                        LineSpacingRuleValues? actualRule = LineSpacingRuleValues.Auto;
+                        var (actualSpacingType, actualSpacingValue, isSpacingDefined) = GetActualLineSpacingForList(paragraph, paragraphStyle, allStyles);
 
-                        if (spacing?.Line != null)
+                        if (!isSpacingDefined)
                         {
-                            if (spacing.LineRule?.Value == LineSpacingRuleValues.Exact)
-                            {
-                                actualSpacing = double.Parse(spacing.Line.Value) / 567.0;
-                                actualSpacingType = "Точно";
-                                actualRule = LineSpacingRuleValues.Exact;
-                            }
-                            else if (spacing.LineRule?.Value == LineSpacingRuleValues.AtLeast)
-                            {
-                                actualSpacing = double.Parse(spacing.Line.Value) / 567.0;
-                                actualSpacingType = "Минимум";
-                                actualRule = LineSpacingRuleValues.AtLeast;
-                            }
-                            else
-                            {
-                                actualSpacing = double.Parse(spacing.Line.Value) / 240.0;
-                                actualSpacingType = "Множитель";
-                                actualRule = LineSpacingRuleValues.Auto;
-                            }
-                        }
-
-                        // Определяем требуемый тип интервала
-                        LineSpacingRuleValues requiredRule = (gost.BulletLineSpacingType ?? DefaultListLineSpacingType) switch
-                        {
-                            "Минимум" => LineSpacingRuleValues.AtLeast,
-                            "Точно" => LineSpacingRuleValues.Exact,
-                            _ => LineSpacingRuleValues.Auto
-                        };
-
-                        string requiredType = gost.BulletLineSpacingType ?? DefaultListLineSpacingType;
-
-                        // Проверка типа интервала
-                        if (actualRule != requiredRule)
-                        {
-                            errorDetails.Add($"тип интервала: '{actualSpacingType}' (требуется '{requiredType}')");
+                            errorDetails.Add($"\n       • не удалось определить междустрочный интервал");
                             paragraphHasError = true;
                         }
-
-                        // Проверка значения интервала
-                        double requiredSpacingValue = gost.BulletLineSpacingValue ?? DefaultListLineSpacingValue;
-                        if (Math.Abs(actualSpacing - requiredSpacingValue) > 0.01)
+                        else
                         {
-                            errorDetails.Add($"межстрочный интервал: {actualSpacing:F2} (требуется {requiredSpacingValue:F2})");
-                            paragraphHasError = true;
+                            // Проверка типа интервала
+                            if (!string.IsNullOrEmpty(gost.BulletLineSpacingType))
+                            {
+                                string requiredType = gost.BulletLineSpacingType ?? DefaultListLineSpacingType;
+                                if (actualSpacingType != requiredType)
+                                {
+                                    errorDetails.Add($"\n       • тип интервала: '{actualSpacingType}' (требуется '{requiredType}')");
+                                    paragraphHasError = true;
+                                }
+                            }
+
+                            // Проверка значения интервала
+                            if (gost.BulletLineSpacingValue.HasValue && Math.Abs(actualSpacingValue - gost.BulletLineSpacingValue.Value) > 0.01)
+                            {
+                                errorDetails.Add($"\n       • межстрочный интервал: {actualSpacingValue:F2} (требуется {gost.BulletLineSpacingValue.Value:F2})");
+                                paragraphHasError = true;
+                            }
                         }
                     }
 
-                    // Проверка интервалов перед/после
+                    // 2. Проверка интервалов перед/после
                     if (gost.BulletLineSpacingBefore.HasValue || gost.BulletLineSpacingAfter.HasValue)
                     {
-                        double actualBefore = spacing?.Before?.Value != null ? ConvertTwipsToPoints(spacing.Before.Value) : DefaultListSpacingBefore;
-                        double actualAfter = spacing?.After?.Value != null ? ConvertTwipsToPoints(spacing.After.Value) : DefaultListSpacingAfter;
+                        var (actualBefore, actualAfter, isSpacingDefined) = GetActualParagraphSpacingForList(paragraph, paragraphStyle, allStyles);
 
-                        if (gost.BulletLineSpacingBefore.HasValue && Math.Abs(actualBefore - gost.BulletLineSpacingBefore.Value) > 0.01)
+                        if (!isSpacingDefined)
                         {
-                            errorDetails.Add($"интервал перед: {actualBefore:F1} pt (требуется {gost.BulletLineSpacingBefore.Value:F1} pt)");
+                            errorDetails.Add($"\n       • не удалось определить интервалы перед/после");
                             paragraphHasError = true;
                         }
-
-                        if (gost.BulletLineSpacingAfter.HasValue && Math.Abs(actualAfter - gost.BulletLineSpacingAfter.Value) > 0.01)
+                        else
                         {
-                            errorDetails.Add($"интервал после: {actualAfter:F1} pt (требуется {gost.BulletLineSpacingAfter.Value:F1} pt)");
-                            paragraphHasError = true;
+                            if (gost.BulletLineSpacingBefore.HasValue && Math.Abs(actualBefore - gost.BulletLineSpacingBefore.Value) > 0.1)
+                            {
+                                errorDetails.Add($"\n       • интервал перед: {actualBefore:F1} pt (требуется {gost.BulletLineSpacingBefore.Value:F1} pt)");
+                                paragraphHasError = true;
+                            }
+
+                            if (gost.BulletLineSpacingAfter.HasValue && Math.Abs(actualAfter - gost.BulletLineSpacingAfter.Value) > 0.1)
+                            {
+                                errorDetails.Add($"\n       • интервал после: {actualAfter:F1} pt (требуется {gost.BulletLineSpacingAfter.Value:F1} pt)");
+                                paragraphHasError = true;
+                            }
                         }
                     }
 
@@ -429,7 +414,7 @@ namespace GOST_Control
                     {
                         errors.Add(new TextErrorInfo
                         {
-                            ErrorMessage = $"Элемент списка '{GetShortText(paragraph)}': {string.Join(", ", errorDetails)}",
+                            ErrorMessage = $"\n       • Элемент списка '{GetShortText(paragraph)}': {string.Join(", ", errorDetails)}",
                             ProblemParagraph = paragraph,
                             ProblemRun = null
                         });
@@ -437,18 +422,18 @@ namespace GOST_Control
                     }
                 }
 
+                // Вывод результатов (оставьте ваш существующий код)
                 Dispatcher.UIThread.Post(() =>
                 {
                     if (hasErrors)
                     {
                         var msg = $"Ошибки в интервалах списков:\n{string.Join("\n", errors.Select(e => e.ErrorMessage).Take(3))}";
-                        if (errors.Count > 3)
-                            msg += $"\n...и ещё {errors.Count - 3} ошибок";
-                        updateUI?.Invoke(msg, Avalonia.Media.Brushes.Red);
+                        if (errors.Count > 3) msg += $"\n...и ещё {errors.Count - 3} ошибок";
+                        updateUI?.Invoke(msg, Brushes.Red);
                     }
                     else
                     {
-                        updateUI?.Invoke("Интервалы списков соответствуют ГОСТу", Avalonia.Media.Brushes.Green);
+                        updateUI?.Invoke("Интервалы списков соответствуют ГОСТу", Brushes.Green);
                     }
                 });
 
@@ -563,12 +548,12 @@ namespace GOST_Control
                     string currentType = "Нет";
                     double? currentValue = null;
 
-                    if (hangingIndentValue != null)
+                    if (hangingIndentValue != null && hangingIndentValue != 0)
                     {
                         currentType = "Выступ";
                         currentValue = hangingIndentValue;
                     }
-                    else if (firstLineIndentValue != null)
+                    else if (firstLineIndentValue != null && firstLineIndentValue != 0)
                     {
                         currentType = "Отступ";
                         currentValue = firstLineIndentValue;
@@ -590,7 +575,7 @@ namespace GOST_Control
                             bool typeMatches = string.Equals(currentType, requiredType, StringComparison.OrdinalIgnoreCase);
                             if (!typeMatches)
                             {
-                                errorDetails.Add($"тип первой строки: {currentType} (требуется {requiredType})");
+                                errorDetails.Add($"\n       • тип первой строки: {currentType} (требуется {requiredType})");
                                 paragraphHasError = true;
                             }
                         }
@@ -601,7 +586,7 @@ namespace GOST_Control
                             double deviation = Math.Abs(currentValue.Value - gostRequiredIndent.Value);
                             if (deviation > 0.05)
                             {
-                                errorDetails.Add($"{currentType} первой строки: {currentValue.Value:F2} см (требуется {gostRequiredIndent.Value:F2} см)");
+                                errorDetails.Add($"\n       • {currentType} первой строки: {currentValue.Value:F2} см (требуется {gostRequiredIndent.Value:F2} см)");
                                 paragraphHasError = true;
                             }
                         }
@@ -615,7 +600,7 @@ namespace GOST_Control
 
                         if (Math.Abs(actualLeft - requiredLeft) > 0.05)
                         {
-                            errorDetails.Add($"Левый отступ: {actualLeft:F2} см (требуется {requiredLeft:F2} см)");
+                            errorDetails.Add($"\n       • Левый отступ: {actualLeft:F2} см (требуется {requiredLeft:F2} см)");
                             paragraphHasError = true;
                         }
                     }
@@ -628,7 +613,7 @@ namespace GOST_Control
 
                         if (Math.Abs(actualRight - requiredRight) > 0.05)
                         {
-                            errorDetails.Add($"Правый отступ: {actualRight:F2} см (требуется {requiredRight:F2} см)");
+                            errorDetails.Add($"\n       • Правый отступ: {actualRight:F2} см (требуется {requiredRight:F2} см)");
                             paragraphHasError = true;
                         }
                     }
@@ -637,7 +622,7 @@ namespace GOST_Control
                     {
                         errors.Add(new TextErrorInfo
                         {
-                            ErrorMessage = $"Список ур. {level} '{GetShortText(paragraph)}': {string.Join(", ", errorDetails)}",
+                            ErrorMessage = $"\n       • Список ур. {level} '{GetShortText(paragraph)}': {string.Join(", ", errorDetails)}",
                             ProblemParagraph = paragraph,
                             ProblemRun = null
                         });
@@ -664,6 +649,301 @@ namespace GOST_Control
             });
         }
 
+        private (string Type, double Value, bool IsDefined) GetActualLineSpacingForList(Paragraph paragraph, Style paragraphStyle, Dictionary<string, Style> allStyles)
+        {
+            // 1. Явные свойства
+            var spacing = paragraph.ParagraphProperties?.SpacingBetweenLines;
+            var parsed = ParseLineSpacing(spacing);
+            if (parsed.IsDefined) return parsed;
+
+            // 2. Стиль абзаца и его родители
+            var paraStyleId = paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value;
+            if (paraStyleId != null && allStyles.TryGetValue(paraStyleId, out var currentStyle))
+            {
+                while (currentStyle != null)
+                {
+                    var styleSpacing = currentStyle.StyleParagraphProperties?.SpacingBetweenLines;
+                    parsed = ParseLineSpacing(styleSpacing);
+                    if (parsed.IsDefined) return parsed;
+
+                    currentStyle = currentStyle.BasedOn?.Val?.Value != null &&
+                                 allStyles.TryGetValue(currentStyle.BasedOn.Val.Value, out var basedOnStyle)
+                        ? basedOnStyle
+                        : null;
+                }
+            }
+
+            // 3. Проверяем переданный стиль (если есть)
+            if (paragraphStyle != null)
+            {
+                var styleSpacing = paragraphStyle.StyleParagraphProperties?.SpacingBetweenLines;
+                parsed = ParseLineSpacing(styleSpacing);
+                if (parsed.IsDefined) return parsed;
+            }
+
+            // 4. Normal стиль
+            if (allStyles.TryGetValue("Normal", out var normalStyle))
+            {
+                parsed = ParseLineSpacing(normalStyle.StyleParagraphProperties?.SpacingBetweenLines);
+                if (parsed.IsDefined) return parsed;
+            }
+
+            // 5. Стандартные значения для списков
+            return (DefaultListLineSpacingType, DefaultListLineSpacingValue, true);
+        }
+
+        private (double Before, double After, bool IsDefined) GetActualParagraphSpacingForList(Paragraph paragraph, Style paragraphStyle, Dictionary<string, Style> allStyles)
+        {
+            double? before = null;
+            double? after = null;
+
+            // 1. Явные свойства
+            var spacing = paragraph.ParagraphProperties?.SpacingBetweenLines;
+            if (spacing?.Before?.Value != null) before = ConvertTwipsToPoints(spacing.Before.Value);
+            if (spacing?.After?.Value != null) after = ConvertTwipsToPoints(spacing.After.Value);
+
+            // 2. Поиск в стилях
+            if (before == null || after == null)
+            {
+                var paraStyleId = paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value;
+                var currentStyle = paraStyleId != null && allStyles.TryGetValue(paraStyleId, out var style) ? style : paragraphStyle;
+
+                while (currentStyle != null)
+                {
+                    var styleSpacing = currentStyle.StyleParagraphProperties?.SpacingBetweenLines;
+                    if (styleSpacing != null)
+                    {
+                        if (before == null && styleSpacing.Before?.Value != null)
+                            before = ConvertTwipsToPoints(styleSpacing.Before.Value);
+                        if (after == null && styleSpacing.After?.Value != null)
+                            after = ConvertTwipsToPoints(styleSpacing.After.Value);
+                    }
+
+                    currentStyle = currentStyle.BasedOn?.Val?.Value != null && allStyles.TryGetValue(currentStyle.BasedOn.Val.Value, out var basedOnStyle) ? basedOnStyle : null;
+                }
+            }
+
+            // 3. Normal стиль
+            if (before == null || after == null)
+            {
+                if (allStyles.TryGetValue("Normal", out var normalStyle))
+                {
+                    var spacingNorm = normalStyle.StyleParagraphProperties?.SpacingBetweenLines;
+                    if (spacingNorm != null)
+                    {
+                        if (before == null && spacingNorm.Before?.Value != null)
+                            before = ConvertTwipsToPoints(spacingNorm.Before.Value);
+                        if (after == null && spacingNorm.After?.Value != null)
+                            after = ConvertTwipsToPoints(spacingNorm.After.Value);
+                    }
+                }
+            }
+
+            return (before ?? DefaultListSpacingBefore, after ?? DefaultListSpacingAfter, true);
+        }
+
+        private (string Type, double Value, bool IsDefined) ParseLineSpacing(SpacingBetweenLines spacing)
+        {
+            // Если spacing вообще не задан - возвращаем неопределенное значение
+            if (spacing == null)
+            {
+                return (null, 0, false);
+            }
+
+            // Если есть LineRule, но нет Line - считаем неопределенным
+            if (spacing.LineRule != null && spacing.Line == null)
+            {
+                return (null, 0, false);
+            }
+
+            // Если есть Line, но нет LineRule - интерпретируем как множитель
+            if (spacing.Line != null && spacing.LineRule == null)
+            {
+                double lineValue = double.Parse(spacing.Line.Value);
+                return ("Множитель", lineValue / 240.0, true);
+            }
+
+            // Если оба значения заданы
+            if (spacing.Line != null && spacing.LineRule != null)
+            {
+                double lineValue = double.Parse(spacing.Line.Value);
+
+                if (spacing.LineRule.Value == LineSpacingRuleValues.Exact)
+                    return ("Точно", lineValue / 567.0, true);
+
+                if (spacing.LineRule.Value == LineSpacingRuleValues.AtLeast)
+                    return ("Минимум", lineValue / 567.0, true);
+
+                // По умолчанию - множитель
+                return ("Множитель", lineValue / 240.0, true);
+            }
+
+            // Если ничего не задано - не определено
+            return (null, 0, false);
+        }
+
+        private (string Alignment, bool IsDefined) GetActualAlignmentForList(Paragraph paragraph, Dictionary<string, Style> allStyles)
+        {
+            // 1. Проверяем явное выравнивание в параграфе
+            if (paragraph.ParagraphProperties?.Justification?.Val?.Value != null)
+            {
+                return (GetAlignmentString(paragraph.ParagraphProperties.Justification), true);
+            }
+
+            // 2. Проверяем стиль параграфа и его родителей
+            var paraStyleId = paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value;
+            if (paraStyleId != null && allStyles.TryGetValue(paraStyleId, out var currentStyle))
+            {
+                while (currentStyle != null)
+                {
+                    if (currentStyle.StyleParagraphProperties?.Justification?.Val?.Value != null)
+                    {
+                        return (GetAlignmentString(currentStyle.StyleParagraphProperties.Justification), true);
+                    }
+                    currentStyle = currentStyle.BasedOn?.Val?.Value != null && allStyles.TryGetValue(currentStyle.BasedOn.Val.Value, out var basedOnStyle) ? basedOnStyle : null;
+                }
+            }
+
+            // 3. Проверяем Normal стиль
+            if (allStyles.TryGetValue("Normal", out var normalStyle) && normalStyle.StyleParagraphProperties?.Justification?.Val?.Value != null)
+            {
+                return (GetAlignmentString(normalStyle.StyleParagraphProperties.Justification), true);
+            }
+
+            // 4. Если нигде не задано - считаем Left по умолчанию
+            return ("Left", true);
+        }
+
+        private (string FontName, bool IsDefined) GetActualFontForList(Run run, Paragraph paragraph, Dictionary<string, Style> allStyles, WordprocessingDocument doc)
+        {
+            // 1. Проверяем явные свойства Run
+            var explicitFont = GetExplicitRunFont(run);
+            if (!string.IsNullOrEmpty(explicitFont))
+                return (explicitFont, true);
+
+            // 2. Проверяем стиль Run
+            var runStyleId = run.RunProperties?.RunStyle?.Val?.Value;
+            if (runStyleId != null && allStyles.TryGetValue(runStyleId, out var runStyle))
+            {
+                var runStyleFont = GetStyleFont(runStyle);
+                if (!string.IsNullOrEmpty(runStyleFont))
+                    return (runStyleFont, true);
+            }
+
+            // 3. Проверяем стиль списка (если есть)
+            var listStyle = GetListStyle(paragraph, doc); 
+            if (listStyle != null)
+            {
+                var listStyleFont = GetStyleFont(listStyle);
+                if (!string.IsNullOrEmpty(listStyleFont))
+                    return (listStyleFont, true);
+            }
+
+            // 4. Проверяем стиль Paragraph с учетом наследования
+            var paraStyleId = paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value;
+            if (paraStyleId != null)
+            {
+                var currentStyle = allStyles.TryGetValue(paraStyleId, out var style) ? style : null;
+                while (currentStyle != null)
+                {
+                    var font = GetStyleFont(currentStyle);
+                    if (!string.IsNullOrEmpty(font))
+                        return (font, true);
+
+                    currentStyle = currentStyle.BasedOn?.Val?.Value != null && allStyles.TryGetValue(currentStyle.BasedOn.Val.Value, out var basedOnStyle)
+                        ? basedOnStyle
+                        : null;
+                }
+            }
+
+            // 5. Проверяем Normal стиль
+            if (allStyles.TryGetValue("Normal", out var normalStyle))
+            {
+                var font = GetStyleFont(normalStyle);
+                if (!string.IsNullOrEmpty(font))
+                    return (font, true);
+            }
+
+            return (DefaultListFont, false);
+        }
+
+        private (double Size, bool IsDefined) GetActualFontSizeForList(Run run, Paragraph paragraph, Dictionary<string, Style> allStyles, WordprocessingDocument doc)
+        {
+            // 1. Проверяем явные свойства Run
+            var runSize = run.RunProperties?.FontSize?.Val?.Value;
+            if (runSize != null)
+                return (double.Parse(runSize) / 2, true);
+
+            // 2. Проверяем стиль Run
+            var runStyleId = run.RunProperties?.RunStyle?.Val?.Value;
+            if (runStyleId != null && allStyles.TryGetValue(runStyleId, out var runStyle))
+            {
+                if (runStyle?.StyleRunProperties?.FontSize?.Val?.Value != null)
+                    return (double.Parse(runStyle.StyleRunProperties.FontSize.Val.Value) / 2, true);
+            }
+
+            // 3. Проверяем стиль списка (если есть)
+            var listStyle = GetListStyle(paragraph, doc);
+            if (listStyle != null && listStyle.StyleRunProperties?.FontSize?.Val?.Value != null)
+            {
+                return (double.Parse(listStyle.StyleRunProperties.FontSize.Val.Value) / 2, true);
+            }
+
+            // 4. Проверяем стиль Paragraph с учетом наследования
+            var paraStyleId = paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value;
+            if (paraStyleId != null && allStyles.TryGetValue(paraStyleId, out var paraStyle))
+            {
+                var currentStyle = paraStyle;
+                while (currentStyle != null)
+                {
+                    if (currentStyle.StyleRunProperties?.FontSize?.Val?.Value != null)
+                        return (double.Parse(currentStyle.StyleRunProperties.FontSize.Val.Value) / 2, true);
+
+                    currentStyle = currentStyle.BasedOn?.Val?.Value != null && allStyles.TryGetValue(currentStyle.BasedOn.Val.Value, out var basedOnStyle)
+                        ? basedOnStyle
+                        : null;
+                }
+            }
+
+            // 5. Проверяем Normal стиль
+            if (allStyles.TryGetValue("Normal", out var normalStyle) && normalStyle.StyleRunProperties?.FontSize?.Val?.Value != null)
+            {
+                return (double.Parse(normalStyle.StyleRunProperties.FontSize.Val.Value) / 2, true);
+            }
+
+            return (DefaultListSize, false);
+        }
+
+        private string GetExplicitRunFont(Run run)
+        {
+            var runProps = run.RunProperties;
+            if (runProps == null) return null;
+
+            return runProps.RunFonts?.Ascii?.Value ?? runProps.RunFonts?.HighAnsi?.Value ?? runProps.RunFonts?.ComplexScript?.Value ?? runProps.RunFonts?.EastAsia?.Value;
+        }
+
+        private string GetStyleFont(Style style)
+        {
+            if (style?.StyleRunProperties == null) return null;
+            return style.StyleRunProperties.RunFonts?.Ascii?.Value ?? style.StyleRunProperties.RunFonts?.HighAnsi?.Value ?? style.StyleRunProperties.RunFonts?.ComplexScript?.Value ?? style.StyleRunProperties.RunFonts?.EastAsia?.Value;
+        }
+
+        private Style GetListStyle(Paragraph paragraph, WordprocessingDocument doc)
+        {
+            if (paragraph.ParagraphProperties?.ParagraphStyleId?.Val == null)
+                return null;
+
+            var styleId = paragraph.ParagraphProperties.ParagraphStyleId.Val.Value;
+
+            // Проверяем, относится ли стиль к спискам
+            if (styleId.Contains("List") || styleId.Contains("Bullet") || styleId.Contains("Numbering"))
+            {
+                return doc.MainDocumentPart?.StyleDefinitionsPart?.Styles?.Elements<Style>().FirstOrDefault(s => s.StyleId == styleId);
+            }
+
+            return null;
+        }
+
         /// <summary>
         /// Строгая проверка определяющая что параграф является элементом списка
         /// </summary>
@@ -671,16 +951,21 @@ namespace GOST_Control
         /// <returns></returns>
         private bool IsStrictListItem(Paragraph paragraph)
         {
-            // 1. Проверка явных свойств нумерации
+            // 1. Сначала проверяем, не является ли это заголовком
+            if (_isAdditionalHeader != null && _isAdditionalHeader(paragraph, _gost))
+                return false;
+
+            // 2. Проверяем явные свойства нумерации
             if (paragraph.ParagraphProperties?.NumberingProperties != null)
                 return true;
 
-            // 2. Проверка стилей списка
+            // 3. Проверяем стили списка
             var styleId = paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value;
-            if (!string.IsNullOrEmpty(styleId) && (styleId.Contains("List") || styleId.Contains("Bullet") || styleId.Contains("Numbering")))
+            if (!string.IsNullOrEmpty(styleId) &&
+                (styleId.Contains("List") || styleId.Contains("Bullet") || styleId.Contains("Numbering")))
                 return true;
 
-            // 3. Проверка по содержимому (маркеры или нумерация)
+            // 4. Проверяем по содержимому (маркеры или нумерация)
             var firstRun = paragraph.Elements<Run>().FirstOrDefault();
             if (firstRun != null)
             {
@@ -690,10 +975,10 @@ namespace GOST_Control
                 if (text.StartsWith("•") || text.StartsWith("-") || text.StartsWith("—"))
                     return true;
 
-                // Нумерованные списки
-                if (Regex.IsMatch(text, @"^\d+[\.\)]") ||   // 1. 1) 
-                    Regex.IsMatch(text, @"^[a-z]\)") ||     // a) b)
-                    Regex.IsMatch(text, @"^[IVXLCDM]+\.", RegexOptions.IgnoreCase))  // I. II.
+                // Нумерованные списки (более строгая проверка)
+                if (Regex.IsMatch(text, @"^\d+[\.\)]\s") ||   // "1. Текст" или "1) Текст"
+                    Regex.IsMatch(text, @"^[a-z]\)\s") ||     // "a) Текст"
+                    Regex.IsMatch(text, @"^[IVXLCDM]+\.\s", RegexOptions.IgnoreCase))  // "I. Текст"
                     return true;
             }
 
@@ -702,19 +987,20 @@ namespace GOST_Control
 
         /// <summary>
         /// Проверяет, является ли параграф элементом списка
-        /// </summary>ё
+        /// </summary>
+        /// <param name="paragraph"></param>
+        /// <returns></returns>
         private bool IsListItem(Paragraph paragraph)
         {
-            // 1. Проверка нумерации
+            // Используем строгую версию, но без проверки стилей
+            if (_isAdditionalHeader != null && _isAdditionalHeader(paragraph, _gost))
+                return false;
+
+            // Проверяем свойства нумерации
             if (paragraph.ParagraphProperties?.NumberingProperties != null)
                 return true;
 
-            // 2. Проверка стиля списка
-            var styleId = paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value;
-            if (!string.IsNullOrEmpty(styleId) && (styleId.Contains("List") || styleId.Contains("Bullet") || styleId.Contains("Numbering")))
-                return true;
-
-            // 3. Проверка по форматированию
+            // Проверяем по форматированию
             var firstRun = paragraph.Elements<Run>().FirstOrDefault();
             if (firstRun != null)
             {
@@ -724,8 +1010,8 @@ namespace GOST_Control
                 if (text.StartsWith("•") || text.StartsWith("-") || text.StartsWith("—"))
                     return true;
 
-                // Нумерованные списки
-                if (Regex.IsMatch(text, @"^\d+[\.\)]") || Regex.IsMatch(text, @"^[a-z]\)"))
+                // Нумерованные списки (более строгая проверка)
+                if (Regex.IsMatch(text, @"^\d+[\.\)]\s") || Regex.IsMatch(text, @"^[a-z]\)\s"))
                     return true;
             }
 
@@ -792,7 +1078,7 @@ namespace GOST_Control
         /// </summary>
         /// <param name="paragraph"></param>
         /// <param name="gost"></param>
-        /// <returns></returns>
+        /// <returns></returns> 
         private int GetListLevel(Paragraph paragraph, Gost gost)
         {
             var numberingProps = paragraph.ParagraphProperties?.NumberingProperties;

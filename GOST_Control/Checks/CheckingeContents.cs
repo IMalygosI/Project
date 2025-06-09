@@ -5,9 +5,12 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Avalonia.Media;
+using Avalonia.Styling;
 using Avalonia.Threading;
+using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
+using Style = DocumentFormat.OpenXml.Wordprocessing.Style;
 
 namespace GOST_Control
 {
@@ -16,33 +19,6 @@ namespace GOST_Control
     /// </summary>
     public class CheckingeContents
     {
-
-        // ======================= СТАНДАРТНЫЕ ЗНАЧЕНИЯ ДЛЯ ЗАГОЛОВКОВ =======================
-        private const string DefaultHeaderFont = "Arial";
-        private const double DefaultHeaderSize = 20.0;
-        private const string DefaultHeaderAlignment = "Left";
-        private const string DefaultHeaderLineSpacingType = "Множитель";
-        private const double DefaultHeaderLineSpacingValue = 1.15;
-        private const double DefaultHeaderSpacingBefore = 0.85;
-        private const double DefaultHeaderSpacingAfter = 0.35;
-        private const string DefaultHeaderFirstLineType = "Нет";
-        private const double DefaultHeaderFirstLineIndent = 0.0;
-        private const double DefaultHeaderLeftIndent = 0.0;
-        private const double DefaultHeaderRightIndent = 0.0;
-
-        // -- Доп Значения для Доп Заголовков
-        private const string DefaultAdditionalHeaderFontName = "Arial";
-        private const double DefaultAdditionalHeaderFontSize = 20.0;
-        private const string DefaultAdditionalHeaderAlignment = "Left";
-        private const string DefaultAdditionalHeaderLineSpacingType = "Множитель";
-        private const double DefaultAdditionalHeaderLineSpacingValue = 1.15;
-        private const double DefaultAdditionalHeaderLineSpacingBefore = 0.85;
-        private const double DefaultAdditionalHeaderLineSpacingAfter = 0.35;
-        private const string DefaultAdditionalHeaderIndentOrOutdent = "Нет";
-        private const double DefaultAdditionalHeaderFirstLineIndent = 0.0;
-        private const double DefaultAdditionalHeaderIndentLeftt = 0.0;
-        private const double DefaultAdditionalHeaderIndentRight = 0.0;
-
         private readonly WordprocessingDocument _wordDoc;
         private readonly Gost _gost;
 
@@ -63,93 +39,92 @@ namespace GOST_Control
         /// <param name="paragraphs"></param>
         /// <param name="updateUI"></param>
         /// <returns></returns>
-        public async Task<(bool IsValid, List<TextErrorInfo> Errors)> CheckHeaderIndentsAsync(List<Paragraph> paragraphs, Action<string, IBrush> updateUI)
+        public async Task<(bool IsValid, List<TextErrorInfo> Errors)> CheckHeaderIndentsAsync(List<Paragraph> paragraphs, WordprocessingDocument doc, Action<string, IBrush> updateUI)
         {
             return await Task.Run(() =>
             {
-                bool isValid = true;
                 var errors = new List<TextErrorInfo>();
+                bool isValid = true;
                 var headerTexts = GetHeaderTexts(paragraphs, _gost);
+
+                // Получаем все стили документа
+                var allStyles = doc.MainDocumentPart?.StyleDefinitionsPart?.Styles?.Elements<Style>()?.ToDictionary(s => s.StyleId.Value) ?? new Dictionary<string, Style>();
 
                 foreach (var paragraph in paragraphs)
                 {
                     if (!headerTexts.Contains(paragraph.InnerText.Trim()))
                         continue;
 
+                    var styleId = paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value;
+                    var paragraphStyle = styleId != null && allStyles.TryGetValue(styleId, out var style) ? style : null;
+
+                    // Получаем отступы
                     var indent = paragraph.ParagraphProperties?.Indentation;
+                    var styleIndent = GetStyleIndentation(paragraphStyle, allStyles);
+                    indent ??= styleIndent;
+
+                    double leftIndent = indent?.Left?.Value != null ? ConvertTwipsToCm(indent.Left.Value) : 0;
+                    double rightIndent = indent?.Right?.Value != null ? ConvertTwipsToCm(indent.Right.Value) : 0;
+                    double firstLineIndent = indent?.FirstLine?.Value != null ? ConvertTwipsToCm(indent.FirstLine.Value) : 0;
+                    double hangingIndent = indent?.Hanging?.Value != null ? ConvertTwipsToCm(indent.Hanging.Value) : 0;
+
                     bool hasError = false;
                     var errorDetails = new List<string>();
 
-                    // Преобразуем все значения в сантиметры
-                    double leftIndent = indent?.Left?.Value != null ? TwipsToCm(double.Parse(indent.Left.Value)) : 0;
-                    double firstLineIndent = indent?.FirstLine?.Value != null ? TwipsToCm(double.Parse(indent.FirstLine.Value)) : 0;
-                    double hangingIndent = indent?.Hanging?.Value != null ? TwipsToCm(double.Parse(indent.Hanging.Value)) : 0;
-
-                    // 1. ПРОВЕРКА ВИЗУАЛЬНОГО ЛЕВОГО ОТСТУПА ЗАГОЛОВКА
+                    // 1. Проверка левого отступа
                     if (_gost.HeaderIndentLeft.HasValue)
                     {
-                        double actualTextIndent = leftIndent; // Базовый отступ
-
-                        // Корректировка если есть выступ (hanging)
+                        double actualTextIndent = leftIndent;
                         if (hangingIndent > 0)
-                        {
                             actualTextIndent = leftIndent - hangingIndent;
-                        }
 
                         if (Math.Abs(actualTextIndent - _gost.HeaderIndentLeft.Value) > 0.05)
                         {
-                            errorDetails.Add($"Левый отступ заголовка: {actualTextIndent:F2} см (требуется {_gost.HeaderIndentLeft.Value:F2} см)");
+                            errorDetails.Add($"\n       • Левый отступ заголовка: {actualTextIndent:F2} см (требуется {_gost.HeaderIndentLeft.Value:F2} см)");
                             hasError = true;
                         }
                     }
 
-                    // 2. ПРОВЕРКА ПЕРВОЙ СТРОКИ ЗАГОЛОВКА
-                    if (_gost.HeaderFirstLineIndent.HasValue)
+                    // 2. Проверка типа и значения первой строки
+                    if (_gost.HeaderFirstLineIndent.HasValue || !string.IsNullOrEmpty(_gost.HeaderIndentOrOutdent))
                     {
                         bool isHanging = hangingIndent > 0;
                         bool isFirstLine = firstLineIndent > 0;
 
-                        // Проверка типа (выступ/отступ)
+                        // Тип первой строки
                         if (!string.IsNullOrEmpty(_gost.HeaderIndentOrOutdent))
                         {
-                            bool typeError = false;
-
-                            if (_gost.HeaderIndentOrOutdent == "Выступ" && !isHanging)
-                                typeError = true;
-                            else if (_gost.HeaderIndentOrOutdent == "Отступ" && !isFirstLine)
-                                typeError = true;
-                            else if (_gost.HeaderIndentOrOutdent == "Нет" && (isHanging || isFirstLine))
-                                typeError = true;
-
-                            if (typeError)
+                            string actualType = isHanging ? "Выступ" : isFirstLine ? "Отступ" : "Нет";
+                            if (actualType != _gost.HeaderIndentOrOutdent)
                             {
-                                errorDetails.Add($"Тип первой строки: {(isHanging ? "Выступ" : isFirstLine ? "Отступ" : "Нет")} (требуется {_gost.HeaderIndentOrOutdent})");
+                                errorDetails.Add($"\n       • Тип первой строки: '{actualType}' (требуется '{_gost.HeaderIndentOrOutdent}')");
                                 hasError = true;
                             }
                         }
 
-                        // Проверка значения
-                        double currentValue = isHanging ? hangingIndent : firstLineIndent;
-                        if ((isHanging || isFirstLine) && Math.Abs(currentValue - _gost.HeaderFirstLineIndent.Value) > 0.05)
+                        // Значение отступа/выступа
+                        if (_gost.HeaderFirstLineIndent.HasValue)
                         {
-                            errorDetails.Add($"{(isHanging ? "Выступ" : "Отступ")} первой строки: {currentValue:F2} см (требуется {_gost.HeaderFirstLineIndent.Value:F2} см)");
-                            hasError = true;
-                        }
-                        else if (_gost.HeaderIndentOrOutdent != "Нет" && !isHanging && !isFirstLine)
-                        {
-                            errorDetails.Add($"Отсутствует {_gost.HeaderIndentOrOutdent} первой строки");
-                            hasError = true;
+                            double actualValue = isHanging ? hangingIndent : firstLineIndent;
+                            if ((isHanging || isFirstLine) && Math.Abs(actualValue - _gost.HeaderFirstLineIndent.Value) > 0.05)
+                            {
+                                errorDetails.Add($"\n       • {(isHanging ? "Выступ" : "Отступ")} первой строки: {actualValue:F2} см (требуется {_gost.HeaderFirstLineIndent.Value:F2} см)");
+                                hasError = true;
+                            }
+                            else if (!isHanging && !isFirstLine && _gost.HeaderIndentOrOutdent != "Нет")
+                            {
+                                errorDetails.Add($"\n       • Отсутствует {_gost.HeaderIndentOrOutdent} первой строки");
+                                hasError = true;
+                            }
                         }
                     }
 
-                    // 3. ПРОВЕРКА ПРАВОГО ОТСТУПА ЗАГОЛОВКА
+                    // 3. Проверка правого отступа
                     if (_gost.HeaderIndentRight.HasValue)
                     {
-                        double actualRight = indent?.Right?.Value != null ? TwipsToCm(double.Parse(indent.Right.Value)) : DefaultHeaderRightIndent;
-
-                        if (Math.Abs(actualRight - _gost.HeaderIndentRight.Value) > 0.05)
+                        if (Math.Abs(rightIndent - _gost.HeaderIndentRight.Value) > 0.05)
                         {
-                            errorDetails.Add($"Правый отступ: {actualRight:F2} см (требуется {_gost.HeaderIndentRight.Value:F2} см)");
+                            errorDetails.Add($"\n       • Правый отступ: {rightIndent:F2} см (требуется {_gost.HeaderIndentRight.Value:F2} см)");
                             hasError = true;
                         }
                     }
@@ -159,7 +134,7 @@ namespace GOST_Control
                         string headerText = GetShortText2(paragraph.InnerText?.Trim() ?? "");
                         errors.Add(new TextErrorInfo
                         {
-                            ErrorMessage = $"Заголовок '{headerText}': {string.Join(", ", errorDetails)}",
+                            ErrorMessage = $"\n       • Заголовок '{headerText}': {string.Join(", ", errorDetails)}",
                             ProblemParagraph = paragraph,
                             ProblemRun = null
                         });
@@ -171,8 +146,10 @@ namespace GOST_Control
                 {
                     if (errors.Any())
                     {
-                        string errorMessage = $"Ошибки в отступах заголовков:\n{string.Join("\n", errors.Select(e => e.ErrorMessage).Take(3))}";
+                        string errorMessage = $"Ошибки в отступах заголовков:\n{string.Join("\n", errors.Select(e => e.ErrorMessage).Take(15))}";
+
                         if (errors.Count > 3) errorMessage += $"\n...и ещё {errors.Count - 3} ошибок";
+
                         updateUI?.Invoke(errorMessage, Brushes.Red);
                     }
                     else
@@ -191,139 +168,127 @@ namespace GOST_Control
         /// <param name="paragraphs"></param>
         /// <param name="updateUI"></param>
         /// <returns></returns>
-        public async Task<(bool IsValid, List<TextErrorInfo> Errors)> CheckHeaderParagraphSpacingAsync(List<Paragraph> paragraphs, Action<string, IBrush> updateUI)
+        public async Task<(bool IsValid, List<TextErrorInfo> Errors)> CheckHeaderParagraphSpacingAsync(List<Paragraph> paragraphs, WordprocessingDocument doc, Action<string, IBrush> updateUI)
         {
             return await Task.Run(() =>
             {
-                bool hasErrors = false;
-                var errors = new List<TextErrorInfo>();
+                var tempErrors = new List<TextErrorInfo>();
+                bool isValid = true;
                 var headerTexts = GetHeaderTexts(paragraphs, _gost);
 
-                var stylesPart = _wordDoc.MainDocumentPart?.StyleDefinitionsPart;
-                var styles = stylesPart?.Styles;
+                // Получаем все стили документа для проверки наследования
+                var allStyles = doc.MainDocumentPart?.StyleDefinitionsPart?.Styles?.Elements<Style>()?.ToDictionary(s => s.StyleId.Value) ?? new Dictionary<string, Style>();
 
                 foreach (var paragraph in paragraphs)
                 {
+                    // Проверяем по тексту параграфа, а не Run
                     if (!headerTexts.Contains(paragraph.InnerText.Trim()))
                         continue;
 
-                    var paraErrors = new List<string>();
-                    bool paragraphHasErrors = false;
+                    var firstRun = paragraph.Elements<Run>().FirstOrDefault(r => !string.IsNullOrWhiteSpace(r.InnerText));
+                    if (firstRun == null) continue;
 
-                    var explicitSpacing = paragraph.ParagraphProperties?.SpacingBetweenLines;
-
-                    Style style = null;
                     var styleId = paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value;
-                    if (styleId != null && styles != null)
-                    {
-                        style = styles.Elements<Style>().FirstOrDefault(s => s.StyleId?.Value == styleId);
-                    }
+                    var paragraphStyle = styleId != null && allStyles.TryGetValue(styleId, out var style) ? style : null;
 
-                    var styleSpacing = style?.StyleParagraphProperties?.SpacingBetweenLines;
+                    var errorMessages = new List<string>();
 
-                    // Межстрочный интервал
-                    if (_gost.HeaderLineSpacingValue.HasValue)
-                    {
-                        double actualSpacing = DefaultHeaderLineSpacingValue;
-                        string actualSpacingType = DefaultHeaderLineSpacingType;
-                        LineSpacingRuleValues? actualRule = LineSpacingRuleValues.Auto;
-
-                        var spacingSource = explicitSpacing ?? styleSpacing;
-                        if (spacingSource?.Line != null)
-                        {
-                            var rule = spacingSource.LineRule?.Value;
-                            var val = spacingSource.Line.Value;
-                            if (rule == LineSpacingRuleValues.Exact)
-                            {
-                                actualSpacing = double.Parse(val) / 567.0;
-                                actualSpacingType = "Точно";
-                                actualRule = LineSpacingRuleValues.Exact;
-                            }
-                            else if (rule == LineSpacingRuleValues.AtLeast)
-                            {
-                                actualSpacing = double.Parse(val) / 567.0;
-                                actualSpacingType = "Минимум";
-                                actualRule = LineSpacingRuleValues.AtLeast;
-                            }
-                            else
-                            {
-                                actualSpacing = double.Parse(val) / 240.0;
-                                actualSpacingType = "Множитель";
-                                actualRule = LineSpacingRuleValues.Auto;
-                            }
-                        }
-
-                        var requiredRule = (_gost.HeaderLineSpacingType ?? DefaultHeaderLineSpacingType) switch
-                        {
-                            "Минимум" => LineSpacingRuleValues.AtLeast,
-                            "Точно" => LineSpacingRuleValues.Exact,
-                            _ => LineSpacingRuleValues.Auto
-                        };
-
-                        if (actualRule != requiredRule)
-                        {
-                            paraErrors.Add($"тип интервала: '{actualSpacingType}' (требуется '{_gost.HeaderLineSpacingType}')");
-                            paragraphHasErrors = true;
-                        }
-
-                        if (Math.Abs(actualSpacing - _gost.HeaderLineSpacingValue.Value) > 0.1)
-                        {
-                            paraErrors.Add($"межстрочный интервал: {actualSpacing:F2} (требуется {_gost.HeaderLineSpacingValue.Value:F2})");
-                            paragraphHasErrors = true;
-                        }
-                    }
-
-                    // Интервалы "Перед" и "После"
-                    double actualBefore = styleSpacing?.Before?.Value != null ? ConvertTwipsToPoints(styleSpacing.Before.Value) : DefaultHeaderSpacingBefore;
-                    if (explicitSpacing?.Before?.Value != null)
-                        actualBefore = ConvertTwipsToPoints(explicitSpacing.Before.Value);
-
-                    if (_gost.HeaderLineSpacingBefore.HasValue && Math.Abs(actualBefore - _gost.HeaderLineSpacingBefore.Value) > 0.1)
-                    {
-                        paraErrors.Add($"интервал перед: {actualBefore:F1} pt (требуется {_gost.HeaderLineSpacingBefore.Value:F1} pt)");
-                        paragraphHasErrors = true;
-                    }
-
-                    double actualAfter = styleSpacing?.After?.Value != null ? ConvertTwipsToPoints(styleSpacing.After.Value) : DefaultHeaderSpacingAfter;
-                    if (explicitSpacing?.After?.Value != null)
-                        actualAfter = ConvertTwipsToPoints(explicitSpacing.After.Value);
-
-                    if (_gost.HeaderLineSpacingAfter.HasValue && Math.Abs(actualAfter - _gost.HeaderLineSpacingAfter.Value) > 0.1)
-                    {
-                        paraErrors.Add($"интервал после: {actualAfter:F1} pt (требуется {_gost.HeaderLineSpacingAfter.Value:F1} pt)");
-                        paragraphHasErrors = true;
-                    }
-
-                    // Выравнивание
+                    // Проверка выравнивания
                     if (!string.IsNullOrEmpty(_gost.HeaderAlignment))
                     {
-                        var currentAlignment = GetAlignmentString(paragraph.ParagraphProperties?.Justification) ?? DefaultHeaderAlignment;
-                        if (currentAlignment != _gost.HeaderAlignment)
+                        var (actualAlignment, isAlignmentDefined) = GetActualAlignmentForHeader(paragraph, paragraphStyle, allStyles);
+
+                        if (!isAlignmentDefined)
                         {
-                            paraErrors.Add($"выравнивание: {currentAlignment} (требуется {_gost.HeaderAlignment})");
-                            paragraphHasErrors = true;
+                            errorMessages.Add($"\n       • не удалось определить выравнивание");
+                            isValid = false;
+                        }
+                        else if (actualAlignment != _gost.HeaderAlignment)
+                        {
+                            errorMessages.Add($"\n       • выравнивание: '{actualAlignment}' (требуется '{_gost.HeaderAlignment}')");
+                            isValid = false;
                         }
                     }
 
-                    if (paragraphHasErrors)
+                    // Проверка междустрочного интервала
+                    if (_gost.HeaderLineSpacingValue.HasValue || !string.IsNullOrEmpty(_gost.HeaderLineSpacingType))
                     {
-                        errors.Add(new TextErrorInfo
+                        var (actualSpacingType, actualSpacingValue, isSpacingDefined) = GetActualLineSpacingForHeader(paragraph, paragraphStyle, allStyles);
+
+                        if (!isSpacingDefined)
                         {
-                            ErrorMessage = $"Заголовок '{paragraph.InnerText.Trim()}': {string.Join(", ", paraErrors)}",
+                            errorMessages.Add($"\n       • не удалось определить междустрочный интервал");
+                            isValid = false;
+                        }
+                        else
+                        {
+                            // Проверка типа интервала
+                            if (!string.IsNullOrEmpty(_gost.HeaderLineSpacingType))
+                            {
+                                string requiredType = _gost.HeaderLineSpacingType;
+                                if (actualSpacingType != requiredType)
+                                {
+                                    errorMessages.Add($"\n       • тип интервала: '{actualSpacingType}' (требуется '{requiredType}')");
+                                    isValid = false;
+                                }
+                            }
+
+                            // Проверка значения интервала
+                            if (_gost.HeaderLineSpacingValue.HasValue && Math.Abs(actualSpacingValue - _gost.HeaderLineSpacingValue.Value) > 0.01)
+                            {
+                                errorMessages.Add($"\n       • межстрочный интервал: {actualSpacingValue:F2} (требуется {_gost.HeaderLineSpacingValue.Value:F2})");
+                                isValid = false;
+                            }
+                        }
+                    }
+
+                    // Проверка интервалов перед/после
+                    if (_gost.HeaderLineSpacingBefore.HasValue || _gost.HeaderLineSpacingAfter.HasValue)
+                    {
+                        var (actualBefore, actualAfter, isSpacingDefined) = GetActualParagraphSpacingForHeader(paragraph, paragraphStyle, allStyles);
+
+                        if (!isSpacingDefined)
+                        {
+                            errorMessages.Add($"\n       • не удалось определить интервалы перед/после");
+                            isValid = false;
+                        }
+                        else
+                        {
+                            if (_gost.HeaderLineSpacingBefore.HasValue && Math.Abs(actualBefore - _gost.HeaderLineSpacingBefore.Value) > 0.01)
+                            {
+                                errorMessages.Add($"\n       • интервал перед: {actualBefore:F1} pt (требуется {_gost.HeaderLineSpacingBefore.Value:F1} pt)");
+                                isValid = false;
+                            }
+
+                            if (_gost.HeaderLineSpacingAfter.HasValue && Math.Abs(actualAfter - _gost.HeaderLineSpacingAfter.Value) > 0.01)
+                            {
+                                errorMessages.Add($"\n       • интервал после: {actualAfter:F1} pt (требуется {_gost.HeaderLineSpacingAfter.Value:F1} pt)");
+                                isValid = false;
+                            }
+                        }
+                    }
+
+                    if (errorMessages.Any())
+                    {
+                        string headerText = GetShortText2(paragraph.InnerText?.Trim() ?? "");
+                        tempErrors.Add(new TextErrorInfo
+                        {
+                            ErrorMessage = $"\n       • Заголовок '{headerText}': {string.Join(", ", errorMessages)}",
                             ProblemParagraph = paragraph,
-                            ProblemRun = null
+                            ProblemRun = firstRun
                         });
-                        hasErrors = true;
                     }
                 }
 
                 Dispatcher.UIThread.Post(() =>
                 {
-                    if (hasErrors)
+                    if (!isValid)
                     {
-                        var msg = $"Ошибки в заголовках:\n{string.Join("\n", errors.Select(e => e.ErrorMessage).Take(3))}";
-                        if (errors.Count > 3)
-                            msg += $"\n...и ещё {errors.Count - 3} ошибок";
+                        var msg = $"Ошибки в заголовках:\n{string.Join("\n", tempErrors.Select(e => e.ErrorMessage).Take(15))}";
+
+                        if (tempErrors.Count > 3)
+                            msg += $"\n...и ещё {tempErrors.Count - 3} ошибок";
+
                         updateUI?.Invoke(msg, Brushes.Red);
                     }
                     else
@@ -332,12 +297,12 @@ namespace GOST_Control
                     }
                 });
 
-                return (!hasErrors, errors);
+                return (isValid, tempErrors);
             });
         }
 
         /// <summary>
-        /// Проверка на наличие верных заголовков
+        /// Проверка основных заголовков (наличие и тип с размером шрифта)
         /// </summary>
         /// <param name="gost"></param>
         /// <param name="paragraphs"></param>
@@ -365,9 +330,17 @@ namespace GOST_Control
                 var missingSections = new List<string>();
                 var invalidSections = new List<string>();
 
-                var headerStyles = doc.MainDocumentPart?.StyleDefinitionsPart?.Styles.Elements<Style>().Where(s => s.StyleName?.Val?.Value?.StartsWith("Heading") == true ||
-                                                                               s.StyleName?.Val?.Value?.StartsWith("Заголовок") == true).ToDictionary(s => s.StyleId.Value);
+                // Получаем все стили документа для проверки наследования
+                var allStyles = doc.MainDocumentPart?.StyleDefinitionsPart?.Styles?.Elements<Style>()?.ToDictionary(s => s.StyleId.Value) ?? new Dictionary<string, Style>();
 
+                // 1. Проверяем дублирование заголовков
+                var (hasDuplicates, duplicateErrors) = CheckDuplicateMainHeaders(paragraphs, requiredSections);
+                if (hasDuplicates)
+                {
+                    errors.AddRange(duplicateErrors);
+                }
+
+                // 2. Проверяем обязательные разделы (Введение, Заключение и т.д.)
                 foreach (var section in requiredSections)
                 {
                     bool sectionFound = false;
@@ -379,64 +352,58 @@ namespace GOST_Control
                         if (text.IndexOf(section, StringComparison.OrdinalIgnoreCase) >= 0)
                         {
                             sectionFound = true;
+                            var firstRun = paragraph.Elements<Run>().FirstOrDefault(r => !string.IsNullOrWhiteSpace(r.InnerText));
 
-                            Style paragraphStyle = null;
-                            var styleId = paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value;
-
-                            if (styleId != null && headerStyles.TryGetValue(styleId, out var style))
+                            if (firstRun != null)
                             {
-                                paragraphStyle = style;
-                            }
+                                var errorMessages = new List<string>();
 
-                            foreach (var run in paragraph.Elements<Run>())
-                            {
-                                if (string.IsNullOrWhiteSpace(run.InnerText)) continue;
-
+                                // Проверка шрифта для обязательных разделов
                                 if (checkFont)
                                 {
-                                    var font = run.RunProperties?.RunFonts?.Ascii?.Value ??
-                                             paragraphStyle?.StyleRunProperties?.RunFonts?.Ascii?.Value ??
-                                             DefaultHeaderFont;
+                                    var (actualFont, isFontDefined) = GetActualFontForHeader(firstRun, paragraph, allStyles);
 
-                                    if (font != null && !string.Equals(font, requiredFont, StringComparison.OrdinalIgnoreCase))
+                                    if (!isFontDefined)
                                     {
-                                        errors.Add(new TextErrorInfo
-                                        {
-                                            ErrorMessage = $"{section} (неверный шрифт: '{font}')",
-                                            ProblemRun = run,
-                                            ProblemParagraph = paragraph
-                                        });
+                                        errorMessages.Add("\n       • не удалось определить шрифт");
+                                        sectionValid = false;
+                                        invalidSections.Add(section);
+                                    }
+                                    else if (!string.Equals(actualFont, requiredFont, StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        errorMessages.Add($"\n       • неверный шрифт: '{actualFont}' (требуется: '{requiredFont}')");
                                         sectionValid = false;
                                         invalidSections.Add(section);
                                     }
                                 }
 
+                                // Проверка размера шрифта для обязательных разделов
                                 if (checkSize)
                                 {
-                                    double? size = null;
-                                    var fontSize = run.RunProperties?.FontSize?.Val?.Value ??
-                                                 paragraphStyle?.StyleRunProperties?.FontSize?.Val?.Value;
+                                    var (actualSize, isSizeDefined) = GetActualFontSizeForHeader(firstRun, paragraph, allStyles);
 
-                                    if (fontSize != null)
+                                    if (!isSizeDefined)
                                     {
-                                        size = double.Parse(fontSize) / 2;
-                                    }
-                                    else
-                                    {
-                                        size = DefaultHeaderSize;
-                                    }
-
-                                    if (size.HasValue && Math.Abs(size.Value - requiredSize.Value) > 0.1)
-                                    {
-                                        errors.Add(new TextErrorInfo
-                                        {
-                                            ErrorMessage = $"{section} (неверный размер: {size:F1} pt)",
-                                            ProblemRun = run,
-                                            ProblemParagraph = paragraph
-                                        });
+                                        errorMessages.Add("\n       • не удалось определить размер шрифта");
                                         sectionValid = false;
                                         invalidSections.Add(section);
                                     }
+                                    else if (Math.Abs(actualSize - requiredSize.Value) > 0.1)
+                                    {
+                                        errorMessages.Add($"\n       • неверный размер: {actualSize:F1} pt (требуется: {requiredSize.Value:F1})");
+                                        sectionValid = false;
+                                        invalidSections.Add(section);
+                                    }
+                                }
+
+                                if (errorMessages.Any())
+                                {
+                                    errors.Add(new TextErrorInfo
+                                    {
+                                        ErrorMessage = $"\n       {section} {string.Join(": ", errorMessages)}",
+                                        ProblemRun = firstRun,
+                                        ProblemParagraph = paragraph
+                                    });
                                 }
                             }
                         }
@@ -453,12 +420,69 @@ namespace GOST_Control
                     }
                 }
 
+                // 3. ПРОВЕРКА ПРИЛОЖЕНИЙ 
+                foreach (var paragraph in paragraphs)
+                {
+                    var text = paragraph.InnerText.Trim();
+                    var match = Regex.Match(text, @"^(ПРИЛОЖЕНИЕ\s+[А-Я0-9]+(\.\d+)*)", RegexOptions.IgnoreCase);
+                    if (match.Success)
+                    {
+                        string appendixFullName = match.Groups[1].Value.ToUpper();
+                        var firstRun = paragraph.Elements<Run>().FirstOrDefault(r => !string.IsNullOrWhiteSpace(r.InnerText));
+
+                        if (firstRun != null)
+                        {
+                            var errorMessages = new List<string>();
+
+                            if (checkFont)
+                            {
+                                var (actualFont, isFontDefined) = GetActualFontForHeader(firstRun, paragraph, allStyles);
+                                if (!isFontDefined)
+                                {
+                                    errorMessages.Add("\n       • не удалось определить шрифт");
+                                    allSectionsValid = false;
+                                }
+                                else if (!string.Equals(actualFont, requiredFont, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    errorMessages.Add($"\n       • неверный шрифт: '{actualFont}' (требуется: '{requiredFont}')");
+                                    allSectionsValid = false;
+                                }
+                            }
+
+                            if (checkSize)
+                            {
+                                var (actualSize, isSizeDefined) = GetActualFontSizeForHeader(firstRun, paragraph, allStyles);
+                                if (!isSizeDefined)
+                                {
+                                    errorMessages.Add("\n       • не удалось определить размер шрифта");
+                                    allSectionsValid = false;
+                                }
+                                else if (Math.Abs(actualSize - requiredSize.Value) > 0.1)
+                                {
+                                    errorMessages.Add($"\n       • неверный размер: {actualSize:F1} pt (требуется: {requiredSize.Value:F1} pt)");
+                                    allSectionsValid = false;
+                                }
+                            }
+
+                            if (errorMessages.Any())
+                            {
+                                errors.Add(new TextErrorInfo
+                                {
+                                    ErrorMessage = $"\n       {appendixFullName} {string.Join(": ", errorMessages)}",
+                                    ProblemRun = firstRun,
+                                    ProblemParagraph = paragraph
+                                });
+                            }
+                        }
+                    }
+                }
+
                 // Добавляем ошибки для отсутствующих разделов
                 if (!allSectionsFound)
                 {
                     errors.AddRange(missingSections.Select(s => new TextErrorInfo
                     {
-                        ErrorMessage = $"Отсутствует раздел: {s}",
+                        ErrorMessage = $"\n       • Отсутствует раздел: {s}",
                         ProblemRun = null,
                         ProblemParagraph = null
                     }));
@@ -466,20 +490,19 @@ namespace GOST_Control
 
                 Dispatcher.UIThread.Post(() =>
                 {
-                    if (!allSectionsFound)
+                    if (errors.Any())
                     {
-                        updateUI?.Invoke($"Не найдены разделы: {string.Join(", ", missingSections)}", Brushes.Red);
-                    }
-                    else if (!allSectionsValid)
-                    {
-                        string msg = $"Ошибки в разделах:\n{string.Join("\n", errors.Select(e => e.ErrorMessage).Take(3))}";
+                        string errorMessage = "Ошибки шрифта и размера в основных заголовках:\n" + string.Join("\n", 
+                                              errors.Where(e => !string.IsNullOrEmpty(e.ErrorMessage)).Select(e => e.ErrorMessage).Take(15));
+
                         if (errors.Count > 3)
-                            msg += $"\n...и ещё {errors.Count - 3} ошибок";
-                        updateUI?.Invoke(msg, Brushes.Red);
+                            errorMessage += $"\n...и ещё {errors.Count - 3} ошибок";
+
+                        updateUI?.Invoke(errorMessage, Brushes.Red);
                     }
                     else
                     {
-                        updateUI?.Invoke("Все обязательные разделы соответствуют требованиям ГОСТ", Brushes.Green);
+                        updateUI?.Invoke("Основные заголовки соответствуют ГОСТу", Brushes.Green);
                     }
                 });
 
@@ -488,7 +511,7 @@ namespace GOST_Control
         }
 
         /// <summary>
-        /// метод для проверки стилей дополнительных заголовков
+        /// метод для проверки дополнительных заголовков
         /// </summary>
         /// <param name="doc"></param>
         /// <param name="paragraphs"></param>
@@ -499,262 +522,229 @@ namespace GOST_Control
         {
             return await Task.Run(() =>
             {
-                bool isValid = true;
                 var errors = new List<TextErrorInfo>();
-                var stylesPart = doc.MainDocumentPart?.StyleDefinitionsPart;
-                var styles = stylesPart?.Styles;
+                bool isValid = true;
+
+                // 1. Сначала проверяем дублирование номеров
+                var (hasDuplicates, duplicateErrors) = CheckDuplicateHeaderNumbers(paragraphs, gost);
+                if (hasDuplicates)
+                {
+                    errors.AddRange(duplicateErrors);
+                    isValid = false;
+                }
+
+                // Получаем все стили документа для проверки наследования
+                var allStyles = doc.MainDocumentPart?.StyleDefinitionsPart?.Styles?.Elements<Style>()?.ToDictionary(s => s.StyleId.Value) ?? new Dictionary<string, Style>();
 
                 foreach (var paragraph in paragraphs)
                 {
                     if (!_isAdditionalHeader(paragraph, gost))
                         continue;
 
+                    var styleId = paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value;
+                    var paragraphStyle = styleId != null && allStyles.TryGetValue(styleId, out var style) ? style : null;
+
                     bool hasError = false;
                     var errorDetails = new List<string>();
-                    var styleId = paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value;
-                    Style style = styleId != null ? styles?.Elements<Style>().FirstOrDefault(s => s.StyleId?.Value == styleId) : null;
 
-                    // Проверка шрифта
+                    // 1. Проверка выравнивания
+                    if (!string.IsNullOrEmpty(gost.AdditionalHeaderAlignment))
+                    {
+                        var (actualAlignment, isAlignmentDefined) = GetActualAlignmentForHeader(paragraph, paragraphStyle, allStyles);
+
+                        if (!isAlignmentDefined)
+                        {
+                            errorDetails.Add($"\n       • не удалось определить выравнивание");
+                            hasError = true;
+                        }
+                        else if (actualAlignment != gost.AdditionalHeaderAlignment)
+                        {
+                            errorDetails.Add($"\n          • выравнивание: '{actualAlignment}' (требуется '{gost.AdditionalHeaderAlignment}')");
+                            hasError = true;
+                        }
+                    }
+
+                    // 2. Проверка междустрочного интервала
+                    if (gost.AdditionalHeaderLineSpacingValue.HasValue || !string.IsNullOrEmpty(gost.AdditionalHeaderLineSpacingType))
+                    {
+                        var (actualSpacingType, actualSpacingValue, isSpacingDefined) = GetActualLineSpacingForHeader(paragraph, paragraphStyle, allStyles);
+
+                        if (!isSpacingDefined)
+                        {
+                            errorDetails.Add($"\n       • не удалось определить междустрочный интервал");
+                            hasError = true;
+                        }
+                        else
+                        {
+                            // Проверка типа интервала
+                            if (!string.IsNullOrEmpty(gost.AdditionalHeaderLineSpacingType))
+                            {
+                                string requiredType = gost.AdditionalHeaderLineSpacingType;
+                                if (actualSpacingType != requiredType)
+                                {
+                                    errorDetails.Add($"\n          • тип интервала: '{actualSpacingType}' (требуется '{requiredType}')");
+                                    hasError = true;
+                                }
+                            }
+
+                            // Проверка значения интервала
+                            if (gost.AdditionalHeaderLineSpacingValue.HasValue && Math.Abs(actualSpacingValue - gost.AdditionalHeaderLineSpacingValue.Value) > 0.01)
+                            {
+                                errorDetails.Add($"\n          • межстрочный интервал: {actualSpacingValue:F2} (требуется {gost.AdditionalHeaderLineSpacingValue.Value:F2})");
+                                hasError = true;
+                            }
+                        }
+                    }
+
+                    // 3. Проверка интервалов перед/после
+                    if (gost.AdditionalHeaderLineSpacingBefore.HasValue || gost.AdditionalHeaderLineSpacingAfter.HasValue)
+                    {
+                        var (actualBefore, actualAfter, isSpacingDefined) = GetActualParagraphSpacingForHeader(paragraph, paragraphStyle, allStyles);
+
+                        if (!isSpacingDefined)
+                        {
+                            errorDetails.Add($"\n       • не удалось определить интервалы перед/после");
+                            hasError = true;
+                        }
+                        else
+                        {
+                            if (gost.AdditionalHeaderLineSpacingBefore.HasValue && Math.Abs(actualBefore - gost.AdditionalHeaderLineSpacingBefore.Value) > 0.1)
+                            {
+                                errorDetails.Add($"\n          • интервал перед: {actualBefore:F1} pt (требуется {gost.AdditionalHeaderLineSpacingBefore.Value:F1} pt)");
+                                hasError = true;
+                            }
+
+                            if (gost.AdditionalHeaderLineSpacingAfter.HasValue && Math.Abs(actualAfter - gost.AdditionalHeaderLineSpacingAfter.Value) > 0.1)
+                            {
+                                errorDetails.Add($"\n          • интервал после: {actualAfter:F1} pt (требуется {gost.AdditionalHeaderLineSpacingAfter.Value:F1} pt)");
+                                hasError = true;
+                            }
+                        }
+                    }
+
+                    // 4. Проверка шрифта
                     if (!string.IsNullOrEmpty(gost.AdditionalHeaderFontName))
                     {
                         foreach (var run in paragraph.Elements<Run>())
                         {
                             if (_shouldSkipRun(run)) continue;
 
-                            var font = run.RunProperties?.RunFonts?.Ascii?.Value;
+                            var (actualFont, isFontDefined) = GetActualFontForHeader(run, paragraph, allStyles);
 
-                            if (string.IsNullOrEmpty(font))
+                            if (!isFontDefined)
                             {
-                                font = style?.StyleRunProperties?.RunFonts?.Ascii?.Value ?? DefaultAdditionalHeaderFontName;
-                            }
-
-                            if (font != gost.AdditionalHeaderFontName)
-                            {
-                                errorDetails.Add($"шрифт: '{font}' (требуется '{gost.AdditionalHeaderFontName}')\n");
+                                errorDetails.Add($"\n       • не удалось определить шрифт");
                                 hasError = true;
+                                break;
+                            }
+                            else if (!string.Equals(actualFont, gost.AdditionalHeaderFontName, StringComparison.OrdinalIgnoreCase))
+                            {
+                                errorDetails.Add($"\n          • шрифт: '{actualFont}' (требуется '{gost.AdditionalHeaderFontName}')");
+                                hasError = true;
+                                break;
                             }
                         }
                     }
 
-                    // Проверка размера шрифта
+                    // 5. Проверка размера шрифта
                     if (gost.AdditionalHeaderFontSize.HasValue)
                     {
                         foreach (var run in paragraph.Elements<Run>())
                         {
                             if (_shouldSkipRun(run)) continue;
 
-                            var fontSizeVal = run.RunProperties?.FontSize?.Val?.Value ?? style?.StyleRunProperties?.FontSize?.Val?.Value;
+                            var (actualSize, isSizeDefined) = GetActualFontSizeForHeader(run, paragraph, allStyles);
 
-                            double actualSize = fontSizeVal != null ? double.Parse(fontSizeVal) / 2 : DefaultAdditionalHeaderFontSize;
-
-                            if (Math.Abs(actualSize - gost.AdditionalHeaderFontSize.Value) > 0.1)
+                            if (!isSizeDefined)
                             {
-                                errorDetails.Add($"размер: {actualSize:F1} pt (требуется {gost.AdditionalHeaderFontSize.Value:F1} pt)\n");
+                                errorDetails.Add($"\n       • не удалось определить размер шрифта");
                                 hasError = true;
+                                break;
                             }
-                        }
-                    }
-
-                    // Проверка выравнивания
-                    if (!string.IsNullOrEmpty(gost.AdditionalHeaderAlignment))
-                    {
-                        string currentAlignment = GetAlignmentString(paragraph.ParagraphProperties?.Justification ?? style?.StyleParagraphProperties?.Justification) ?? DefaultAdditionalHeaderAlignment;
-
-                        if (currentAlignment != gost.AdditionalHeaderAlignment)
-                        {
-                            errorDetails.Add($"выравнивание: {currentAlignment} (требуется {gost.AdditionalHeaderAlignment})\n");
-                            hasError = true;
-                        }
-                    }
-
-                    // Проверка межстрочного интервала
-                    if (gost.AdditionalHeaderLineSpacingValue.HasValue)
-                    {
-                        double actualSpacing = DefaultAdditionalHeaderLineSpacingValue;
-                        string actualSpacingType = DefaultAdditionalHeaderLineSpacingType;
-                        LineSpacingRuleValues? actualRule = LineSpacingRuleValues.Auto;
-
-                        var explicitSpacing = paragraph.ParagraphProperties?.SpacingBetweenLines;
-                        var styleSpacing = style?.StyleParagraphProperties?.SpacingBetweenLines;
-                        var spacingSource = explicitSpacing ?? styleSpacing;
-
-                        if (spacingSource?.Line != null)
-                        {
-                            if (spacingSource.LineRule?.Value == LineSpacingRuleValues.Exact)
+                            else if (Math.Abs(actualSize - gost.AdditionalHeaderFontSize.Value) > 0.1)
                             {
-                                actualSpacing = double.Parse(spacingSource.Line.Value) / 567.0;
-                                actualSpacingType = "Точно";
-                                actualRule = LineSpacingRuleValues.Exact;
+                                errorDetails.Add($"\n          • размер шрифта: {actualSize:F1} pt (требуется {gost.AdditionalHeaderFontSize.Value:F1} pt)");
+                                hasError = true;
+                                break;
                             }
-                            else if (spacingSource.LineRule?.Value == LineSpacingRuleValues.AtLeast)
-                            {
-                                actualSpacing = double.Parse(spacingSource.Line.Value) / 567.0;
-                                actualSpacingType = "Минимум";
-                                actualRule = LineSpacingRuleValues.AtLeast;
-                            }
-                            else
-                            {
-                                actualSpacing = double.Parse(spacingSource.Line.Value) / 240.0;
-                                actualSpacingType = "Множитель";
-                                actualRule = LineSpacingRuleValues.Auto;
-                            }
-                        }
-
-                        // Тип интервала, который должен быть по ГОСТу
-                        LineSpacingRuleValues requiredRule = gost.AdditionalHeaderLineSpacingType switch
-                        {
-                            "Минимум" => LineSpacingRuleValues.AtLeast,
-                            "Точно" => LineSpacingRuleValues.Exact,
-                            _ => LineSpacingRuleValues.Auto
-                        };
-
-                        // Проверка типа интервала
-                        if (actualRule != requiredRule)
-                        {
-                            errorDetails.Add($"тип интервала: '{actualSpacingType}' (требуется '{gost.AdditionalHeaderLineSpacingType}')\n");
-                            hasError = true;
-                        }
-
-                        // Проверка значения интервала
-                        if (Math.Abs(actualSpacing - gost.AdditionalHeaderLineSpacingValue.Value) > 0.1)
-                        {
-                            errorDetails.Add($"межстрочный интервал: {actualSpacing:F2} (требуется {gost.AdditionalHeaderLineSpacingValue:F2})\n");
-                            hasError = true;
                         }
                     }
 
-                    // Проверка интервалов "Перед" и "После"
-                    if (gost.AdditionalHeaderLineSpacingBefore.HasValue || gost.AdditionalHeaderLineSpacingAfter.HasValue)
-                    {
-                        double actualBefore = DefaultAdditionalHeaderLineSpacingBefore;
-                        double actualAfter = DefaultAdditionalHeaderLineSpacingAfter;
-
-                        var explicitSpacing = paragraph.ParagraphProperties?.SpacingBetweenLines;
-                        var styleSpacing = style?.StyleParagraphProperties?.SpacingBetweenLines;
-
-                        if (explicitSpacing?.Before?.Value != null)
-                        {
-                            actualBefore = ConvertTwipsToPoints(explicitSpacing.Before.Value);
-                        }
-                        else if (styleSpacing?.Before?.Value != null)
-                        {
-                            actualBefore = ConvertTwipsToPoints(styleSpacing.Before.Value);
-                        }
-
-                        if (gost.AdditionalHeaderLineSpacingBefore.HasValue && Math.Abs(actualBefore - gost.AdditionalHeaderLineSpacingBefore.Value) > 0.1)
-                        {
-                            errorDetails.Add($"интервал перед: {actualBefore:F1} pt! (требуется {gost.AdditionalHeaderLineSpacingBefore.Value:F1} pt)\n");
-                            hasError = true;
-                        }
-
-                        if (explicitSpacing?.After?.Value != null)
-                        {
-                            actualAfter = ConvertTwipsToPoints(explicitSpacing.After.Value);
-                        }
-                        else if (styleSpacing?.After?.Value != null)
-                        {
-                            actualAfter = ConvertTwipsToPoints(styleSpacing.After.Value);
-                        }
-
-                        if (gost.AdditionalHeaderLineSpacingAfter.HasValue && Math.Abs(actualAfter - gost.AdditionalHeaderLineSpacingAfter.Value) > 0.1)
-                        {
-                            errorDetails.Add($"интервал после: {actualAfter:F1} pt! (требуется {gost.AdditionalHeaderLineSpacingAfter.Value:F1} pt)\n");
-                            hasError = true;
-                        }
-                    }
-
-                    // Проверка отступов
+                    // Получаем отступы для дополнительных проверок
                     var indent = paragraph.ParagraphProperties?.Indentation;
-                    var styleIndent = style?.StyleParagraphProperties?.Indentation;
+                    var styleIndent = GetStyleIndentation(paragraphStyle, allStyles);
+                    indent ??= styleIndent;
 
-                    // Преобразуем все значения в сантиметры
-                    double leftIndent = indent?.Left?.Value != null ? TwipsToCm(double.Parse(indent.Left.Value)) :
-                                     styleIndent?.Left?.Value != null ? TwipsToCm(double.Parse(styleIndent.Left.Value)) : 0;
+                    double leftIndent = indent?.Left?.Value != null ? ConvertTwipsToCm(indent.Left.Value) : 0;
+                    double rightIndent = indent?.Right?.Value != null ? ConvertTwipsToCm(indent.Right.Value) : 0;
+                    double firstLineIndent = indent?.FirstLine?.Value != null ? ConvertTwipsToCm(indent.FirstLine.Value) : 0;
+                    double hangingIndent = indent?.Hanging?.Value != null ? ConvertTwipsToCm(indent.Hanging.Value) : 0;
 
-                    double firstLineIndent = indent?.FirstLine?.Value != null ? TwipsToCm(double.Parse(indent.FirstLine.Value)) :
-                                          styleIndent?.FirstLine?.Value != null ? TwipsToCm(double.Parse(styleIndent.FirstLine.Value)) : 0;
-
-                    double hangingIndent = indent?.Hanging?.Value != null ? TwipsToCm(double.Parse(indent.Hanging.Value)) :
-                                        styleIndent?.Hanging?.Value != null ? TwipsToCm(double.Parse(styleIndent.Hanging.Value)) : 0;
-
-                    // 1. ПРОВЕРКА ВИЗУАЛЬНОГО ЛЕВОГО ОТСТУПА ЗАГОЛОВКА
+                    // 6. Проверка левого отступа
                     if (gost.AdditionalHeaderIndentLeft.HasValue)
                     {
-                        double actualTextIndent = leftIndent; // Базовый отступ
+                        double actualTextIndent = leftIndent;
 
-                        // Корректировка если есть выступ (hanging)
                         if (hangingIndent > 0)
-                        {
                             actualTextIndent = leftIndent - hangingIndent;
-                        }
 
                         if (Math.Abs(actualTextIndent - gost.AdditionalHeaderIndentLeft.Value) > 0.05)
                         {
-                            errorDetails.Add($"Левый отступ заголовка: {actualTextIndent:F2} см (требуется {gost.AdditionalHeaderIndentLeft.Value:F2} см)\n");
+                            errorDetails.Add($"\n          • Левый отступ: {actualTextIndent:F2} см (требуется {gost.AdditionalHeaderIndentLeft.Value:F2} см)");
                             hasError = true;
                         }
                     }
 
-                    // 2. ПРОВЕРКА ПРАВОГО ОТСТУПА ЗАГОЛОВКА
-                    if (gost.AdditionalHeaderIndentRight.HasValue)
-                    {
-                        double actualRight = indent?.Right?.Value != null ? TwipsToCm(double.Parse(indent.Right.Value)) :
-                                          styleIndent?.Right?.Value != null ? TwipsToCm(double.Parse(styleIndent.Right.Value)) :
-                                          DefaultAdditionalHeaderIndentRight;
-
-                        if (Math.Abs(actualRight - gost.AdditionalHeaderIndentRight.Value) > 0.05)
-                        {
-                            errorDetails.Add($"Правый отступ: {actualRight:F2} см (требуется {gost.AdditionalHeaderIndentRight.Value:F2} см)\n");
-                            hasError = true;
-                        }
-                    }
-
-                    // 3. ПРОВЕРКА ПЕРВОЙ СТРОКИ ЗАГОЛОВКА
-                    if (gost.AdditionalHeaderFirstLineIndent.HasValue)
+                    // 7. Проверка типа и значения первой строки
+                    if (gost.AdditionalHeaderFirstLineIndent.HasValue || !string.IsNullOrEmpty(gost.AdditionalHeaderIndentOrOutdent))
                     {
                         bool isHanging = hangingIndent > 0;
                         bool isFirstLine = firstLineIndent > 0;
 
-                        // Проверка типа (выступ/отступ)
+                        // Тип первой строки
                         if (!string.IsNullOrEmpty(gost.AdditionalHeaderIndentOrOutdent))
                         {
-                            bool typeError = false;
-
-                            if (gost.AdditionalHeaderIndentOrOutdent == "Выступ" && !isHanging)
-                                typeError = true;
-                            else if (gost.AdditionalHeaderIndentOrOutdent == "Отступ" && !isFirstLine)
-                                typeError = true;
-                            else if (gost.AdditionalHeaderIndentOrOutdent == "Нет" && (isHanging || isFirstLine))
-                                typeError = true;
-
-                            if (typeError)
+                            string actualType = isHanging ? "Выступ" : isFirstLine ? "Отступ" : "Нет";
+                            if (actualType != gost.AdditionalHeaderIndentOrOutdent)
                             {
-                                errorDetails.Add($"Тип первой строки: {(isHanging ? "Выступ" : isFirstLine ? "Отступ" : "Нет")} (требуется {gost.AdditionalHeaderIndentOrOutdent})\n");
+                                errorDetails.Add($"\n          • Тип первой строки: '{actualType}' (требуется '{gost.AdditionalHeaderIndentOrOutdent}')");
                                 hasError = true;
                             }
                         }
 
-                        // Проверка значения
-                        double currentValue = isHanging ? hangingIndent : firstLineIndent;
-                        if ((isHanging || isFirstLine) && Math.Abs(currentValue - gost.AdditionalHeaderFirstLineIndent.Value) > 0.05)
+                        // Значение отступа/выступа
+                        if (gost.AdditionalHeaderFirstLineIndent.HasValue)
                         {
-                            errorDetails.Add($"{(isHanging ? "Выступ" : "Отступ")} первой строки: {currentValue:F2} см (требуется {gost.AdditionalHeaderFirstLineIndent.Value:F2} см)\n");
-                            hasError = true;
-                        }
-                        else if (gost.AdditionalHeaderIndentOrOutdent != "Нет" && !isHanging && !isFirstLine)
-                        {
-                            errorDetails.Add($"Отсутствует {gost.AdditionalHeaderIndentOrOutdent} первой строки\n");
-                            hasError = true;
+                            double actualValue = isHanging ? hangingIndent : firstLineIndent;
+                            if ((isHanging || isFirstLine) && Math.Abs(actualValue - gost.AdditionalHeaderFirstLineIndent.Value) > 0.05)
+                            {
+                                errorDetails.Add($"\n          • {(isHanging ? "Выступ" : "Отступ")} первой строки: {actualValue:F2} см (требуется {gost.AdditionalHeaderFirstLineIndent.Value:F2} см)");
+                                hasError = true;
+                            }
+                            else if (!isHanging && !isFirstLine && gost.AdditionalHeaderIndentOrOutdent != "Нет")
+                            {
+                                errorDetails.Add($"\n          • Отсутствует {gost.AdditionalHeaderIndentOrOutdent} первой строки");
+                                hasError = true;
+                            }
                         }
                     }
 
+                    // 8. Проверка правого отступа
+                    if (gost.AdditionalHeaderIndentRight.HasValue)
+                    {
+                        if (Math.Abs(rightIndent - gost.AdditionalHeaderIndentRight.Value) > 0.05)
+                        {
+                            errorDetails.Add($"\n          • Правый отступ: {rightIndent:F2} см (требуется {gost.AdditionalHeaderIndentRight.Value:F2} см)");
+                            hasError = true;
+                        }
+                    }
 
                     if (hasError)
                     {
                         string shortText = GetShortText2(paragraph.InnerText?.Trim() ?? "");
                         errors.Add(new TextErrorInfo
                         {
-                            ErrorMessage = $"Заголовок '{shortText}': {string.Join("        - ", errorDetails)}",
+                            ErrorMessage = $"\n       • Доп. заголовок '{shortText}': {string.Join(", ", errorDetails)}",
                             ProblemParagraph = paragraph,
                             ProblemRun = null
                         });
@@ -766,8 +756,12 @@ namespace GOST_Control
                 {
                     if (errors.Any())
                     {
-                        string errorMessage = "Ошибки в дополнительных заголовках:\n";
-                        errorMessage += string.Join("\n", errors.Select(error => $"  • {error.ErrorMessage}"));
+                        string errorMessage = "Ошибки в доп. заголовках:\n" +
+                            string.Join("\n", errors.Select(e => e.ErrorMessage).Take(15));
+
+                        if (errors.Count > 3)
+                            errorMessage += $"\n...и ещё {errors.Count - 3} ошибок";
+
                         updateUI?.Invoke(errorMessage, Brushes.Red);
                     }
                     else
@@ -781,11 +775,434 @@ namespace GOST_Control
         }
 
         /// <summary>
-        /// Конвертирует twips в сантиметры (1 см = 567 twips)
+        /// Проверяет дублирование номеров у заголовков
         /// </summary>
-        /// <param name="twips"></param>
+        /// <param name="paragraphs"></param>
+        /// <param name="gost"></param>
         /// <returns></returns>
-        private double TwipsToCm(double twips) => twips / 567.0;
+        private (bool HasDuplicates, List<TextErrorInfo> Errors) CheckDuplicateHeaderNumbers(List<Paragraph> paragraphs, Gost gost)
+        {
+            var errors = new List<TextErrorInfo>();
+            var headerGroups = new Dictionary<string, List<(Paragraph paragraph, string fullText)>>();
+            bool hasDuplicates = false;
+
+            // Группируем заголовки по номерам
+            foreach (var paragraph in paragraphs)
+            {
+                if (!_isAdditionalHeader(paragraph, gost))
+                    continue;
+
+                var text = paragraph.InnerText?.Trim();
+                if (string.IsNullOrEmpty(text)) continue;
+
+                var match = Regex.Match(text, @"^(\d+(?:\.\d+)*)[\s\t]+(.+)");
+                if (!match.Success) continue;
+
+                var number = match.Groups[1].Value;
+                var headerText = $"{number} {match.Groups[2].Value.Trim()}";
+
+                if (!headerGroups.ContainsKey(number))
+                {
+                    headerGroups[number] = new List<(Paragraph, string)>();
+                }
+                headerGroups[number].Add((paragraph, headerText));
+            }
+
+            // Обрабатываем группы с дубликатами
+            foreach (var group in headerGroups.Where(g => g.Value.Count > 1))
+            {
+                hasDuplicates = true;
+
+                var errorMessage = new StringBuilder("\n       • Обнаружено дублирование номеров в заголовках!");
+                foreach (var header in group.Value)
+                {
+                    errorMessage.Append($"\n            - {header.fullText}");
+                }
+                errorMessage.Append($"\n            Данные дополнительные заголовки имеют одинаковый номер: '{group.Key}'");
+
+                // Добавляем одно сообщение для отображения ошибки
+                errors.Add(new TextErrorInfo
+                {
+                    ErrorMessage = errorMessage.ToString(),
+                    ProblemParagraph = group.Value.First().paragraph,
+                    ProblemRun = null
+                });
+
+                foreach (var header in group.Value.Skip(1))
+                {
+                    errors.Add(new TextErrorInfo
+                    {
+                        ErrorMessage = null,
+                        ProblemParagraph = header.paragraph,
+                        ProblemRun = null
+                    });
+                }
+            }
+
+            return (hasDuplicates, errors);
+        }
+
+        /// <summary>
+        /// Проверяет дублирование номеров у главных заголовков
+        /// </summary>
+        /// <param name="paragraphs"></param>
+        /// <param name="gost"></param>
+        /// <param name="requiredSections"></param>
+        /// <returns></returns>
+        private (bool HasDuplicates, List<TextErrorInfo> Errors) CheckDuplicateMainHeaders(List<Paragraph> paragraphs, List<string> requiredSections)
+        {
+            var errors = new List<TextErrorInfo>();
+            var headerGroups = new Dictionary<string, List<Paragraph>>(StringComparer.OrdinalIgnoreCase);
+            bool hasDuplicates = false;
+
+            // Собираем все заголовки, которые соответствуют обязательным разделам
+            foreach (var paragraph in paragraphs)
+            {
+                var text = paragraph.InnerText?.Trim();
+                if (string.IsNullOrEmpty(text)) continue;
+
+                var cleanText = Regex.Replace(text, @"^\d+[\s\.]*", "").Trim();
+
+                // Проверяем, является ли этот заголовок обязательным разделом
+                if (requiredSections.Contains(cleanText, StringComparer.OrdinalIgnoreCase))
+                {
+                    if (!headerGroups.ContainsKey(cleanText))
+                    {
+                        headerGroups[cleanText] = new List<Paragraph>();
+                    }
+                    headerGroups[cleanText].Add(paragraph);
+                }
+            }
+
+            // Проверяем дубликаты
+            foreach (var group in headerGroups)
+            {
+                if (group.Value.Count > 1) 
+                {
+                    hasDuplicates = true;
+
+                    var errorMessage = new StringBuilder($"\n       • Обнаружено дублирование заголовка '{group.Key}':");
+                    foreach (var para in group.Value)
+                    {
+                        errorMessage.Append($"\n            - {GetShortText2(para.InnerText.Trim())}");
+                    }
+
+                    errors.Add(new TextErrorInfo
+                    {
+                        ErrorMessage = errorMessage.ToString(),
+                        ProblemParagraph = group.Value.First(),
+                        ProblemRun = null
+                    });
+
+                    foreach (var para in group.Value.Skip(1))
+                    {
+                        errors.Add(new TextErrorInfo
+                        {
+                            ErrorMessage = null,
+                            ProblemParagraph = para,
+                            ProblemRun = null
+                        });
+                    }
+                }
+            }
+
+            return (hasDuplicates, errors);
+        }
+
+        private Indentation GetStyleIndentation(Style style, Dictionary<string, Style> allStyles)
+        {
+            while (style != null)
+            {
+                var indent = style.StyleParagraphProperties?.Indentation;
+                if (indent != null)
+                    return indent;
+
+                if (style.BasedOn?.Val?.Value != null && allStyles.TryGetValue(style.BasedOn.Val.Value, out var basedOnStyle))
+                    style = basedOnStyle;
+                else
+                    break;
+            }
+            return null;
+        }
+
+        private (string Alignment, bool IsDefined) GetActualAlignmentForHeader(Paragraph paragraph, Style paragraphStyle, Dictionary<string, Style> allStyles)
+        {
+            // 1. Проверяем явное выравнивание в параграфе
+            if (paragraph.ParagraphProperties?.Justification?.Val?.Value != null)
+            {
+                return (GetAlignmentString(paragraph.ParagraphProperties.Justification), true);
+            }
+
+            // 2. Проверяем стиль параграфа и его родителей
+            var paraStyleId = paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value;
+            if (paraStyleId != null && allStyles.TryGetValue(paraStyleId, out var currentStyle))
+            {
+                while (currentStyle != null)
+                {
+                    if (currentStyle.StyleParagraphProperties?.Justification?.Val?.Value != null)
+                    {
+                        return (GetAlignmentString(currentStyle.StyleParagraphProperties.Justification), true);
+                    }
+                    currentStyle = currentStyle.BasedOn?.Val?.Value != null && allStyles.TryGetValue(currentStyle.BasedOn.Val.Value, out var basedOnStyle) ? basedOnStyle : null;
+                }
+            }
+
+            // 3. Проверяем переданный стиль (если есть)
+            if (paragraphStyle != null)
+            {
+                if (paragraphStyle.StyleParagraphProperties?.Justification?.Val?.Value != null)
+                {
+                    return (GetAlignmentString(paragraphStyle.StyleParagraphProperties.Justification), true);
+                }
+            }
+
+            // 4. Проверяем Normal стиль
+            if (allStyles.TryGetValue("Normal", out var normalStyle) && normalStyle.StyleParagraphProperties?.Justification?.Val?.Value != null)
+            {
+                return (GetAlignmentString(normalStyle.StyleParagraphProperties.Justification), true);
+            }
+
+            return ("Left", true);
+        }
+
+        private (string Type, double Value, bool IsDefined) GetActualLineSpacingForHeader(Paragraph paragraph, Style paragraphStyle, Dictionary<string, Style> allStyles)
+        {
+            // 1. Явные свойства
+            var spacing = paragraph.ParagraphProperties?.SpacingBetweenLines;
+            var parsed = ParseLineSpacing(spacing);
+
+            if (parsed.IsDefined)
+                return parsed;
+
+            // 2. Стиль абзаца и его родители
+            var paraStyleId = paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value;
+            if (paraStyleId != null && allStyles.TryGetValue(paraStyleId, out var currentStyle))
+            {
+                while (currentStyle != null)
+                {
+                    var styleSpacing = currentStyle.StyleParagraphProperties?.SpacingBetweenLines;
+                    parsed = ParseLineSpacing(styleSpacing);
+                    if (parsed.IsDefined)
+                        return parsed;
+
+                    currentStyle = currentStyle.BasedOn?.Val?.Value != null && allStyles.TryGetValue(currentStyle.BasedOn.Val.Value, out var basedOnStyle) ? basedOnStyle : null;
+                }
+            }
+
+            // 3. Проверяем переданный стиль (если есть)
+            if (paragraphStyle != null)
+            {
+                var styleSpacing = paragraphStyle.StyleParagraphProperties?.SpacingBetweenLines;
+                parsed = ParseLineSpacing(styleSpacing);
+                if (parsed.IsDefined)
+                    return parsed;
+            }
+
+            // 4. Normal
+            if (allStyles.TryGetValue("Normal", out var normalStyle))
+            {
+                parsed = ParseLineSpacing(normalStyle.StyleParagraphProperties?.SpacingBetweenLines);
+                if (parsed.IsDefined)
+                    return parsed;
+            }
+
+            return ("Множитель", 1.0, true);
+        }
+
+        private (double Before, double After, bool IsDefined) GetActualParagraphSpacingForHeader(Paragraph paragraph, Style paragraphStyle, Dictionary<string, Style> allStyles)
+        {
+            double? before = null;
+            double? after = null;
+
+            var spacing = paragraph.ParagraphProperties?.SpacingBetweenLines;
+            if (spacing?.Before?.Value != null) before = ConvertTwipsToPoints(spacing.Before.Value);
+            if (spacing?.After?.Value != null) after = ConvertTwipsToPoints(spacing.After.Value);
+
+            if (before == null || after == null)
+            {
+                var paraStyleId = paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value;
+                var currentStyle = paraStyleId != null && allStyles.TryGetValue(paraStyleId, out var style) ? style : paragraphStyle;
+
+                while (currentStyle != null)
+                {
+                    var styleSpacing = currentStyle.StyleParagraphProperties?.SpacingBetweenLines;
+                    if (styleSpacing != null)
+                    {
+                        if (before == null && styleSpacing.Before?.Value != null)
+                            before = ConvertTwipsToPoints(styleSpacing.Before.Value);
+
+                        if (after == null && styleSpacing.After?.Value != null)
+                            after = ConvertTwipsToPoints(styleSpacing.After.Value);
+                    }
+
+                    currentStyle = currentStyle.BasedOn?.Val?.Value != null && allStyles.TryGetValue(currentStyle.BasedOn.Val.Value, out var basedOnStyle) ? basedOnStyle : null;
+                }
+            }
+
+            if (before == null || after == null)
+            {
+                if (allStyles.TryGetValue("Normal", out var normalStyle))
+                {
+                    var spacingNorm = normalStyle.StyleParagraphProperties?.SpacingBetweenLines;
+                    if (spacingNorm != null)
+                    {
+                        if (before == null && spacingNorm.Before?.Value != null)
+                            before = ConvertTwipsToPoints(spacingNorm.Before.Value);
+
+                        if (after == null && spacingNorm.After?.Value != null)
+                            after = ConvertTwipsToPoints(spacingNorm.After.Value);
+                    }
+                }
+            }
+
+            var isDefined = before.HasValue || after.HasValue;
+            return (before ?? 0, after ?? 0, isDefined);
+        }
+
+        private (string Type, double Value, bool IsDefined) ParseLineSpacing(SpacingBetweenLines spacing)
+        {
+            // Если spacing вообще не задан - возвращаем неопределенное значение
+            if (spacing == null)
+            {
+                return (null, 0, false);
+            }
+
+            // Если есть LineRule, но нет Line - считаем неопределенным
+            if (spacing.LineRule != null && spacing.Line == null)
+            {
+                return (null, 0, false);
+            }
+
+            // Если есть Line, но нет LineRule - интерпретируем как множитель
+            if (spacing.Line != null && spacing.LineRule == null)
+            {
+                double lineValue = double.Parse(spacing.Line.Value);
+                return ("Множитель", lineValue / 240.0, true);
+            }
+
+            // Если оба значения заданы
+            if (spacing.Line != null && spacing.LineRule != null)
+            {
+                double lineValue = double.Parse(spacing.Line.Value);
+
+                if (spacing.LineRule.Value == LineSpacingRuleValues.Exact)
+                    return ("Точно", lineValue / 567.0, true);
+
+                if (spacing.LineRule.Value == LineSpacingRuleValues.AtLeast)
+                    return ("Минимум", lineValue / 567.0, true);
+
+                // По умолчанию - множитель
+                return ("Множитель", lineValue / 240.0, true);
+            }
+
+            // Если ничего не задано - не определено
+            return (null, 0, false);
+        }
+
+        private double ConvertTwipsToCm(string twipsValue)
+        {
+            if (string.IsNullOrEmpty(twipsValue))
+                return 0;
+
+            if (double.TryParse(twipsValue, out double twips))
+                return twips / 567.0;
+
+            return 0;
+        }
+
+        private (string FontName, bool IsDefined) GetActualFontForHeader(Run run, Paragraph paragraph, Dictionary<string, Style> allStyles)
+        {
+            // 1. Проверяем явные свойства Run
+            var explicitFont = GetExplicitRunFont(run);
+            if (!string.IsNullOrEmpty(explicitFont))
+                return (explicitFont, true);
+
+            // 2. Проверяем стиль Run
+            var runStyleId = run.RunProperties?.RunStyle?.Val?.Value;
+            if (runStyleId != null && allStyles.TryGetValue(runStyleId, out var runStyle))
+            {
+                var runStyleFont = GetStyleFont(runStyle);
+                if (!string.IsNullOrEmpty(runStyleFont))
+                    return (runStyleFont, true);
+            }
+
+            // 3. Проверяем стиль Paragraph с учетом наследования
+            var paraStyleId = paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value;
+            if (paraStyleId != null)
+            {
+                var currentStyle = allStyles.TryGetValue(paraStyleId, out var style) ? style : null;
+                while (currentStyle != null)
+                {
+                    var font = GetStyleFont(currentStyle);
+                    if (!string.IsNullOrEmpty(font))
+                        return (font, true);
+
+                    currentStyle = currentStyle.BasedOn?.Val?.Value != null && allStyles.TryGetValue(currentStyle.BasedOn.Val.Value, out var basedOnStyle) ? basedOnStyle : null;
+                }
+            }
+
+            // 4. Проверяем Normal стиль
+            if (allStyles.TryGetValue("Normal", out var normalStyle))
+            {
+                var font = GetStyleFont(normalStyle);
+                if (!string.IsNullOrEmpty(font))
+                    return (font, true);
+            }
+
+            return (null, false);
+        }
+
+        private (double Size, bool IsDefined) GetActualFontSizeForHeader(Run run, Paragraph paragraph, Dictionary<string, Style> allStyles)
+        {
+            // 1. Проверяем явные свойства Run
+            var runSize = run.RunProperties?.FontSize?.Val?.Value;
+            if (runSize != null)
+                return (double.Parse(runSize) / 2, true);
+
+            // 2. Проверяем стиль Run
+            var runStyleId = run.RunProperties?.RunStyle?.Val?.Value;
+            if (runStyleId != null && allStyles.TryGetValue(runStyleId, out var runStyle))
+            {
+                if (runStyle?.StyleRunProperties?.FontSize?.Val?.Value != null)
+                    return (double.Parse(runStyle.StyleRunProperties.FontSize.Val.Value) / 2, true);
+            }
+
+            // 3. Проверяем стиль Paragraph с учетом наследования
+            var paraStyleId = paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value;
+            if (paraStyleId != null && allStyles.TryGetValue(paraStyleId, out var paraStyle))
+            {
+                var currentStyle = paraStyle;
+                while (currentStyle != null)
+                {
+                    if (currentStyle.StyleRunProperties?.FontSize?.Val?.Value != null)
+                        return (double.Parse(currentStyle.StyleRunProperties.FontSize.Val.Value) / 2, true);
+
+                    currentStyle = currentStyle.BasedOn?.Val?.Value != null && allStyles.TryGetValue(currentStyle.BasedOn.Val.Value, out var basedOnStyle) ? basedOnStyle : null;
+                }
+            }
+
+            // 4. Проверяем Normal стиль
+            if (allStyles.TryGetValue("Normal", out var normalStyle) && normalStyle.StyleRunProperties?.FontSize?.Val?.Value != null)
+            {
+                return (double.Parse(normalStyle.StyleRunProperties.FontSize.Val.Value) / 2, true);
+            }
+
+            return (0, false);
+        }
+
+        private string GetExplicitRunFont(Run run)
+        {
+            var runProps = run.RunProperties;
+            if (runProps == null) return null;
+
+            return runProps.RunFonts?.Ascii?.Value ?? runProps.RunFonts?.HighAnsi?.Value ?? runProps.RunFonts?.ComplexScript?.Value ?? runProps.RunFonts?.EastAsia?.Value;
+        }
+
+        private string GetStyleFont(Style style)
+        {
+            if (style?.StyleRunProperties == null) return null;
+            return style.StyleRunProperties.RunFonts?.Ascii?.Value ?? style.StyleRunProperties.RunFonts?.HighAnsi?.Value ?? style.StyleRunProperties.RunFonts?.ComplexScript?.Value ?? style.StyleRunProperties.RunFonts?.EastAsia?.Value;
+        }
 
         /// <summary>
         /// Вспомогательный метод. Получает тексты заголовков из тела документа на основе обязательных разделов ГОСТа
@@ -802,9 +1219,18 @@ namespace GOST_Control
             {
                 var text = paragraph.InnerText.Trim();
 
+                if (string.IsNullOrEmpty(text)) continue;
+
+                // Проверка на приложение
+                bool isAppendix = Regex.IsMatch(text, @"^ПРИЛОЖЕНИЕ\s+([А-Я]|\d+)(\.\d+)*(\s|$)", RegexOptions.IgnoreCase);
+                if (isAppendix)
+                {
+                    headerTexts.Add(text);
+                    continue;
+                }
+
                 // Удаление номеров (например из "1 Введение" получаем "Введение")
                 string cleanText = Regex.Replace(text, @"^\d+[\s\.]*", "").Trim();
-
                 foreach (var section in requiredSections)
                 {
                     if (cleanText.Equals(section, StringComparison.OrdinalIgnoreCase))

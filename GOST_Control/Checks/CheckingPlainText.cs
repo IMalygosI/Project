@@ -1,11 +1,14 @@
 ﻿using Avalonia.Media;
+using DocumentFormat.OpenXml.ExtendedProperties;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace GOST_Control
 {
@@ -33,7 +36,7 @@ namespace GOST_Control
         {
             _shouldSkipParagraph = shouldSkipParagraph;
         }
-
+       
         /// <summary>
         /// Метод проверки интервалов между абзацами
         /// </summary>
@@ -57,33 +60,39 @@ namespace GOST_Control
                     return (true, tempErrors);
                 }
 
+                var normalStyle = GetStyle(doc, "Normal");
+                var defaultSpacing = normalStyle?.StyleParagraphProperties?.SpacingBetweenLines;
+
                 foreach (var paragraph in paragraphs)
                 {
                     if (_shouldSkipParagraph(paragraph))
                         continue;
 
-                    var spacing = paragraph.ParagraphProperties?.SpacingBetweenLines;
+                    var explicitSpacing = paragraph.ParagraphProperties?.SpacingBetweenLines;
+                    var styleSpacing = GetParagraphStyleSpacing(paragraph, doc);
+                    var spacing = explicitSpacing ?? styleSpacing ?? defaultSpacing;
+
                     bool hasError = false;
                     var errorDetails = new List<string>();
 
-                    // Проверка интервала перед абзацем
                     if (hasBeforeSpacing && gost.LineSpacingBefore.HasValue)
                     {
-                        double actualBefore = spacing?.Before?.Value != null ? ConvertTwipsToPoints(spacing.Before.Value) : DefaultTextSpacingBefore;
+                        double actualBefore = spacing?.Before?.Value != null ? ConvertTwipsToPoints(spacing.Before.Value) : 0;
+
                         if (Math.Abs(actualBefore - gost.LineSpacingBefore.Value) > 0.01)
                         {
-                            errorDetails.Add($"интервал перед: {actualBefore:F1} pt (требуется {gost.LineSpacingBefore.Value:F1} pt)");
+                            errorDetails.Add($"\n              • интервал перед: {actualBefore:F1} pt (требуется {gost.LineSpacingBefore.Value:F1} pt)");
                             hasError = true;
                         }
                     }
 
-                    // Проверка интервала после абзаца
                     if (hasAfterSpacing && gost.LineSpacingAfter.HasValue)
                     {
-                        double actualAfter = spacing?.After?.Value != null ? ConvertTwipsToPoints(spacing.After.Value) : DefaultTextSpacingAfter;
+                        double actualAfter = spacing?.After?.Value != null ? ConvertTwipsToPoints(spacing.After.Value) : 0;
+
                         if (Math.Abs(actualAfter - gost.LineSpacingAfter.Value) > 0.01)
                         {
-                            errorDetails.Add($"интервал после: {actualAfter:F1} pt (требуется {gost.LineSpacingAfter.Value:F1} pt)");
+                            errorDetails.Add($"\n              • интервал после: {actualAfter:F1} pt (требуется {gost.LineSpacingAfter.Value:F1} pt)");
                             hasError = true;
                         }
                     }
@@ -93,16 +102,18 @@ namespace GOST_Control
                         string shortText = GetShortText(paragraph);
                         tempErrors.Add(new TextErrorInfo
                         {
-                            ErrorMessage = $"'{shortText}' - {string.Join(", ", errorDetails)}",
-                            ProblemParagraph = paragraph, 
+                            ErrorMessage = $"       • Абзац '{shortText}': {string.Join(", ", errorDetails)}",
+                            ProblemParagraph = paragraph,
                             ProblemRun = null
                         });
                         isValid = false;
                     }
-
                 }
-                updateUI?.Invoke(!isValid ? "Ошибки в интервалах между абзацами:\n" + string.Join("\n", tempErrors.Select(e => e.ErrorMessage).Take(3)) : 
-                                                                 "Интервалы между абзацами соответствуют ГОСТу", !isValid ? Brushes.Red : Brushes.Green);
+
+                updateUI?.Invoke(!isValid ? $"Ошибки в интервалах между абзацами:\n{string.Join("\n", tempErrors.Select(e => e.ErrorMessage).Take(3))}" +
+                                (tempErrors.Count > 3 ? $"\n...и ещё {tempErrors.Count - 3} ошибок" : "") : "Интервалы между абзацами соответствуют ГОСТу",
+                                 !isValid ? Brushes.Red : Brushes.Green);
+
                 return (isValid, tempErrors);
             });
         }
@@ -115,7 +126,7 @@ namespace GOST_Control
         /// <param name="gost"></param>
         /// <param name="updateUI"></param>
         /// <returns></returns>
-        public async Task<(bool IsValid, List<TextErrorInfo> Errors)> CheckFirstLineIndentAsync(double requiredFirstLineIndent, List<Paragraph> paragraphs, Gost gost, Action<string, IBrush> updateUI)
+        public async Task<(bool IsValid, List<TextErrorInfo> Errors)> CheckFirstLineIndentAsync(double requiredFirstLineIndent, List<Paragraph> paragraphs, WordprocessingDocument doc, Gost gost, Action<string, IBrush> updateUI)
         {
             return await Task.Run(() =>
             {
@@ -127,44 +138,37 @@ namespace GOST_Control
                     if (_shouldSkipParagraph(paragraph))
                         continue;
 
-                    var indent = paragraph.ParagraphProperties?.Indentation;
+                    var explicitIndent = paragraph.ParagraphProperties?.Indentation;
+                    var styleIndent = GetParagraphStyleIndentation(paragraph, doc);
+                    var indent = explicitIndent ?? styleIndent;
+
                     bool hasError = false;
                     var errorDetails = new List<string>();
 
-                    // Преобразуем все значения в сантиметры
                     double leftIndent = indent?.Left?.Value != null ? TwipsToCm(double.Parse(indent.Left.Value)) : 0;
                     double firstLineIndent = indent?.FirstLine?.Value != null ? TwipsToCm(double.Parse(indent.FirstLine.Value)) : 0;
                     double hangingIndent = indent?.Hanging?.Value != null ? TwipsToCm(double.Parse(indent.Hanging.Value)) : 0;
 
-                    // 1. ПРОВЕРКА ВИЗУАЛЬНОГО ЛЕВОГО ОТСТУПА
                     if (gost.IndentLeftText.HasValue)
                     {
-                        double actualTextIndent = leftIndent; // Базовый отступ
-
-                        // Корректировка если есть выступ (hanging)
-                        if (hangingIndent > 0)
-                        {
-                            actualTextIndent = leftIndent - hangingIndent;
-                        }
+                        double actualTextIndent = leftIndent;
+                        if (hangingIndent > 0) actualTextIndent = leftIndent - hangingIndent;
 
                         if (Math.Abs(actualTextIndent - gost.IndentLeftText.Value) > 0.05)
                         {
-                            errorDetails.Add($"Фактический левый отступ текста: {actualTextIndent:F2} см (требуется {gost.IndentLeftText.Value:F2} см)");
+                            errorDetails.Add($"\n              • левый отступ текста: {actualTextIndent:F2} см (требуется {gost.IndentLeftText.Value:F2} см)");
                             hasError = true;
                         }
                     }
 
-                    // 2. ПРОВЕРКА ПЕРВОЙ СТРОКИ
-                    if (gost.FirstLineIndent.HasValue)
+                    if (gost.FirstLineIndent.HasValue || !string.IsNullOrEmpty(gost.TextIndentOrOutdent))
                     {
                         bool isHanging = hangingIndent > 0;
                         bool isFirstLine = firstLineIndent > 0;
 
-                        // Проверка типа (выступ/отступ)
                         if (!string.IsNullOrEmpty(gost.TextIndentOrOutdent))
                         {
                             bool typeError = false;
-
                             if (gost.TextIndentOrOutdent == "Выступ" && !isHanging)
                                 typeError = true;
                             else if (gost.TextIndentOrOutdent == "Отступ" && !isFirstLine)
@@ -174,28 +178,26 @@ namespace GOST_Control
 
                             if (typeError)
                             {
-                                errorDetails.Add($"Тип первой строки: {(isHanging ? "Выступ" : isFirstLine ? "Отступ" : "Нет")} (требуется {gost.TextIndentOrOutdent})");
+                                errorDetails.Add($"\n              • тип первой строки: {(isHanging ? "Выступ" : isFirstLine ? "Отступ" : "Нет")} (требуется {gost.TextIndentOrOutdent})");
                                 hasError = true;
                             }
                         }
 
-                        // Проверка значения
                         double currentValue = isHanging ? hangingIndent : firstLineIndent;
                         if ((isHanging || isFirstLine) && Math.Abs(currentValue - gost.FirstLineIndent.Value) > 0.05)
                         {
-                            errorDetails.Add($"{(isHanging ? "Выступ" : "Отступ")} первой строки: {currentValue:F2} см (требуется {gost.FirstLineIndent.Value:F2} см)");
+                            errorDetails.Add($"\n              • {(isHanging ? "Выступ" : "Отступ")} первой строки: {currentValue:F2} см (требуется {gost.FirstLineIndent.Value:F2} см)");
                             hasError = true;
                         }
                     }
 
-                    // 3. ПРОВЕРКА ПРАВОГО ОТСТУПА (без изменений)
                     if (gost.IndentRightText.HasValue)
                     {
                         double actualRight = indent?.Right?.Value != null ? TwipsToCm(double.Parse(indent.Right.Value)) : DefaultTextRightIndent;
 
                         if (Math.Abs(actualRight - gost.IndentRightText.Value) > 0.05)
                         {
-                            errorDetails.Add($"Правый отступ: {actualRight:F2} см (требуется {gost.IndentRightText.Value:F2} см)");
+                            errorDetails.Add($"\n              • правый отступ: {actualRight:F2} см (требуется {gost.IndentRightText.Value:F2} см)");
                             hasError = true;
                         }
                     }
@@ -205,7 +207,7 @@ namespace GOST_Control
                         string shortText = GetShortText(paragraph);
                         tempErrors.Add(new TextErrorInfo
                         {
-                            ErrorMessage = $"'{shortText}' - {string.Join(", ", errorDetails)}",
+                            ErrorMessage = $"       • Абзац '{shortText}': {string.Join(", ", errorDetails)}",
                             ProblemParagraph = paragraph,
                             ProblemRun = null
                         });
@@ -213,13 +215,14 @@ namespace GOST_Control
                     }
                 }
 
-                // 5. ОБНОВЛЕНИЕ UI
-                updateUI?.Invoke( !isValid ? "Ошибки в отступах:\n" + string.Join("\n", tempErrors.Select(e => e.ErrorMessage).Take(3)) : "Отступы соответствуют ГОСТу", 
-                                  !isValid ? Brushes.Red : Brushes.Green);
+                updateUI?.Invoke(!isValid ? $"Ошибки в отступах:\n{string.Join("\n", tempErrors.Select(e => e.ErrorMessage).Take(3))}" +
+                                 (tempErrors.Count > 3 ? $"\n...и ещё {tempErrors.Count - 3} ошибок" : "") : "Отступы соответствуют ГОСТу",
+                                 !isValid ? Brushes.Red : Brushes.Green);
+
                 return (isValid, tempErrors);
             });
         }
-
+       
         /// <summary>
         /// Метод проверки межстрочного интервала для простого текста
         /// </summary>
@@ -247,8 +250,9 @@ namespace GOST_Control
                         if (ShouldSkipRun(run))
                             continue;
 
-                        var paragraphProperties = paragraph.ParagraphProperties;
-                        var spacing = paragraphProperties?.SpacingBetweenLines;
+                        var explicitSpacing = paragraph.ParagraphProperties?.SpacingBetweenLines;
+                        var styleSpacing = GetParagraphStyleSpacing(paragraph, doc);
+                        var spacing = explicitSpacing ?? styleSpacing;
 
                         double actualSpacing;
                         string actualSpacingType;
@@ -264,32 +268,42 @@ namespace GOST_Control
                             actualSpacingType = DefaultTextLineSpacingType;
                         }
 
+                        bool hasError = false;
+                        var errorDetails = new List<string>();
+
                         if (actualSpacingType != requiredLineSpacingType)
                         {
-                            tempErrors.Add(new TextErrorInfo
-                            {
-                                ErrorMessage = $"Тип интервала: '{actualSpacingType}' (требуется '{requiredLineSpacingType}')",
-                                ProblemRun = run,
-                                ProblemParagraph = null
-                            });
-                            isValid = false;
+                            errorDetails.Add($"\n              • тип интервала: '{actualSpacingType}' (требуется '{requiredLineSpacingType}')");
+                            hasError = true;
                         }
 
                         if (Math.Abs(actualSpacing - requiredLineSpacing) > 0.01)
                         {
-                            tempErrors.Add(new TextErrorInfo
+                            errorDetails.Add($"\n              • интервал: {actualSpacing:F2} (требуется {requiredLineSpacing:F2})");
+                            hasError = true;
+                        }
+
+                        if (hasError)
+                        {
+                            string runText = run.InnerText.Trim();
+                            if (!string.IsNullOrWhiteSpace(runText))
                             {
-                                ErrorMessage = $"Интервал: {actualSpacing:F2} (требуется {requiredLineSpacing:F2})",
-                                ProblemRun = run,
-                                ProblemParagraph = null
-                            });
-                            isValid = false;
+                                string shortText = runText.Length > 30 ? runText.Substring(0, 27) + "..." : runText;
+                                tempErrors.Add(new TextErrorInfo
+                                {
+                                    ErrorMessage = $"       • Текст '{shortText}': {string.Join(", ", errorDetails)}",
+                                    ProblemRun = run,
+                                    ProblemParagraph = null
+                                });
+                                isValid = false;
+                            }
                         }
                     }
                 }
 
-                updateUI?.Invoke(!isValid ? "Ошибки интервала:\n" + string.Join("\n", tempErrors.Select(e => e.ErrorMessage).Take(3)) : "Интервал соответствует ГОСТу", 
-                                                                                                                               !isValid ? Brushes.Red : Brushes.Green);
+                updateUI?.Invoke(!isValid ? $"Ошибки интервала:\n{string.Join("\n", tempErrors.Select(e => e.ErrorMessage).Take(3))}" +
+                                 (tempErrors.Count > 3 ? $"\n...и ещё {tempErrors.Count - 3} ошибок" : "") : "Интервал соответствует ГОСТу",
+                                 !isValid ? Brushes.Red : Brushes.Green);
 
                 return (isValid, tempErrors);
             });
@@ -318,18 +332,21 @@ namespace GOST_Control
 
                     if (currentAlignment != requiredAlignment)
                     {
-                        var shortText = GetShortText(paragraph);
+                        string shortText = GetShortText(paragraph);
                         tempErrors.Add(new TextErrorInfo
                         {
-                            ErrorMessage = $"'{shortText}' (выравнивание: '{currentAlignment}', требуется: '{requiredAlignment}')",
-                            ProblemParagraph = paragraph, 
+                            ErrorMessage = $"       • Абзац '{shortText}':\n              • выравнивание '{currentAlignment}' (требуется '{requiredAlignment}')",
+                            ProblemParagraph = paragraph,
                             ProblemRun = null
                         });
                         isValid = false;
                     }
                 }
-                updateUI?.Invoke(isValid ? "Выравнивание соответствует ГОСТу" : "Ошибки в выравнивании:\n" + string.Join("\n", tempErrors.Select(e => e.ErrorMessage).Take(3)),
-                                                                                                                                        isValid ? Brushes.Green : Brushes.Red);
+
+                updateUI?.Invoke(!isValid ? $"Ошибки в выравнивании:\n{string.Join("\n", tempErrors.Select(e => e.ErrorMessage).Take(3))}" +
+                                 (tempErrors.Count > 3 ? $"\n...и ещё {tempErrors.Count - 3} ошибок" : "") : "Выравнивание соответствует ГОСТу",
+                                 !isValid ? Brushes.Red : Brushes.Green);
+
                 return (isValid, tempErrors);
             });
         }
@@ -366,11 +383,12 @@ namespace GOST_Control
                             var runText = run.InnerText.Trim();
                             if (!string.IsNullOrWhiteSpace(runText))
                             {
+                                string shortText = runText.Length > 30 ? runText.Substring(0, 27) + "..." : runText;
                                 tempErrors.Add(new TextErrorInfo
                                 {
-                                    ErrorMessage = $"{runText} (размер: {actualSize:F1} pt) - требуется ({requiredFontSize:F1} pt)",
+                                    ErrorMessage = $"       • Текст '{shortText}':\n              •  размер {actualSize:F1} pt (требуется {requiredFontSize:F1} pt)",
                                     ProblemRun = run,
-                                    ProblemParagraph = null 
+                                    ProblemParagraph = null
                                 });
                                 isValid = false;
                             }
@@ -378,12 +396,14 @@ namespace GOST_Control
                     }
                 }
 
-                updateUI?.Invoke(!isValid ? "Ошибки в размере шрифта:\n" + string.Join("\n", tempErrors.Select(e => e.ErrorMessage).Take(3)) : "Размер шрифта соответствует ГОСТу",
-                                                                                                                                           !isValid ? Brushes.Red : Brushes.Green);
+                updateUI?.Invoke(!isValid ? $"Ошибки в размере шрифта:\n{string.Join("\n", tempErrors.Select(e => e.ErrorMessage).Take(3))}" +
+                                (tempErrors.Count > 3 ? $"\n...и ещё {tempErrors.Count - 3} ошибок" : "") : "Размер шрифта соответствует ГОСТу",
+                                 !isValid ? Brushes.Red : Brushes.Green);
+
                 return (isValid, tempErrors);
             });
         }
-
+        
         /// <summary>
         /// Метод проверки шрифта
         /// </summary>
@@ -414,20 +434,55 @@ namespace GOST_Control
 
                         if (fontName != requiredFontName)
                         {
-                            tempErrors.Add(new TextErrorInfo
+                            var runText = run.InnerText.Trim();
+                            if (!string.IsNullOrWhiteSpace(runText))
                             {
-                                ErrorMessage = $"Ошибка шрифта: '{fontName}' (требуется '{requiredFontName}')",
-                                ProblemRun = run,       // Указываем проблемный Run
-                                ProblemParagraph = null // Ошибка не на уровне абзаца
-                            });
-                            isValid = false;
+                                string shortText = runText.Length > 30 ? runText.Substring(0, 27) + "..." : runText;
+                                tempErrors.Add(new TextErrorInfo
+                                {
+                                    ErrorMessage = $"       • Текст '{shortText}':\n              • шрифт '{fontName}' (требуется '{requiredFontName}')",
+                                    ProblemRun = run,
+                                    ProblemParagraph = null
+                                });
+                                isValid = false;
+                            }
                         }
                     }
                 }
-                updateUI?.Invoke(isValid ? "Шрифт корректен" : "Ошибки шрифта:\n" + string.Join("\n", tempErrors.Select(e => e.ErrorMessage).Take(3)), isValid ? Brushes.Green :
-                                                                                                                                                                 Brushes.Red);
+
+                updateUI?.Invoke(!isValid ? $"Ошибки шрифта:\n{string.Join("\n", tempErrors.Select(e => e.ErrorMessage).Take(3))}" +
+                                (tempErrors.Count > 3 ? $"\n...и ещё {tempErrors.Count - 3} ошибок" : "") : "Шрифт соответствует ГОСТу",
+                                 !isValid ? Brushes.Red : Brushes.Green);
+
                 return (isValid, tempErrors);
             });
+        }
+        
+        private Indentation GetParagraphStyleIndentation(Paragraph paragraph, WordprocessingDocument doc)
+        {
+            if (paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value != null)
+            {
+                var styleId = paragraph.ParagraphProperties.ParagraphStyleId.Val.Value;
+                var style = GetStyle(doc, styleId);
+                return style?.StyleParagraphProperties?.Indentation;
+            }
+            return null;
+        }
+
+        private SpacingBetweenLines GetParagraphStyleSpacing(Paragraph paragraph, WordprocessingDocument doc)
+        {
+            if (paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value != null)
+            {
+                var styleId = paragraph.ParagraphProperties.ParagraphStyleId.Val.Value;
+                var style = GetStyle(doc, styleId);
+                return style?.StyleParagraphProperties?.SpacingBetweenLines;
+            }
+            return null;
+        }
+
+        private Style GetStyle(WordprocessingDocument doc, string styleId)
+        {
+            return doc.MainDocumentPart?.StyleDefinitionsPart?.Styles.Elements<Style>().FirstOrDefault(s => s.StyleId == styleId);
         }
 
         /// <summary>
@@ -551,12 +606,33 @@ namespace GOST_Control
         /// <returns></returns>
         private double TwipsToCm(double twips) => twips / 567.0;
 
+        /// <summary>
+        /// Поиск стиля
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <returns></returns>
         private Style GetDefaultStyle(WordprocessingDocument doc)
         {
             var stylesPart = doc.MainDocumentPart?.StyleDefinitionsPart;
             if (stylesPart == null) return null;
 
-            return stylesPart.Styles.Elements<Style>().FirstOrDefault(s => s.Type == StyleValues.Paragraph && (s.Default?.Value ?? false));
+            // 1. Сначала ищем стиль "Normal" по имени
+            var normalStyle = stylesPart.Styles.Elements<Style>().FirstOrDefault(s => s.Type == StyleValues.Paragraph && 
+                                                                                (s.StyleId?.Value?.Equals("Normal", StringComparison.OrdinalIgnoreCase) ?? false));
+
+            // 2. Если не нашли, ищем стиль с атрибутом Default
+            if (normalStyle == null)
+            {
+                normalStyle = stylesPart.Styles.Elements<Style>().FirstOrDefault(s => s.Type == StyleValues.Paragraph && (s.Default?.Value ?? false));
+            }
+
+            // 3. Если стиль всё ещё не найден, берём первый параграфный стиль
+            if (normalStyle == null)
+            {
+                normalStyle = stylesPart.Styles.Elements<Style>().FirstOrDefault(s => s.Type == StyleValues.Paragraph);
+            }
+
+            return normalStyle;
         }
 
         /// <summary>

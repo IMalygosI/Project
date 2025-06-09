@@ -17,8 +17,8 @@ namespace GOST_Control
 
         private readonly FileDialogFilter fileFilter = new()
         {
-            Extensions = new List<string>() { "doc", "docx" },
-            Name = "Документы Word"
+            Extensions = new List<string>() { "docx" },
+            Name = "Документы Word(docx)"
         };
 
         /// <summary>

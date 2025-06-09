@@ -385,7 +385,7 @@ namespace GOST_Control
                         {
                             checkTasks.Add(Task.Run(async () =>
                             {
-                                var (isValid, firstLineIndentErrors) = await checkingTextPlain.CheckFirstLineIndentAsync(gost.FirstLineIndent.Value, bodyParagraphsAfterTitle, gost, (text, brush) =>
+                                var (isValid, firstLineIndentErrors) = await checkingTextPlain.CheckFirstLineIndentAsync(gost.FirstLineIndent.Value, bodyParagraphsAfterTitle, wordDoc, gost, (text, brush) =>
                                 {
                                     Dispatcher.UIThread.Post(() =>
                                     {
@@ -413,18 +413,19 @@ namespace GOST_Control
                         {
                             checkTasks.Add(Task.Run(async () =>
                             {
-                                var (isValid, pageNumberingErrors) = await docChecker.CheckPageNumberingAsync(wordDoc, gost.PageNumbering.Value, gost.PageNumberingAlignment, gost.PageNumberingPosition, (text, brush) =>
-                                {
-                                    Dispatcher.UIThread.Post(() =>
+                                var result = await docChecker.CheckPageNumberingAsync(wordDoc, gost.PageNumbering.Value, gost.PageNumberingAlignment, gost.PageNumberingPosition,
+                                    (text, brush) =>
                                     {
-                                        ErrorControlNumberPage.Text = text;
-                                        ErrorControlNumberPage.Foreground = brush;
+                                        Dispatcher.UIThread.Post(() =>
+                                        {
+                                            ErrorControlNumberPage.Text = text;
+                                            ErrorControlNumberPage.Foreground = brush;
+                                        });
                                     });
-                                });
 
-                                pageNumberingValid = isValid;
-                                if (!isValid)
-                                    errors.AddRange(pageNumberingErrors.Select(e => $"Нумерация страниц: {e}"));
+                                pageNumberingValid = result.IsValid;
+                                if (!result.IsValid)
+                                    errors.AddRange(result.Errors.Select(e => $"Нумерация страниц: {e}"));
                             }));
                         }
                         else
@@ -530,7 +531,7 @@ namespace GOST_Control
                         {
                             checkTasks.Add(Task.Run(async () =>
                             {
-                                var (isValid, spacingErrors) = await checkingeContents.CheckHeaderParagraphSpacingAsync(bodyParagraphsAfterTitle, (text, brush) =>
+                                var (isValid, spacingErrors) = await checkingeContents.CheckHeaderParagraphSpacingAsync(bodyParagraphsAfterTitle, wordDoc, (text, brush) =>
                                 {
                                     Dispatcher.UIThread.Post(() =>
                                     {
@@ -551,7 +552,7 @@ namespace GOST_Control
                         {
                             checkTasks.Add(Task.Run(async () =>
                             {
-                                var (isValid, indentErrors) = await checkingeContents.CheckHeaderIndentsAsync(bodyParagraphsAfterTitle, (text, brush) =>
+                                var (isValid, indentErrors) = await checkingeContents.CheckHeaderIndentsAsync(bodyParagraphsAfterTitle, wordDoc, (text, brush) =>
                                 {
                                     Dispatcher.UIThread.Post(() =>
                                     {
@@ -669,12 +670,12 @@ namespace GOST_Control
                     bool hasLists = body.Descendants<Paragraph>().Any(IsListItem);
                     if (hasLists)
                     {
-                        var checkingLists = new CheckListDocText();
+                        var checkingLists = new CheckListDocText(gost, IsAdditionalHeader);
 
                         // Проверка базовых параметров списков
                         checkTasks.Add(Task.Run(async () =>
                         {
-                            var (isValid, listErrors) = await checkingLists.CheckBulletedListsAsync(bodyParagraphsAfterTitle, gost, (text, brush) =>
+                            var (isValid, listErrors) = await checkingLists.CheckBulletedListsAsync(wordDoc, bodyParagraphsAfterTitle, gost, (text, brush) =>
                             {
                                 Dispatcher.UIThread.Post(() =>
                                 {
@@ -696,7 +697,7 @@ namespace GOST_Control
                         {
                             checkTasks.Add(Task.Run(async () =>
                             {
-                                var (isValid, spacingErrors) = await checkingLists.CheckListParagraphSpacingAsync(bodyParagraphsAfterTitle, gost, (text, brush) =>
+                                var (isValid, spacingErrors) = await checkingLists.CheckListParagraphSpacingAsync(wordDoc, bodyParagraphsAfterTitle, gost, (text, brush) =>
                                 {
                                     Dispatcher.UIThread.Post(() =>
                                     {
@@ -715,8 +716,8 @@ namespace GOST_Control
                         }
 
                         // Проверка отступов списков
-                        if (gost.ListLevel1BulletIndentLeft.HasValue || gost.ListLevel1BulletIndentRight.HasValue ||
-                            gost.ListLevel1Indent.HasValue || gost.ListLevel2Indent.HasValue || gost.ListLevel3Indent.HasValue)
+                        if (gost.ListLevel1BulletIndentLeft.HasValue || gost.ListLevel1BulletIndentRight.HasValue || gost.ListLevel1Indent.HasValue || gost.ListLevel2Indent.HasValue || 
+                            gost.ListLevel3Indent.HasValue)
                         {
                             checkTasks.Add(Task.Run(async () =>
                             {
@@ -760,9 +761,10 @@ namespace GOST_Control
                     await Task.WhenAll(checkTasks);
 
                     // Общий результат проверки
-                    if (fontNameValid && fontSizeValid && marginsValid && lineSpacingValid && firstLineIndentValid && textAlignmentValid && pageNumberingValid && sectionsValid && paperSizeValid && orientationValid &&
-                        tocValid && bulletedListsValid && textIndentsValid && paragraphSpacingValid && headerSpacingValid && tocSpacingValid && listSpacingValid && listHangingValid && headerIndentsValid &&
-                        tocIndentsValid && plainTextLinksValid && imagesValid && tablesValid && additionalHeadersValid)
+                    if (fontNameValid && fontSizeValid && marginsValid && lineSpacingValid && firstLineIndentValid && textAlignmentValid && pageNumberingValid && 
+                        sectionsValid && paperSizeValid && orientationValid && tocValid && bulletedListsValid && textIndentsValid && paragraphSpacingValid && 
+                        headerSpacingValid && tocSpacingValid && listSpacingValid && listHangingValid && headerIndentsValid && tocIndentsValid && 
+                        plainTextLinksValid && imagesValid && tablesValid && additionalHeadersValid)
                     {
                         GostControl.Text = "Документ соответствует ГОСТу.";
                         GostControl.Foreground = Brushes.Green;
@@ -831,7 +833,7 @@ namespace GOST_Control
                 // Выделения ошибок
                 foreach (var error in errors)
                 {
-                    if (error.ProblemRun != null)
+                    if (error != null && error.ProblemRun != null)
                     {
                         var originalRuns = originalDoc.MainDocumentPart.Document.Body.Descendants<Run>().ToList();
                         int runIndex = originalRuns.IndexOf(error.ProblemRun);
@@ -842,7 +844,7 @@ namespace GOST_Control
                             MarkRunWithBackgroundHighlight(runToMark);
                         }
                     }
-                    else if (error.ProblemParagraph != null)
+                    else if (error != null && error.ProblemParagraph != null)
                     {
                         var originalParagraphs = originalDoc.MainDocumentPart.Document.Body.Descendants<Paragraph>().ToList();
                         int paraIndex = originalParagraphs.IndexOf(error.ProblemParagraph);
@@ -869,8 +871,6 @@ namespace GOST_Control
                 try { File.Delete(tempPath); } catch { }
             }
         }
-
-
 
         /// <summary>
         /// Применяет красное фоновое выделение к указанному текстовому фрагменту (Run)
@@ -907,24 +907,33 @@ namespace GOST_Control
         }
 
         /// <summary>
-        ///  метод для определения, является ли заголовок дополнительным
+        /// Метод для определения, является ли параграф дополнительным заголовком
         /// </summary>
-        /// <param name="paragraph"></param>
-        /// <param name="gost"></param>
-        /// <returns></returns>
+        /// <param name="paragraph">Проверяемый параграф</param>
+        /// <param name="gost">Настройки ГОСТа</param>
+        /// <returns>True, если это дополнительный заголовок</returns>
         private bool IsAdditionalHeader(Paragraph paragraph, Gost gost)
         {
+            // 1. Сначала проверяем по стилю (если стиль соответствует шаблону заголовков)
+            var styleId = paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value;
+            if (!string.IsNullOrEmpty(styleId) && (styleId.StartsWith("Heading") || styleId.StartsWith("Заголовок") ||  styleId.StartsWith("TOC") || styleId.Contains("Subtitle")))
+            {
+                return true;
+            }
+
             var text = paragraph.InnerText?.Trim();
             if (string.IsNullOrWhiteSpace(text))
                 return false;
 
-            // Шаблон: начинается с нумерации, за которой идёт текст (не цифры/формулы)
-            bool startsWithNumberingAndText = Regex.IsMatch(text, @"^\d+(\.\d+)*\s+[А-Яа-яA-Za-z]");
+            // 2. Проверяем по содержанию текста:
 
-            // Также допускаем "Глава 1", "Глава 2" и т.п.
-            bool isChapter = Regex.IsMatch(text, @"^Глава\s+\d+", RegexOptions.IgnoreCase);
+            // Шаблон для обычных нумерованных заголовков (например: "1.1 Общие положения")
+            bool isNumberedHeader = Regex.IsMatch(text, @"^\d+(\.\d+)*[\s\t]+[А-Яа-яA-Za-z]", RegexOptions.IgnoreCase);
 
-            return startsWithNumberingAndText || isChapter;
+            // Шаблон для глав (например: "Глава 2")
+            bool isChapterHeader = Regex.IsMatch(text, @"^Глава\s+\d+", RegexOptions.IgnoreCase);
+
+            return isNumberedHeader || isChapterHeader;
         }
 
         /// <summary>
@@ -1054,25 +1063,38 @@ namespace GOST_Control
         /// <returns></returns>
         private bool IsHeaderParagraph(Paragraph paragraph, Gost gost)
         {
-            if (string.IsNullOrEmpty(gost.RequiredSections))
+            var text = paragraph.InnerText?.Trim();
+            if (string.IsNullOrWhiteSpace(text))
                 return false;
 
-            // Проверка по стилю
-            var styleId = paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value;
-            if (!string.IsNullOrEmpty(styleId) &&
-                (styleId.StartsWith("Heading") || styleId.StartsWith("Заголовок")))
-                return true;
+            // 1. Проверка обязательных разделов (если они указаны в ГОСТе)
+            if (!string.IsNullOrEmpty(gost.RequiredSections))
+            {
+                // Проверка по стилю
+                var styleId = paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value;
+                if (!string.IsNullOrEmpty(styleId) &&
+                    (styleId.StartsWith("Heading") || styleId.StartsWith("Заголовок")))
+                    return true;
 
-            // Проверка по тексту
-            var requiredSections = GetRequiredSectionsList(gost);
-            var paragraphText = paragraph.InnerText.Trim();
+                // Проверка по тексту
+                var requiredSections = GetRequiredSectionsList(gost);
 
-            // Удаляем нумерацию (например "1. Введение" -> "Введение")
-            string cleanText = Regex.Replace(paragraphText, @"^\d+[\s\.]*", "").Trim();
+                // Удаляем нумерацию (например "1. Введение" -> "Введение")
+                string cleanText = Regex.Replace(text, @"^\d+[\s\.]*", "").Trim();
 
-            return requiredSections.Any(section =>
-                cleanText.Equals(section, StringComparison.OrdinalIgnoreCase));
+                if (requiredSections.Any(section => cleanText.Equals(section, StringComparison.OrdinalIgnoreCase)))
+                {
+                    return true;
+                }
+            }
+
+            // 2. Проверка на приложение 
+            bool isAppendix = Regex.IsMatch(text, @"^ПРИЛОЖЕНИЕ\s+([А-Я]|\d+)(\.\d+)*(\s|$)", RegexOptions.IgnoreCase);
+
+            return isAppendix;
         }
+
+
 
         /// <summary>
         /// Проверяет, является ли параграф пустым
@@ -1115,8 +1137,7 @@ namespace GOST_Control
 
             // 6. Пропуск специальных стилей
             var style = paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value;
-            if (!string.IsNullOrEmpty(style) && (style.Contains("Caption") || style.Contains("Footer") ||
-                                                style.Contains("Header") || style.Contains("Title")))
+            if (!string.IsNullOrEmpty(style) && (style.Contains("Caption") || style.Contains("Footer") || style.Contains("Header") || style.Contains("Title")))
                 return true;
 
             // 7. Пропуск номеров страниц
@@ -1125,9 +1146,52 @@ namespace GOST_Control
 
             // 8. Пропуск подписей к рисункам/таблицам
             string text = paragraph.InnerText.Trim();
-            if (text.StartsWith("Рисунок") || text.StartsWith("Таблица") ||
-                text.StartsWith("Рис.") || text.StartsWith("Табл."))
+            if (text.StartsWith("Рисунок") || text.StartsWith("Таблица") || text.StartsWith("Рис.") || text.StartsWith("Табл."))
                 return true;
+            
+            //9. Пропуск картинок в случае если у них попадается текст в проверку
+            if (paragraph.Descendants<DocumentFormat.OpenXml.Office.Drawing.Drawing>().Any() || paragraph.Descendants<Picture>().Any())
+                return true;
+
+            // 10. Пропускаем ВЕСЬ текст после любого "ПРИЛОЖЕНИЕ [А-Я]"
+            if (IsInsideAppendixSection(paragraph, gost))
+                return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// Метод для работы с ПРИЛОЖЕНИЕМ А-Я
+        /// </summary>
+        /// <param name="paragraph"></param>
+        /// <returns></returns>
+        private bool IsInsideAppendixSection(Paragraph paragraph, Gost gost)
+        {
+            // Получаем все абзацы документа
+            var allParagraphs = paragraph.Ancestors<Document>()?.FirstOrDefault()?.Descendants<Paragraph>().ToList();
+            if (allParagraphs == null)
+                return false;
+
+            int currentIndex = allParagraphs.IndexOf(paragraph);
+            if (currentIndex < 0)
+                return false;
+
+            // Ищем ближайший заголовок "ПРИЛОЖЕНИЕ [А-Я]" ВЫШЕ текущего абзаца
+            for (int i = currentIndex - 1; i >= 0; i--)
+            {
+                var prevParagraph = allParagraphs[i];
+                var text = prevParagraph.InnerText?.Trim();
+
+                // Если нашли заголовок "ПРИЛОЖЕНИЕ [А-Я]" → значит текущий абзац внутри раздела приложений
+                if (!string.IsNullOrWhiteSpace(text) && Regex.IsMatch(text, @"^ПРИЛОЖЕНИЕ?\s+[А-Я](\s|$)", RegexOptions.IgnoreCase))
+                {
+                    return true;
+                }
+
+                // Если встретили другой заголовок (не приложение) то выходим, т.к. это уже не приложение
+                if (IsHeaderParagraph(prevParagraph, gost) || IsAdditionalHeader(prevParagraph, gost))
+                    break;
+            }
 
             return false;
         }
