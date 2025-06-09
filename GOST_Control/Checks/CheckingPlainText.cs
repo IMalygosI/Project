@@ -31,9 +31,11 @@ namespace GOST_Control
         private const double DefaultTextRightIndent = 0.0;
 
         private readonly Func<Paragraph, bool> _shouldSkipParagraph;
+        private readonly WordprocessingDocument _wordDoc;
 
-        public CheckingPlainText(Func<Paragraph, bool> shouldSkipParagraph)
+        public CheckingPlainText(WordprocessingDocument wordDoc, Func<Paragraph, bool> shouldSkipParagraph)
         {
+            _wordDoc = wordDoc;
             _shouldSkipParagraph = shouldSkipParagraph;
         }
        
@@ -60,7 +62,7 @@ namespace GOST_Control
                     return (true, tempErrors);
                 }
 
-                var normalStyle = GetStyle(doc, "Normal");
+                var normalStyle = GetStyleById("Normal");
                 var defaultSpacing = normalStyle?.StyleParagraphProperties?.SpacingBetweenLines;
 
                 foreach (var paragraph in paragraphs)
@@ -119,7 +121,7 @@ namespace GOST_Control
         }
 
         /// <summary>
-        ///  Метод проверки отступов первой строки
+        /// Метод проверки отступов первой строки
         /// </summary>
         /// <param name="requiredFirstLineIndent"></param>
         /// <param name="paragraphs"></param>
@@ -222,7 +224,7 @@ namespace GOST_Control
                 return (isValid, tempErrors);
             });
         }
-       
+
         /// <summary>
         /// Метод проверки межстрочного интервала для простого текста
         /// </summary>
@@ -238,66 +240,40 @@ namespace GOST_Control
             {
                 var tempErrors = new List<TextErrorInfo>();
                 bool isValid = true;
-                string requiredSpacingType = requiredLineSpacingType;
 
                 foreach (var paragraph in paragraphs)
                 {
                     if (_shouldSkipParagraph(paragraph))
                         continue;
 
-                    foreach (var run in paragraph.Elements<Run>())
+                    var (actualSpacingType, actualSpacingValue, isSpacingDefined) = GetActualLineSpacing(paragraph, doc);
+
+                    if (!isSpacingDefined)
                     {
-                        if (ShouldSkipRun(run))
-                            continue;
+                        AddSpacingError(tempErrors, paragraph, "не удалось определить междустрочный интервал");
+                        isValid = false;
+                        continue;
+                    }
 
-                        var explicitSpacing = paragraph.ParagraphProperties?.SpacingBetweenLines;
-                        var styleSpacing = GetParagraphStyleSpacing(paragraph, doc);
-                        var spacing = explicitSpacing ?? styleSpacing;
+                    bool hasError = false;
+                    var errorDetails = new List<string>();
 
-                        double actualSpacing;
-                        string actualSpacingType;
+                    if (actualSpacingType != requiredLineSpacingType)
+                    {
+                        errorDetails.Add($"\n              • тип интервала: '{actualSpacingType}' (требуется '{requiredLineSpacingType}')");
+                        hasError = true;
+                    }
 
-                        if (spacing != null && spacing.Line != null)
-                        {
-                            actualSpacing = CalculateActualSpacing(spacing);
-                            actualSpacingType = ConvertSpacingRuleToName(spacing.LineRule?.Value);
-                        }
-                        else
-                        {
-                            actualSpacing = DefaultTextLineSpacingValue;
-                            actualSpacingType = DefaultTextLineSpacingType;
-                        }
+                    if (Math.Abs(actualSpacingValue - requiredLineSpacing) > 0.01)
+                    {
+                        errorDetails.Add($"\n              • интервал: {actualSpacingValue:F2} (требуется {requiredLineSpacing:F2})");
+                        hasError = true;
+                    }
 
-                        bool hasError = false;
-                        var errorDetails = new List<string>();
-
-                        if (actualSpacingType != requiredLineSpacingType)
-                        {
-                            errorDetails.Add($"\n              • тип интервала: '{actualSpacingType}' (требуется '{requiredLineSpacingType}')");
-                            hasError = true;
-                        }
-
-                        if (Math.Abs(actualSpacing - requiredLineSpacing) > 0.01)
-                        {
-                            errorDetails.Add($"\n              • интервал: {actualSpacing:F2} (требуется {requiredLineSpacing:F2})");
-                            hasError = true;
-                        }
-
-                        if (hasError)
-                        {
-                            string runText = run.InnerText.Trim();
-                            if (!string.IsNullOrWhiteSpace(runText))
-                            {
-                                string shortText = runText.Length > 30 ? runText.Substring(0, 27) + "..." : runText;
-                                tempErrors.Add(new TextErrorInfo
-                                {
-                                    ErrorMessage = $"       • Текст '{shortText}': {string.Join(", ", errorDetails)}",
-                                    ProblemRun = run,
-                                    ProblemParagraph = null
-                                });
-                                isValid = false;
-                            }
-                        }
+                    if (hasError)
+                    {
+                        AddSpacingError(tempErrors, paragraph, string.Join(", ", errorDetails));
+                        isValid = false;
                     }
                 }
 
@@ -309,6 +285,66 @@ namespace GOST_Control
             });
         }
 
+        private (string Type, double Value, bool IsDefined) GetActualLineSpacing(Paragraph paragraph, WordprocessingDocument doc)
+        {
+            // 1. Проверяем явные свойства абзаца
+            var spacing = paragraph.ParagraphProperties?.SpacingBetweenLines;
+            var parsed = ParseLineSpacing(spacing);
+            if (parsed.IsDefined)
+                return parsed;
+
+            // 2. Проверяем стиль абзаца и его родительские стили
+            var paraStyleId = paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value;
+            if (paraStyleId != null)
+            {
+                var currentStyle = GetStyleById( paraStyleId);
+                while (currentStyle != null)
+                {
+                    var styleSpacing = currentStyle.StyleParagraphProperties?.SpacingBetweenLines;
+                    parsed = ParseLineSpacing(styleSpacing);
+                    if (parsed.IsDefined)
+                        return parsed;
+
+                    currentStyle = currentStyle.BasedOn?.Val?.Value != null ? GetStyleById(currentStyle.BasedOn.Val.Value) : null;
+                }
+            }
+
+            // 3. Проверяем Normal стиль
+            var normalStyle = GetStyleById("Normal");
+            parsed = ParseLineSpacing(normalStyle?.StyleParagraphProperties?.SpacingBetweenLines);
+            if (parsed.IsDefined)
+                return parsed;
+
+            return (DefaultTextLineSpacingType, DefaultTextLineSpacingValue, false);
+        }
+
+        private (string Type, double Value, bool IsDefined) ParseLineSpacing(SpacingBetweenLines spacing)
+        {
+            if (spacing?.Line != null)
+            {
+                double value = double.Parse(spacing.Line.Value.ToString()) / 240.0; // Конвертация из twips в множитель
+                string type = ConvertSpacingRuleToName(spacing.LineRule?.Value);
+                return (type, value, true);
+            }
+            return (null, 0, false);
+        }
+
+        private void AddSpacingError(List<TextErrorInfo> errors, Paragraph paragraph, string errorMessage)
+        {
+            var runText = paragraph.InnerText.Trim();
+            if (!string.IsNullOrWhiteSpace(runText))
+            {
+                string shortText = runText.Length > 30 ? runText.Substring(0, 27) + "..." : runText;
+                errors.Add(new TextErrorInfo
+                {
+                    ErrorMessage = $"       • Текст '{shortText}': {errorMessage}",
+                    ProblemRun = null,
+                    ProblemParagraph = paragraph
+                });
+            }
+        }
+
+
         /// <summary>
         /// Метод проверки выравнивания текста
         /// </summary>
@@ -316,7 +352,7 @@ namespace GOST_Control
         /// <param name="paragraphs"></param>
         /// <param name="updateUI"></param>
         /// <returns></returns>
-        public async Task<(bool IsValid, List<TextErrorInfo> Errors)> CheckTextAlignmentAsync(string requiredAlignment, List<Paragraph> paragraphs, Action<string, IBrush> updateUI)
+        public async Task<(bool IsValid, List<TextErrorInfo> Errors)> CheckTextAlignmentAsync(string requiredAlignment, List<Paragraph> paragraphs, WordprocessingDocument doc, Action<string, IBrush> updateUI)
         {
             return await Task.Run(() =>
             {
@@ -328,17 +364,17 @@ namespace GOST_Control
                     if (_shouldSkipParagraph(paragraph))
                         continue;
 
-                    var currentAlignment = GetAlignmentString(paragraph.ParagraphProperties?.Justification) ?? DefaultTextAlignment;
+                    var (actualAlignment, isAlignmentDefined) = GetActualAlignment(paragraph, doc);
 
-                    if (currentAlignment != requiredAlignment)
+                    if (!isAlignmentDefined)
                     {
-                        string shortText = GetShortText(paragraph);
-                        tempErrors.Add(new TextErrorInfo
-                        {
-                            ErrorMessage = $"       • Абзац '{shortText}':\n              • выравнивание '{currentAlignment}' (требуется '{requiredAlignment}')",
-                            ProblemParagraph = paragraph,
-                            ProblemRun = null
-                        });
+                        AddAlignmentError(tempErrors, paragraph, "не удалось определить выравнивание");
+                        isValid = false;
+                    }
+                    else if (actualAlignment != requiredAlignment)
+                    {
+                        AddAlignmentError(tempErrors, paragraph,
+                            $"выравнивание '{actualAlignment}' (требуется '{requiredAlignment}')");
                         isValid = false;
                     }
                 }
@@ -350,6 +386,54 @@ namespace GOST_Control
                 return (isValid, tempErrors);
             });
         }
+
+        private (string Alignment, bool IsDefined) GetActualAlignment(Paragraph paragraph, WordprocessingDocument doc)
+        {
+            // 1. Проверяем явное выравнивание в параграфе
+            if (paragraph.ParagraphProperties?.Justification != null)
+            {
+                return (GetAlignmentString(paragraph.ParagraphProperties.Justification), true);
+            }
+
+            // 2. Проверяем стиль параграфа и его родителей
+            var paraStyleId = paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value;
+            if (paraStyleId != null)
+            {
+                var currentStyle = GetStyleById(paraStyleId);
+                while (currentStyle != null)
+                {
+                    if (currentStyle.StyleParagraphProperties?.Justification != null)
+                    {
+                        return (GetAlignmentString(currentStyle.StyleParagraphProperties.Justification), true);
+                    }
+                    currentStyle = currentStyle.BasedOn?.Val?.Value != null ? GetStyleById(currentStyle.BasedOn.Val.Value) : null;
+                }
+            }
+
+            // 3. Проверяем стиль Normal
+            var normalStyle = GetStyleById("Normal");
+            if (normalStyle?.StyleParagraphProperties?.Justification != null)
+            {
+                return (GetAlignmentString(normalStyle.StyleParagraphProperties.Justification), true);
+            }
+
+            return (DefaultTextAlignment, false);
+        }
+
+        private void AddAlignmentError(List<TextErrorInfo> errors, Paragraph paragraph, string errorMessage)
+        {
+            string shortText = GetShortText(paragraph);
+            if (!string.IsNullOrWhiteSpace(shortText))
+            {
+                errors.Add(new TextErrorInfo
+                {
+                    ErrorMessage = $"       • Абзац '{shortText}':\n              • {errorMessage}",
+                    ProblemParagraph = paragraph,
+                    ProblemRun = null
+                });
+            }
+        }
+
 
         /// <summary>
         /// Метод проверки размера шрифта
@@ -375,10 +459,9 @@ namespace GOST_Control
                     {
                         if (ShouldSkipRun(run)) continue;
 
-                        var fontSize = run.RunProperties?.FontSize?.Val?.Value;
-                        double actualSize = fontSize != null ? double.Parse(fontSize.ToString()) / 2 : DefaultTextSize;
+                        var (actualSize, isSizeDefined) = GetActualFontSize(run, paragraph);
 
-                        if (Math.Abs(actualSize - requiredFontSize) > 0.1)
+                        if (!isSizeDefined)
                         {
                             var runText = run.InnerText.Trim();
                             if (!string.IsNullOrWhiteSpace(runText))
@@ -386,7 +469,22 @@ namespace GOST_Control
                                 string shortText = runText.Length > 30 ? runText.Substring(0, 27) + "..." : runText;
                                 tempErrors.Add(new TextErrorInfo
                                 {
-                                    ErrorMessage = $"       • Текст '{shortText}':\n              •  размер {actualSize:F1} pt (требуется {requiredFontSize:F1} pt)",
+                                    ErrorMessage = $"       • Текст '{shortText}':\n              • не удалось определить размер шрифта",
+                                    ProblemRun = run,
+                                    ProblemParagraph = null
+                                });
+                                isValid = false;
+                            }
+                        }
+                        else if (Math.Abs(actualSize - requiredFontSize) > 0.1)
+                        {
+                            var runText = run.InnerText.Trim();
+                            if (!string.IsNullOrWhiteSpace(runText))
+                            {
+                                string shortText = runText.Length > 30 ? runText.Substring(0, 27) + "..." : runText;
+                                tempErrors.Add(new TextErrorInfo
+                                {
+                                    ErrorMessage = $"       • Текст '{shortText}':\n              • размер {actualSize:F1} pt (требуется {requiredFontSize:F1} pt)",
                                     ProblemRun = run,
                                     ProblemParagraph = null
                                 });
@@ -403,7 +501,54 @@ namespace GOST_Control
                 return (isValid, tempErrors);
             });
         }
-        
+
+        private (double Size, bool IsDefined) GetActualFontSize(Run run, Paragraph paragraph)
+        {
+            // 1. Проверяем явные свойства Run
+            var runSize = run.RunProperties?.FontSize?.Val?.Value;
+
+            if (runSize != null)
+                return (double.Parse(runSize.ToString()) / 2, true);
+
+            // 2. Проверяем стиль Run
+            var runStyleId = run.RunProperties?.RunStyle?.Val?.Value;
+
+            if (runStyleId != null)
+            {
+                var runStyle = GetStyleById(runStyleId);
+                if (runStyle?.StyleRunProperties?.FontSize?.Val?.Value != null)
+                    return (double.Parse(runStyle.StyleRunProperties.FontSize.Val.Value.ToString()) / 2, true);
+            }
+
+            // 3. Проверяем стиль Paragraph
+            var paraStyleId = paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value;
+
+            if (paraStyleId != null)
+            {
+                var currentStyle = GetStyleById(paraStyleId);
+                while (currentStyle != null)
+                {
+                    if (currentStyle.StyleRunProperties?.FontSize?.Val?.Value != null)
+                        return (double.Parse(currentStyle.StyleRunProperties.FontSize.Val.Value.ToString()) / 2, true);
+
+                    currentStyle = currentStyle.BasedOn?.Val?.Value != null ? GetStyleById(currentStyle.BasedOn.Val.Value) : null;
+                }
+            }
+
+            // 4. Проверяем Normal стиль
+            var normalStyle = GetStyleById("Normal");
+
+            if (normalStyle?.StyleRunProperties?.FontSize?.Val?.Value != null)
+                return (double.Parse(normalStyle.StyleRunProperties.FontSize.Val.Value.ToString()) / 2, true);
+
+            return (0, false);
+        }
+
+        private Style GetStyleById(string styleId)
+        {
+            return _wordDoc.MainDocumentPart.StyleDefinitionsPart?.Styles?.Elements<Style>().FirstOrDefault(s => s.StyleId.Value == styleId);
+        }
+
         /// <summary>
         /// Метод проверки шрифта
         /// </summary>
@@ -463,7 +608,7 @@ namespace GOST_Control
             if (paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value != null)
             {
                 var styleId = paragraph.ParagraphProperties.ParagraphStyleId.Val.Value;
-                var style = GetStyle(doc, styleId);
+                var style = GetStyleById(styleId);
                 return style?.StyleParagraphProperties?.Indentation;
             }
             return null;
@@ -474,15 +619,10 @@ namespace GOST_Control
             if (paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value != null)
             {
                 var styleId = paragraph.ParagraphProperties.ParagraphStyleId.Val.Value;
-                var style = GetStyle(doc, styleId);
+                var style = GetStyleById(styleId);
                 return style?.StyleParagraphProperties?.SpacingBetweenLines;
             }
             return null;
-        }
-
-        private Style GetStyle(WordprocessingDocument doc, string styleId)
-        {
-            return doc.MainDocumentPart?.StyleDefinitionsPart?.Styles.Elements<Style>().FirstOrDefault(s => s.StyleId == styleId);
         }
 
         /// <summary>

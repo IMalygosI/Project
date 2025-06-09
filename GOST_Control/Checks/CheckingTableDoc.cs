@@ -12,6 +12,7 @@ using DocumentFormat.OpenXml.Spreadsheet;
 using Run = DocumentFormat.OpenXml.Wordprocessing.Run;
 using Table = DocumentFormat.OpenXml.Wordprocessing.Table;
 using GOST_Control;
+using Text = DocumentFormat.OpenXml.Wordprocessing.Text;
 
 namespace GOST_Control
 {
@@ -134,8 +135,13 @@ namespace GOST_Control
         {
             if (captionParagraph == null) return false;
 
+            // Получаем только видимый текст, игнорируя поля SEQ
+            string text = GetVisibleText(captionParagraph).Trim();
+
+            // Очищаем текст от полей SEQ
+            text = CleanTableCaptionText(text);
+
             string pattern = @"^Таблица\s\d+\s*[-–]\s*\D.*";
-            string text = captionParagraph.InnerText.Trim();
 
             if (!Regex.IsMatch(text, pattern, RegexOptions.IgnoreCase))
             {
@@ -149,6 +155,21 @@ namespace GOST_Control
             }
 
             return true;
+        }
+
+        private string CleanTableCaptionText(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return text;
+
+            // Удаляем поля SEQ и лишние пробелы
+            text = Regex.Replace(text, @"SEQ Table \\\* ARABIC \d+", "").Trim();
+            text = Regex.Replace(text, @"\s+", " "); // Заменяем множественные пробелы на один
+            return text;
+        }
+
+        private string GetVisibleText(Paragraph paragraph)
+        {
+            return string.Concat(paragraph.Descendants<Text>().Select(t => t.Text));
         }
 
         /// <summary>

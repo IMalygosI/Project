@@ -34,6 +34,15 @@ namespace GOST_Control
             _gost = gost;
             _shouldSkipRun = shouldSkipRun;
         }
+        private string CleanCaptionText(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return text;
+
+            // Удаляем поля SEQ и лишние пробелы
+            text = Regex.Replace(text, @"SEQ Figure \\\* ARABIC \d+", "").Trim();
+            text = Regex.Replace(text, @"\s+", " "); // Заменяем множественные пробелы на один
+            return text;
+        }
 
         /// <summary>
         /// Проверяет изображения и их подписи на соответствие ГОСТу
@@ -499,9 +508,9 @@ namespace GOST_Control
                 {
                     Dispatcher.UIThread.Post(() => {
                         var groupedErrors = errors.GroupBy(e => e.ProblemParagraph).Select(g => new {
-                                Paragraph = g.Key,
-                                Caption = g.Key?.InnerText?.Trim() ?? "Неизвестный рисунок",
-                                Errors = g.ToList()
+                            Paragraph = g.Key,
+                            Caption = g.Key != null ? CleanCaptionText(GetVisibleText(g.Key)) : "Неизвестный рисунок",
+                            Errors = g.ToList()
                             });
 
                         var errorMessages = new List<string>();
@@ -514,7 +523,7 @@ namespace GOST_Control
                             errorMessages.Add($"Ошибки в подписях под изображение '{shortCaption}':");
 
                             // Добавляем первые 3 ошибки для этого рисунка
-                            errorMessages.AddRange(group.Errors.Take(300).Select(e => e.ErrorMessage));
+                            errorMessages.AddRange(group.Errors.Take(15).Select(e => e.ErrorMessage));
 
                             // Если ошибок больше 3, добавляем сообщение об этом
                             if (group.Errors.Count > 3)
@@ -859,12 +868,14 @@ namespace GOST_Control
         /// <returns></returns>
         private (bool IsValid, string CaptionText) CheckImageCaptionFormat(Paragraph captionParagraph, List<TextErrorInfo> errors)
         {
-            if (string.IsNullOrWhiteSpace(captionParagraph.InnerText))
+            // Получаем только видимый текст, игнорируя поля
+            string text = GetVisibleText(captionParagraph).Trim();
+
+            if (string.IsNullOrWhiteSpace(text))
             {
                 return (true, null);
             }
 
-            string text = captionParagraph.InnerText.Trim();
             string pattern = @"^Рисунок\s+\d+\s*[-–—]\s*.+";
             bool isValid = Regex.IsMatch(text, pattern, RegexOptions.IgnoreCase);
 
@@ -880,6 +891,11 @@ namespace GOST_Control
             }
 
             return (isValid, text);
+        }
+
+        private string GetVisibleText(Paragraph paragraph)
+        {
+            return string.Concat(paragraph.Descendants<Text>().Select(t => t.Text));
         }
 
         /// <summary>

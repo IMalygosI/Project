@@ -3,8 +3,16 @@
   "WorkspaceRootPath": "C:\\Users\\dimau\\Desktop\\\u0414\u0438\u043F\u043B\u043E\u043C \u0418\u0442\u043E\u0433\\Project\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{38027419-4475-4D13-8781-7F0DF1472C39}|GOST_Control\\GOST_Control.csproj|c:\\users\\dimau\\desktop\\\u0434\u0438\u043F\u043B\u043E\u043C \u0438\u0442\u043E\u0433\\project\\gost_control\\checks\\checklistdoctext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{38027419-4475-4D13-8781-7F0DF1472C39}|GOST_Control\\GOST_Control.csproj|solutionrelative:gost_control\\checks\\checklistdoctext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{38027419-4475-4D13-8781-7F0DF1472C39}|GOST_Control\\GOST_Control.csproj|c:\\users\\dimau\\desktop\\\u0434\u0438\u043F\u043B\u043E\u043C \u0438\u0442\u043E\u0433\\project\\gost_control\\views\\gost_\u0441heck.axaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{38027419-4475-4D13-8781-7F0DF1472C39}|GOST_Control\\GOST_Control.csproj|solutionrelative:gost_control\\views\\gost_\u0441heck.axaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{38027419-4475-4D13-8781-7F0DF1472C39}|GOST_Control\\GOST_Control.csproj|c:\\users\\dimau\\desktop\\\u0434\u0438\u043F\u043B\u043E\u043C \u0438\u0442\u043E\u0433\\project\\gost_control\\checks\\checkingimagedoc.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{38027419-4475-4D13-8781-7F0DF1472C39}|GOST_Control\\GOST_Control.csproj|solutionrelative:gost_control\\checks\\checkingimagedoc.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -27,12 +35,38 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "CheckListDocText.cs",
+              "DocumentMoniker": "C:\\Users\\dimau\\Desktop\\\u0414\u0438\u043F\u043B\u043E\u043C \u0418\u0442\u043E\u0433\\Project\\GOST_Control\\Checks\\CheckListDocText.cs",
+              "RelativeDocumentMoniker": "GOST_Control\\Checks\\CheckListDocText.cs",
+              "ToolTip": "C:\\Users\\dimau\\Desktop\\\u0414\u0438\u043F\u043B\u043E\u043C \u0418\u0442\u043E\u0433\\Project\\GOST_Control\\Checks\\CheckListDocText.cs",
+              "RelativeToolTip": "GOST_Control\\Checks\\CheckListDocText.cs",
+              "ViewState": "AgIAAGwCAAAAAAAAAAAmwF4CAABBAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-09T06:52:30.181Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "CheckingImageDoc.cs",
+              "DocumentMoniker": "C:\\Users\\dimau\\Desktop\\\u0414\u0438\u043F\u043B\u043E\u043C \u0418\u0442\u043E\u0433\\Project\\GOST_Control\\Checks\\CheckingImageDoc.cs",
+              "RelativeDocumentMoniker": "GOST_Control\\Checks\\CheckingImageDoc.cs",
+              "ToolTip": "C:\\Users\\dimau\\Desktop\\\u0414\u0438\u043F\u043B\u043E\u043C \u0418\u0442\u043E\u0433\\Project\\GOST_Control\\Checks\\CheckingImageDoc.cs",
+              "RelativeToolTip": "GOST_Control\\Checks\\CheckingImageDoc.cs",
+              "ViewState": "AgIAAHgDAAAAAAAAAAAiwAIAAAASAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-09T06:32:28.326Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
               "Title": "GOST_\u0421heck.axaml.cs",
               "DocumentMoniker": "C:\\Users\\dimau\\Desktop\\\u0414\u0438\u043F\u043B\u043E\u043C \u0418\u0442\u043E\u0433\\Project\\GOST_Control\\Views\\GOST_\u0421heck.axaml.cs",
               "RelativeDocumentMoniker": "GOST_Control\\Views\\GOST_\u0421heck.axaml.cs",
               "ToolTip": "C:\\Users\\dimau\\Desktop\\\u0414\u0438\u043F\u043B\u043E\u043C \u0418\u0442\u043E\u0433\\Project\\GOST_Control\\Views\\GOST_\u0421heck.axaml.cs",
               "RelativeToolTip": "GOST_Control\\Views\\GOST_\u0421heck.axaml.cs",
-              "ViewState": "AgIAAO4AAAAAAAAAAAAqwLgAAAAaAAAAAAAAAA==",
+              "ViewState": "AgIAAJ8CAAAAAAAAAAAIwLoCAABxAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-05-27T12:10:39.716Z",
               "EditorCaption": ""

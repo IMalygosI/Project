@@ -337,7 +337,7 @@ namespace GOST_Control
                 bool hasErrors = false;
 
                 // Получаем все стили документа
-                var allStyles = doc.MainDocumentPart?.StyleDefinitionsPart?.Styles?.Elements<Style>() ?.ToDictionary(s => s.StyleId.Value) ?? new Dictionary<string, Style>();
+                var allStyles = doc.MainDocumentPart?.StyleDefinitionsPart?.Styles?.Elements<Style>()?.ToDictionary(s => s.StyleId.Value) ?? new Dictionary<string, Style>();
 
                 foreach (var paragraph in paragraphs)
                 {
@@ -367,7 +367,7 @@ namespace GOST_Control
                             // Проверка типа интервала
                             if (!string.IsNullOrEmpty(gost.BulletLineSpacingType))
                             {
-                                string requiredType = gost.BulletLineSpacingType ?? DefaultListLineSpacingType;
+                                string requiredType = gost.BulletLineSpacingType;
                                 if (actualSpacingType != requiredType)
                                 {
                                     errorDetails.Add($"\n       • тип интервала: '{actualSpacingType}' (требуется '{requiredType}')");
@@ -479,7 +479,6 @@ namespace GOST_Control
                 {
                     if (!IsStrictListItem(paragraph)) continue;
 
-                    // ============ ПРОПУСКАЕМ ПУСТЫЕ АБЗАЦЫ ============
                     if (string.IsNullOrWhiteSpace(paragraph.InnerText?.Trim()))
                         continue;
 
@@ -488,7 +487,7 @@ namespace GOST_Control
                     bool paragraphHasError = false;
                     var errorDetails = new List<string>();
 
-                    // 1. Получаем ТРЕБУЕМЫЕ значения из ГОСТа для текущего уровня
+                    // Получаем ТРЕБУЕМЫЕ значения из ГОСТа для текущего уровня
                     double? gostRequiredIndent = level switch
                     {
                         1 => gost.ListLevel1Indent,
@@ -503,7 +502,6 @@ namespace GOST_Control
                         _ => null
                     };
 
-                    // Получаем требуемый отступ слева для текущего уровня
                     double? gostRequiredLeftIndent = level switch
                     {
                         1 => gost.ListLevel1BulletIndentLeft,
@@ -518,7 +516,6 @@ namespace GOST_Control
                         _ => null
                     };
 
-                    // Получаем требуемый отступ справа для текущего уровня
                     double? gostRequiredRightIndent = level switch
                     {
                         1 => gost.ListLevel1BulletIndentRight,
@@ -533,43 +530,41 @@ namespace GOST_Control
                         _ => null
                     };
 
-                    // Если для уровня нет специфичного требования, используем общее значение
                     gostRequiredIndent ??= gost.ListLevel1Indent;
                     gostRequiredLeftIndent ??= gost.ListLevel1BulletIndentLeft;
                     gostRequiredRightIndent ??= gost.ListLevel1BulletIndentRight;
 
-                    // 2. Получаем ФАКТИЧЕСКИЕ значения из документа
-                    double? leftIndentValue = indent?.Left?.Value != null ? TwipsToCm(double.Parse(indent.Left.Value)) : null;
-                    double? firstLineIndentValue = indent?.FirstLine?.Value != null ? TwipsToCm(double.Parse(indent.FirstLine.Value)) : null;
-                    double? hangingIndentValue = indent?.Hanging?.Value != null ? TwipsToCm(double.Parse(indent.Hanging.Value)) : null;
-                    double? rightIndentValue = indent?.Right?.Value != null ? TwipsToCm(double.Parse(indent.Right.Value)) : null;
+                    // Получаем ФАКТИЧЕСКИЕ значения из документа
+                    double leftIndentValue = indent?.Left?.Value != null ? TwipsToCm(double.Parse(indent.Left.Value)) : 0;
+                    double firstLineIndentValue = indent?.FirstLine?.Value != null ? TwipsToCm(double.Parse(indent.FirstLine.Value)) : 0;
+                    double hangingIndentValue = indent?.Hanging?.Value != null ? TwipsToCm(double.Parse(indent.Hanging.Value)) : 0;
+                    double rightIndentValue = indent?.Right?.Value != null ? TwipsToCm(double.Parse(indent.Right.Value)) : 0;
 
-                    // Определяем текущий тип и значение отступа
+                    // Определяем тип отступа первой строки
                     string currentType = "Нет";
-                    double? currentValue = null;
+                    double? currentFirstLineValue = null;
 
-                    if (hangingIndentValue != null && hangingIndentValue != 0)
+                    if (hangingIndentValue > 0)
                     {
                         currentType = "Выступ";
-                        currentValue = hangingIndentValue;
+                        currentFirstLineValue = hangingIndentValue;
                     }
-                    else if (firstLineIndentValue != null && firstLineIndentValue != 0)
+                    else if (firstLineIndentValue > 0)
                     {
                         currentType = "Отступ";
-                        currentValue = firstLineIndentValue;
+                        currentFirstLineValue = firstLineIndentValue;
                     }
-                    else // Если в документе не заданы отступы, используем значения по умолчанию
+                    else
                     {
                         currentType = GetRequiredIndentType(gost, level);
-                        currentValue = GetListLevelIndent(level);
+                        currentFirstLineValue = GetListLevelIndent(level);
                     }
 
-                    // 3. Проверяем только если в ГОСТе есть требования для отступов
+                    // Проверка отступа первой строки
                     if (gostRequiredIndent.HasValue)
                     {
                         string requiredType = GetRequiredIndentType(gost, level);
 
-                        // Проверка типа отступа
                         if (!string.IsNullOrEmpty(requiredType))
                         {
                             bool typeMatches = string.Equals(currentType, requiredType, StringComparison.OrdinalIgnoreCase);
@@ -580,40 +575,46 @@ namespace GOST_Control
                             }
                         }
 
-                        // Проверка значения отступа
-                        if (currentValue.HasValue)
+                        if (currentFirstLineValue.HasValue)
                         {
-                            double deviation = Math.Abs(currentValue.Value - gostRequiredIndent.Value);
+                            double deviation = Math.Abs(currentFirstLineValue.Value - gostRequiredIndent.Value);
                             if (deviation > 0.05)
                             {
-                                errorDetails.Add($"\n       • {currentType} первой строки: {currentValue.Value:F2} см (требуется {gostRequiredIndent.Value:F2} см)");
+                                errorDetails.Add($"\n       • {currentType} первой строки: {currentFirstLineValue.Value:F2} см (требуется {gostRequiredIndent.Value:F2} см)");
                                 paragraphHasError = true;
                             }
                         }
                     }
 
-                    // 4. Проверка левого отступа (теперь для каждого уровня)
+                    // Проверка левого отступа (учитывая отступ первой строки)
                     if (gostRequiredLeftIndent.HasValue)
                     {
-                        double actualLeft = leftIndentValue ?? GetListLevelIndentLeft(level);
-                        double requiredLeft = gostRequiredLeftIndent.Value;
+                        double actualLeftIndent;
 
-                        if (Math.Abs(actualLeft - requiredLeft) > 0.05)
+                        if (currentType == "Выступ")
                         {
-                            errorDetails.Add($"\n       • Левый отступ: {actualLeft:F2} см (требуется {requiredLeft:F2} см)");
+                            // Для выступа левый отступ текста = leftIndentValue - hangingIndentValue
+                            actualLeftIndent = leftIndentValue - hangingIndentValue;
+                        }
+                        else
+                        {
+                            // Для отступа или без отступа левый отступ текста = leftIndentValue
+                            actualLeftIndent = leftIndentValue;
+                        }
+
+                        if (Math.Abs(actualLeftIndent - gostRequiredLeftIndent.Value) > 0.05)
+                        {
+                            errorDetails.Add($"\n       • Левый отступ текста: {actualLeftIndent:F2} см (требуется {gostRequiredLeftIndent.Value:F2} см)");
                             paragraphHasError = true;
                         }
                     }
 
-                    // 5. Проверка правого отступа (теперь для каждого уровня)
+                    // Проверка правого отступа
                     if (gostRequiredRightIndent.HasValue)
                     {
-                        double actualRight = rightIndentValue ?? GetListLevelIndentRight(level);
-                        double requiredRight = gostRequiredRightIndent.Value;
-
-                        if (Math.Abs(actualRight - requiredRight) > 0.05)
+                        if (Math.Abs(rightIndentValue - gostRequiredRightIndent.Value) > 0.05)
                         {
-                            errorDetails.Add($"\n       • Правый отступ: {actualRight:F2} см (требуется {requiredRight:F2} см)");
+                            errorDetails.Add($"\n       • Правый отступ: {rightIndentValue:F2} см (требуется {gostRequiredRightIndent.Value:F2} см)");
                             paragraphHasError = true;
                         }
                     }
@@ -689,8 +690,9 @@ namespace GOST_Control
             }
 
             // 5. Стандартные значения для списков
-            return (DefaultListLineSpacingType, DefaultListLineSpacingValue, true);
+            return (DefaultListLineSpacingType, DefaultListLineSpacingValue, false);
         }
+
 
         private (double Before, double After, bool IsDefined) GetActualParagraphSpacingForList(Paragraph paragraph, Style paragraphStyle, Dictionary<string, Style> allStyles)
         {
@@ -831,7 +833,7 @@ namespace GOST_Control
             }
 
             // 3. Проверяем стиль списка (если есть)
-            var listStyle = GetListStyle(paragraph, doc); 
+            var listStyle = GetListStyle(paragraph, doc);
             if (listStyle != null)
             {
                 var listStyleFont = GetStyleFont(listStyle);

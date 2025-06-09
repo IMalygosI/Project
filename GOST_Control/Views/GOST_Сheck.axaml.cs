@@ -67,7 +67,6 @@ namespace GOST_Control
             {
                 _gostService = await Task.Run(() =>
                 {
-                    // Используйте полное имя ресурса, которое вы увидели в консоли
                     return new JsonGostService("GOST_Control.Resources.gosts.json", "gosts_modified.json");
                 });
 
@@ -271,7 +270,7 @@ namespace GOST_Control
                     if (!string.IsNullOrEmpty(gost.FontName) || gost.FontSize.HasValue)
                     {
                         var headerTexts = GetHeaderTexts(bodyParagraphsAfterTitle, gost);
-                        var checkingTextPlain = new CheckingPlainText((p) => ShouldSkipParagraph(p, headerTexts, gost));
+                        var checkingTextPlain = new CheckingPlainText(wordDoc, (p) => ShouldSkipParagraph(p, headerTexts, gost));
 
                         // === Проверка шрифта ===
                         if (!string.IsNullOrEmpty(gost.FontName))
@@ -320,7 +319,7 @@ namespace GOST_Control
                         {
                             checkTasks.Add(Task.Run(async () =>
                             {
-                                var (isValid, textAlignmentErrors) = await checkingTextPlain.CheckTextAlignmentAsync(gost.TextAlignment, bodyParagraphsAfterTitle, (text, brush) =>
+                                var (isValid, textAlignmentErrors) = await checkingTextPlain.CheckTextAlignmentAsync(gost.TextAlignment, bodyParagraphsAfterTitle, wordDoc, (text, brush) =>
                                 {
                                     Dispatcher.UIThread.Post(() =>
                                     {
