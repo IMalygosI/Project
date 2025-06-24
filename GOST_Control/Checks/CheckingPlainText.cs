@@ -18,7 +18,7 @@ namespace GOST_Control
     public class CheckingPlainText
     {
         // ======================= СТАНДАРТНЫЕ ЗНАЧЕНИЯ ДЛЯ ПРОСТОГО ТЕКСТА =======================
-        private const string DefaultTextFont = "Arial";
+        private const string DefaultTextFont = "Не обнаружен!";
         private const double DefaultTextSize = 11.0;
         private const string DefaultTextAlignment = "Left";
         private const string DefaultTextLineSpacingType = "Множитель";
